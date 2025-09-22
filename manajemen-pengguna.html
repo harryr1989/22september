@@ -8,7 +8,7 @@
     :root{
       --bg:#f6f8fb; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#0b63f3;
       --card:#fff; --bd:#e5e7eb; --muted:#64748b; --txt:#0f172a;
-      --blue:#1d4ed8; --amber:#d97706; --green:#16a34a; --red:#be123c;
+      --blue:#1d4ed8; --amber:#d97706; --green:#16a34a; --red:#be123c; --gray:#64748b;
       --shadow:0 6px 18px rgba(15,23,42,.08); --touch:48px; --radius:16px;
       --safe-bottom: env(safe-area-inset-bottom, 0);
     }
@@ -39,6 +39,7 @@
     .btn-primary{background:var(--pri);color:#fff}
     .btn-ghost{background:#f1f5f9}
     .btn-danger{background:#fee2e2;color:#991b1b}
+    .btn-gray{background:#eef2f6}
     .table{width:100%;border-collapse:separate;border-spacing:0 8px}
     .table th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;text-align:left;padding:0 10px}
     .rowcard{display:grid;grid-template-columns:200px 1fr 120px 140px 120px;gap:8px;align-items:center;background:#fff;border:1px solid var(--bd);border-radius:12px;padding:10px}
@@ -46,6 +47,8 @@
     .badge-owner{background:#0ea5e9}
     .badge-admin{background:#22c55e}
     .badge-kasir{background:#d97706}
+    .badge-pending{background:#06b6d4}
+    .badge-done{background:#94a3b8}
     .muted{color:#64748b}
     .hint{font-size:12px;color:#475569}
 
@@ -83,7 +86,6 @@
       <a href="master-saldo-akun.html">💳 Master Akun</a>
       <a href="transaksi-mini-atm.html">🏧 Mini ATM</a>
       <a class="active" href="manajemen-pengguna.html">⚙️ Manajemen</a>
-      <a id="menu-manajemen" href="manajemen-pengguna.html" style="display:none">⚙️ Manajemen</a>
       <a href="#" id="lnk-logout">🚪 Logout</a>
     </nav>
   </aside>
@@ -92,7 +94,7 @@
     <header>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <h2 style="margin:0;font-size:18px">Manajemen Pengguna</h2>
-        <span class="pill">Kelola cabang & user (owner)</span>
+        <span class="pill">Kelola cabang, user, & undangan (owner)</span>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <div id="me" class="pill">memuat…</div>
@@ -148,6 +150,26 @@
             <div id="usersList" style="display:grid;gap:8px"></div>
             <div id="noUser" class="muted" style="padding:8px 2px;display:none">Belum ada pengguna.</div>
           </div>
+        </div>
+      </div>
+
+      <!-- INVITES -->
+      <div class="section" id="invitesSection">
+        <h3>Undangan (Invites)</h3>
+        <div class="card">
+          <div class="toolbar">
+            <input id="qInvite" class="input" placeholder="Cari email / nama undangan…"/>
+            <select id="fltInviteStatus" class="input">
+              <option value="">Semua status</option>
+              <option value="pending">Pending</option>
+              <option value="done">Selesai/Dibatalkan</option>
+            </select>
+            <button id="btnRefreshInvites" class="btn btn-gray">↻ Refresh</button>
+            <span class="hint">Status <b>Pending</b> = belum dipakai. Tombol <b>Batalkan</b> akan menandai undangan sebagai terpakai agar tidak bisa digunakan.</span>
+          </div>
+
+          <div id="invitesList" style="display:grid;gap:8px"></div>
+          <div id="noInvite" class="muted" style="padding:8px 2px;display:none">Belum ada undangan.</div>
         </div>
       </div>
 
@@ -253,9 +275,10 @@
   const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: true, autoRefreshToken: true } });
 
   const $ = (id)=>document.getElementById(id)
+  const fmtDateTime = (s)=> s ? new Date(s).toLocaleString('id-ID', { dateStyle:'medium', timeStyle:'short' }) : '-'
 
   let gRole=null, gBranch=null, gMe=null
-  let branches=[], users=[]
+  let branches=[], users=[], invites=[]
 
   const showErr = (el, t)=>{ el.textContent=t; el.style.display='block'; setTimeout(()=>{el.style.display='none'},3500) }
   const showOk  = (el, t)=>{ el.textContent=t; el.style.display='block'; setTimeout(()=>{el.style.display='none'},2000) }
@@ -276,14 +299,16 @@
     $('me').textContent = `${prof.full_name || prof.email}`
     $('roleBadge').textContent = `role: ${prof.role}`
     $('branchBadge').textContent = `branch: ${prof.branch_code}`
-    const menuMgmt = document.getElementById('menu-manajemen')
-    if (menuMgmt) menuMgmt.style.display = (prof.role === 'owner') ? '' : 'none'
 
-    if(gRole!=='owner'){ $('btnAddBranch').style.display='none' }
+    if(gRole!=='owner'){
+      $('btnAddBranch').style.display='none'
+      const invSec = $('invitesSection'); if (invSec) invSec.style.display='none'
+    }
 
-    await Promise.all([loadBranches(), loadUsers()])
+    await Promise.all([loadBranches(), loadUsers(), loadInvites()])
     renderBranches()
     renderUsers()
+    renderInvites()
     fillBranchFilters()
   }
 
@@ -303,6 +328,16 @@
     const { data, error } = await query.order('full_name', { nullsFirst:true })
     if(error){ console.error(error); users=[]; return }
     users = data||[]
+  }
+
+  async function loadInvites(){
+    if(gRole!=='owner'){ invites=[]; return }
+    const { data, error } = await supabase
+      .from('invites')
+      .select('id,email,full_name,role,branch_code,invited_by,used_at,created_at')
+      .order('created_at', { ascending:false })
+    if(error){ console.error(error); invites=[]; return }
+    invites = data||[]
   }
 
   // ====== Render ======
@@ -362,6 +397,45 @@
     $('noUser').style.display = list.length ? 'none' : 'block'
   }
 
+  function renderInvites(){
+    const wrap = $('invitesList')
+    if(!wrap) return
+    const q = $('qInvite').value.trim().toLowerCase()
+    const fStatus = $('fltInviteStatus').value
+
+    const list = (invites||[]).filter(iv=>{
+      const matchesQ = !q || (iv.email||'').toLowerCase().includes(q) || (iv.full_name||'').toLowerCase().includes(q)
+      const status = iv.used_at ? 'done' : 'pending'
+      const matchesS = !fStatus || status===fStatus
+      return matchesQ && matchesS
+    })
+
+    wrap.innerHTML = list.map(iv=>{
+      const status = iv.used_at ? 'done' : 'pending'
+      const badge = status==='pending'
+        ? '<span class="badge badge-pending">PENDING</span>'
+        : '<span class="badge badge-done">SELESAI/DIBATALKAN</span>'
+      const actions = (status==='pending')
+        ? `<button class="btn btn-danger" onclick="cancelInvite('${iv.id}')">Batalkan</button>`
+        : `<span class="muted">-</span>`
+
+      return `
+        <div class="rowcard">
+          <div><strong>${iv.full_name || '-'}</strong></div>
+          <div class="muted">${iv.email}</div>
+          <div>${pillRole(iv.role)}</div>
+          <div><span class="pill">branch: ${iv.branch_code}</span></div>
+          <div>${badge}</div>
+          <div class="muted">Dibuat: ${fmtDateTime(iv.created_at)}</div>
+          <div class="muted">Dipakai/Dibatalkan: ${fmtDateTime(iv.used_at)}</div>
+          <div style="text-align:right">${actions}</div>
+        </div>
+      `
+    }).join('')
+
+    $('noInvite').style.display = list.length ? 'none' : 'block'
+  }
+
   function fillBranchFilters(){
     const sel = $('fltBranch'); const sel2 = $('u_branch')
     const opts = ['<option value="">Semua cabang</option>'].concat(
@@ -369,7 +443,6 @@
     )
     sel.innerHTML = opts.join('')
     sel2.innerHTML = (branches||[]).map(b=>`<option value="${b.code}">${b.name} (${b.code})</option>`).join('')
-    // default pilih cabang saat tambah user
     sel2.value = gBranch || ''
   }
 
@@ -382,6 +455,12 @@
   $('qUser').addEventListener('input', renderUsers)
   $('fltBranch').addEventListener('change', renderUsers)
   $('fltRole').addEventListener('change', renderUsers)
+
+  $('qInvite').addEventListener('input', renderInvites)
+  $('fltInviteStatus').addEventListener('change', renderInvites)
+  $('btnRefreshInvites').addEventListener('click', async ()=>{
+    await loadInvites(); renderInvites()
+  })
 
   // Tambah Cabang
   $('btnAddBranch').addEventListener('click', ()=>{
@@ -411,7 +490,7 @@
     setTimeout(()=>closeModal('modalBranch'), 600)
   })
 
-  // Tambah User
+  // Tambah User (create invite)
   $('btnAddUser').addEventListener('click', ()=>{
     if(!ensureOwner('menambah user')) return
     $('u_name').value=''; $('u_email').value=''; $('u_role').value='kasir'
@@ -423,7 +502,6 @@
   $('btnCloseUser').onclick = ()=>closeModal('modalUser')
   $('btnCancelUser').onclick = ()=>closeModal('modalUser')
 
-  // Simpan undangan user -> tabel invites
   $('btnSaveUser').addEventListener('click', async ()=>{
     if(!ensureOwner('menambah user')) return;
 
@@ -439,13 +517,13 @@
     if(!email || !branch){ showErrUser('Email & cabang wajib diisi'); return; }
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ showErrUser('Format email tidak valid'); return; }
 
-    // Cek: apakah sudah ada profil dengan email ini?
+    // Sudah jadi user?
     const { data: profExist, error: profErr } = await supabase
       .from('profiles').select('id').eq('email', email).maybeSingle();
     if (profErr){ showErrUser('Gagal cek profil: '+profErr.message); return; }
     if (profExist){ showErrUser('Email ini sudah terdaftar sebagai user.'); return; }
 
-    // Cek undangan aktif yang sama
+    // Sudah ada undangan aktif?
     const { data:exist, error:chk } = await supabase
       .from('invites').select('id, used_at')
       .eq('email', email).maybeSingle();
@@ -462,8 +540,18 @@
     if(ins){ showErrUser('Gagal membuat undangan: '+ins.message); return; }
 
     showOkUser('Undangan dibuat. Minta user daftar/login pakai email ini — role & cabang akan terisi otomatis.');
+    await loadInvites(); renderInvites()
     setTimeout(()=>{ closeModal('modalUser'); }, 1200);
   });
+
+  // Expose cancelInvite to window (dipakai di HTML onclick)
+  window.cancelInvite = async (id)=>{
+    if(!ensureOwner('membatalkan undangan')) return
+    if(!confirm('Batalkan undangan ini? Undangan akan ditandai sebagai terpakai dan tidak bisa digunakan.')) return
+    const { error } = await supabase.from('invites').update({ used_at: new Date().toISOString() }).eq('id', id)
+    if(error){ alert('Gagal membatalkan: '+error.message); return }
+    await loadInvites(); renderInvites()
+  }
 
   // Logout
   $('lnk-logout').addEventListener('click', async ()=>{
