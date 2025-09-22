@@ -21,6 +21,7 @@
     .nav a{color:var(--sbfg);text-decoration:none;padding:10px 12px;border-radius:10px}
     .nav a:hover{background:rgba(255,255,255,.10)}
     .nav a.active{background:var(--pri);color:#fff}
+
     header{position:sticky;top:0;z-index:9;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
     .content{padding:16px;max-width:1100px;margin:0 auto}
     .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px}
@@ -35,7 +36,7 @@
     .btn-ghost{background:#f1f5f9}
 
     .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .rowcard{display:grid;grid-template-columns:200px 1fr 120px 140px 120px;gap:8px;align-items:center;background:#fff;border:1px solid var(--bd);border-radius:12px;padding:10px}
+    .rowcard{display:grid;grid-template-columns:200px 1fr 140px 160px 220px;gap:8px;align-items:center;background:#fff;border:1px solid var(--bd);border-radius:12px;padding:10px}
     .muted{color:#64748b}
     .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800;color:#fff}
     .badge-owner{background:#0ea5e9}
@@ -53,7 +54,7 @@
     .error{display:none;background:#fee2e2;border:1px solid #fecaca;color:#991b1b;padding:10px;border-radius:10px}
     .ok{display:none;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:10px;border-radius:10px}
 
-    @media (max-width: 840px){
+    @media (max-width: 960px){
       .layout{grid-template-columns:1fr}
       .sidebar{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:10}
       .brand{margin:0}
@@ -81,7 +82,7 @@
     <header>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <h2 style="margin:0;font-size:18px">Manajemen Pengguna</h2>
-        <span class="pill">Tambah & Edit user (server-verified)</span>
+        <span class="pill">Tambah • Edit • Reset Password</span>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <div id="me" class="pill">memuat…</div>
@@ -295,6 +296,7 @@
   // ===== Edge Functions =====
   const FUNC_CREATE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/clever-processor";      // Buat user
   const FUNC_UPDATE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/super-endpoint";         // Edit user
+  const FUNC_RESET_URL  = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/admin-reset-password";   // Reset password
 
   const $ = (id)=>document.getElementById(id)
   const showErr = (el, t)=>{ el.textContent=t; el.style.display='block'; setTimeout(()=>{el.style.display='none'},3500) }
@@ -307,6 +309,7 @@
   function openModal(id){ $(id).style.display='flex' }
   function closeModal(id){ $(id).style.display='none' }
 
+  // ===== Boot =====
   async function boot(){
     const { data:{ session } } = await supabase.auth.getSession()
     if(!session){ location.href='login.html'; return }
@@ -325,12 +328,15 @@
     renderBranches(); renderUsers(); fillBranchFilters()
   }
 
+  // ===== Load data =====
   async function loadBranches(){
-    let q = supabase.from('branches').select('id,code,name')
-    if(gRole!=='owner') q = q.eq('code', gBranch)
-    const { data, error } = await q.order('name')
+    // Muat semua cabang untuk daftar & dropdown
+    const { data, error } = await supabase
+      .from('branches')
+      .select('id,code,name')
+      .order('name');
     if(error){ console.error(error); branches=[]; return }
-    branches = data||[]
+    branches = data || []
   }
 
   async function loadUsers(){
@@ -338,9 +344,10 @@
     if(gRole!=='owner') q = q.eq('branch_code', gBranch)
     const { data, error } = await q.order('full_name', { nullsFirst:true })
     if(error){ console.error(error); users=[]; return }
-    users = data||[]
+    users = data || []
   }
 
+  // ===== Render =====
   function renderBranches(){
     const q = $('qBranch').value.trim().toLowerCase()
     const list = (branches||[]).filter(b => !q || (b.name||'').toLowerCase().includes(q) || (b.code||'').toLowerCase().includes(q))
@@ -373,8 +380,9 @@
           <div class="muted">${u.email||'-'}</div>
           <div><span class="badge ${pill(u.role)}">${u.role}</span></div>
           <div><span class="pill">branch: ${u.branch_code||'-'}</span></div>
-          <div style="text-align:right">
+          <div style="text-align:right; display:flex; gap:6px; justify-content:flex-end">
             <button class="btn btn-ghost" data-edit="${u.id}">Edit</button>
+            ${gRole==='owner' ? `<button class="btn btn-ghost" data-reset="${u.id}">Reset PW</button>` : ``}
           </div>
         </div>`
     }).join('')
@@ -391,13 +399,13 @@
     selAdd.value = gBranch || ''
   }
 
-  // events filter
+  // ===== Events =====
   $('qBranch').addEventListener('input', renderBranches)
   $('qUser').addEventListener('input', renderUsers)
   $('fltBranch').addEventListener('change', renderUsers)
   $('fltRole').addEventListener('change', renderUsers)
 
-  // Tambah Cabang
+  // Cabang
   $('btnAddBranch').addEventListener('click', function(){
     $('b_name').value=''; $('b_code').value='';
     $('msgErrBranch').style.display='none'; $('msgOkBranch').style.display='none';
@@ -411,9 +419,11 @@
     const code = $('b_code').value.trim()
     if(!name || !code){ showErr($('msgErrBranch'),'Nama & Kode wajib'); return }
     if(/\s/.test(code)){ showErr($('msgErrBranch'),'Kode tanpa spasi'); return }
+
     const existRes = await supabase.from('branches').select('id').eq('code', code).maybeSingle()
     if(existRes.error){ showErr($('msgErrBranch'),'Cek kode: '+existRes.error.message); return }
     if(existRes.data){ showErr($('msgErrBranch'),'Kode sudah dipakai'); return }
+
     const ins = await supabase.from('branches').insert({ name, code })
     if(ins.error){ showErr($('msgErrBranch'),'Gagal tambah cabang: '+ins.error.message); return }
     showOk($('msgOkBranch'),'Cabang ditambahkan')
@@ -470,27 +480,54 @@
     }
   })
 
-  // Edit User - delegasi klik (tanpa TypeScript)
-  $('usersList').addEventListener('click', function(e){
+  // Edit & Reset: delegasi klik di daftar user
+  $('usersList').addEventListener('click', async function(e){
     var target = e.target;
     if(!(target instanceof Element)) return;
-    var btn = target.closest('[data-edit]');
-    if(!btn) return;
-    var id = btn.getAttribute('data-edit');
-    var u = (users||[]).find(function(x){ return x.id === id });
-    if(!u) return;
-    $('e_id').value = u.id;
-    $('e_name').value = u.full_name || '';
-    $('e_email').value = u.email || '';
-    $('e_role').value = u.role || 'kasir';
-    $('e_branch').value = u.branch_code || '';
-    $('msgErrEdit').style.display='none'; $('msgOkEdit').style.display='none';
-    openModal('modalEdit');
-  });
 
-  $('btnCloseEdit').onclick = function(){ closeModal('modalEdit') }
-  $('btnCancelEdit').onclick = function(){ closeModal('modalEdit') }
+    // Edit
+    var btnEdit = target.closest('[data-edit]');
+    if(btnEdit){
+      var id = btnEdit.getAttribute('data-edit');
+      var u = (users||[]).find(function(x){ return x.id === id });
+      if(!u) return;
+      $('e_id').value = u.id;
+      $('e_name').value = u.full_name || '';
+      $('e_email').value = u.email || '';
+      $('e_role').value = u.role || 'kasir';
+      $('e_branch').value = u.branch_code || '';
+      $('msgErrEdit').style.display='none'; $('msgOkEdit').style.display='none';
+      openModal('modalEdit');
+      return;
+    }
 
+    // Reset Password
+    var btnReset = target.closest('[data-reset]');
+    if(btnReset){
+      if(gRole!=='owner'){ alert('Hanya owner'); return }
+      var id = btnReset.getAttribute('data-reset');
+
+      const sess = await supabase.auth.getSession()
+      const session = sess && sess.data ? sess.data.session : null
+      if(!session){ alert('Session habis, login ulang'); return }
+
+      try{
+        const res = await fetch(FUNC_RESET_URL, {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json','Authorization': 'Bearer '+session.access_token },
+          body: JSON.stringify({ user_id:id })
+        })
+        const out = await res.json()
+        if(!res.ok){ alert(out.error || 'Gagal membuat link reset'); return }
+        try { await navigator.clipboard.writeText(out.reset_link || '') } catch(_e){}
+        alert('Link reset dibuat & disalin ke clipboard:\n\n'+ (out.reset_link || '(kosong)'))
+      }catch(err){
+        alert('Network error: '+ err.message)
+      }
+    }
+  })
+
+  // Simpan Edit
   $('btnSaveEdit').addEventListener('click', async function(){
     const id = $('e_id').value;
     const full_name = $('e_name').value.trim();
@@ -523,6 +560,10 @@
       showErrEdit('Network error: '+ e.message)
     }
   })
+
+  // Tutup modal Edit
+  $('btnCloseEdit').onclick = function(){ closeModal('modalEdit') }
+  $('btnCancelEdit').onclick = function(){ closeModal('modalEdit') }
 
   // Logout
   $('lnk-logout').addEventListener('click', async function(){
