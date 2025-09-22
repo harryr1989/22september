@@ -10,16 +10,13 @@
       --card:#fff; --bd:#e5e7eb; --muted:#64748b; --txt:#0f172a;
       --blue:#1d4ed8; --amber:#d97706; --yellow:#f59e0b; --red:#be123c;
       --shadow:0 6px 18px rgba(15,23,42,.08);
-      --touch:48px;
-      --radius:16px;
-      --safe-bottom: env(safe-area-inset-bottom, 0);
+      --touch:48px; --radius:16px; --safe-bottom: env(safe-area-inset-bottom, 0);
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt);-webkit-tap-highlight-color: transparent}
     button,input,select,textarea{font-family:inherit}
 
-    /* ===== LAYOUT ===== */
     .layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
     .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px}
     .brand{color:#fff;font-weight:800;font-size:20px;margin-bottom:12px}
@@ -57,7 +54,6 @@
     .muted{color:var(--muted);font-size:12px}
     .actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
 
-    /* ===== MODAL ===== */
     .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:50}
     .modal.show{display:flex}
     .dialog{width:min(760px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:92vh}
@@ -73,7 +69,6 @@
     .error{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:10px;border-radius:10px;display:none}
     .ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:10px;border-radius:10px;display:none}
 
-    /* ===== MOBILE OPTIMIZATION ===== */
     @media (max-width: 840px){
       .layout{grid-template-columns:1fr}
       .sidebar{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:11}
@@ -90,7 +85,6 @@
       .fab{display:flex}
     }
 
-    /* Floating Action Button (HP, owner only) */
     .fab{
       position:fixed;right:14px;bottom:calc(14px + var(--safe-bottom));
       width:56px;height:56px;border-radius:999px;background:var(--pri);color:#fff;
@@ -103,7 +97,6 @@
 <body>
 
 <div class="layout">
-  <!-- SIDEBAR / TOPBAR (mobile) -->
   <aside class="sidebar">
     <div class="brand">AMKO</div>
     <nav class="nav" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
@@ -114,12 +107,11 @@
     </nav>
   </aside>
 
-  <!-- MAIN -->
   <div>
     <header>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <h2 style="margin:0;font-size:18px">Master Akun Saldo</h2>
-        <span class="pill" style="font-size:11px">Owner: CRUD • Non-owner: edit Saldo/Saldo Awal (checklist)/Keterangan</span>
+        <span class="pill" style="font-size:11px">Owner: CRUD • Non-owner: edit Saldo/Saldo Awal/Keterangan</span>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <div id="me" class="pill">memuat…</div>
@@ -128,12 +120,13 @@
       </div>
     </header>
 
-    <!-- Sticky search controls -->
     <div class="topbar">
-      <!-- ROW: hanya owner yang melihat pemilih cabang -->
-      <div id="branchRow" style="display:none; margin-bottom:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+      <!-- IMPORTANT: default hide; JS akan show jika owner -->
+      <div id="branchRow" style="display:none; margin-bottom:10px; gap:8px; align-items:center; flex-wrap:wrap">
         <span style="font-size:12px;color:#475569;">Cabang</span>
-        <select id="branchSelect" class="input" style="width:260px;max-width:100%"></select>
+        <select id="branchSelect" class="input" style="width:260px;max-width:100%">
+          <option value="">Memuat cabang…</option>
+        </select>
       </div>
 
       <div class="searchbar">
@@ -146,17 +139,14 @@
       </div>
     </div>
 
-    <!-- GRID -->
     <div class="content">
       <div id="grid" class="grid"></div>
     </div>
   </div>
 </div>
 
-<!-- FAB: Owner only on mobile -->
 <button id="fabAdd" class="fab" title="Tambah">+</button>
 
-<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="dialog">
     <div class="dlg-hd">
@@ -189,7 +179,6 @@
         </div>
       </div>
 
-      <!-- Saldo + CHECKLIST Saldo Awal (single column on mobile) -->
       <div class="row" style="grid-template-columns:1fr">
         <div>
           <label>Saldo</label>
@@ -198,7 +187,6 @@
             <input id="m_saldo" inputmode="numeric" placeholder="0" />
           </div>
         </div>
-
         <div>
           <label>&nbsp;</label>
           <label class="icon-input" style="gap:10px">
@@ -225,23 +213,21 @@
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-  // Supabase project (punya kamu)
   const supabaseUrl = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
-  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91QW8mhfLQnaZHpCGkVo93Q3Ty03Y";
-
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
   const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: true, autoRefreshToken: true } });
 
   const $ = (id)=>document.getElementById(id)
   const fmtRp = n => "Rp " + new Intl.NumberFormat('id-ID').format(Number(n||0))
-  const TYPE_BADGE = t => t==='rekening' ? 'badge-bank'
-                         : t==='cash' ? 'badge-laci'
-                         : 'badge-server'
+  const TYPE_BADGE = t => t==='rekening' ? 'badge-bank' : t==='cash' ? 'badge-laci' : 'badge-server'
   const TYPE_LABEL = { rekening:'BANK', cash:'CASH', server_pulsa:'SERVER PULSA' }
 
-  let gRole=null, gBranch=null           // cabang default dari profil
-  let viewBranch=null                    // cabang yang sedang dipilih owner
+  let gRole=null, gBranch=null
+  let viewBranch=null
   let editId=null
   let cacheRows=[]
+
+  const isOwner = ()=> gRole === 'owner'  // setelah normalisasi
 
   const showErr = (t)=>{ const el=$('msgErr'); el.textContent=t; el.style.display='block'; setTimeout(()=>{el.style.display='none';},3500); }
   const showOk  = (t)=>{ const el=$('msgOk');  el.textContent=t; el.style.display='block'; setTimeout(()=>{el.style.display='none';},2000); }
@@ -259,8 +245,7 @@
     $('m_name').disabled=false
   }
 
-  // format ribuan input saldo
-  (function(){
+  ;(()=>{ // format ribuan
     const el = $('m_saldo')
     el.addEventListener('input', e=>{
       const raw = e.target.value.replace(/\D/g,'')
@@ -277,51 +262,59 @@
   async function boot(){
     const { data:{ session } } = await supabase.auth.getSession()
     if(!session){ location.href="login.html"; return }
+
     const { data: prof, error } = await supabase
       .from('profiles').select('role,branch_code,full_name,email')
       .eq('id', session.user.id).single()
     if(error){ alert("Gagal ambil profil: "+error.message); return }
-    gRole   = prof.role
-    gBranch = prof.branch_code
+
+    // 🔧 NORMALISASI ROLE (fix tampilan dropdown owner)
+    gRole   = (prof.role || '').toString().trim().toLowerCase()
+    gBranch = (prof.branch_code || '').toString().trim()
     viewBranch = gBranch
 
     $('me').textContent = `${prof.full_name || prof.email}`
-    $('roleBadge').textContent = `role: ${prof.role}`
-    $('branchBadge').textContent = `branch: ${viewBranch}`
+    $('roleBadge').textContent = `role: ${gRole}`
+    $('branchBadge').textContent = `branch: ${viewBranch || '-'}`
 
-    // Owner: tampilkan dropdown cabang & FAB
-    const fab = $('fabAdd');
-    if(gRole === 'owner'){
-      fab.style.display='flex'
-      $('branchRow').style.display='flex'
+    if(isOwner()){
+      $('fabAdd').style.display='flex'
+      $('branchRow').style.display='flex'  // tampilkan dropdown untuk owner
       await loadBranches()
     }else{
-      fab.style.display='none'
+      $('fabAdd').style.display='none'
       $('branchRow').style.display='none'
     }
 
     await loadAccounts()
   }
 
-  // Muat daftar cabang
   async function loadBranches(){
     const sel = $('branchSelect')
+    sel.innerHTML = `<option value="">Memuat cabang…</option>`
     let list = []
-    // Coba dari tabel branches (code,name)
+
+    // Coba dari tabel branches
     const { data: br, error: ebr } = await supabase.from('branches').select('code,name').order('name')
     if(!ebr && br && br.length){
-      list = br.map(b=>({code:b.code, name:b.name || b.code}))
+      list = br.map(b=>({code:(b.code||'').trim(), name:b.name || b.code}))
     }else{
       // Fallback: distinct dari accounts.branch_code
       const { data: accs, error: ea } = await supabase.from('accounts').select('branch_code').order('branch_code')
-      const set = new Set((accs||[]).map(a=>a.branch_code).filter(Boolean))
+      const set = new Set((accs||[]).map(a=>(a.branch_code||'').trim()).filter(Boolean))
       list = Array.from(set).map(code=>({code, name: code}))
-      // pastikan cabang profil tetap tersedia
       if(list.length===0 && gBranch){ list = [{code:gBranch, name:gBranch}] }
     }
 
+    if(list.length===0){
+      sel.innerHTML = `<option value="">(Belum ada cabang)</option>`
+      return
+    }
+
     sel.innerHTML = list.map(b=>`<option value="${b.code}">${b.code} — ${b.name}</option>`).join('')
-    sel.value = viewBranch
+    sel.value = viewBranch || list[0].code
+    if(!viewBranch) viewBranch = sel.value
+
     sel.onchange = ()=>{
       viewBranch = sel.value
       $('branchBadge').textContent = `branch: ${viewBranch}`
@@ -339,7 +332,7 @@
     if(error){ alert("Gagal ambil akun: "+error.message); return }
     cacheRows = data || []
 
-    // PIN Laci Tunai
+    // PIN Laci Tunai ke atas
     cacheRows.sort((a,b)=>{
       const aLaci = a.account_type==='cash' && (a.name||'').toLowerCase().includes('laci')
       const bLaci = b.account_type==='cash' && (b.name||'').toLowerCase().includes('laci')
@@ -362,9 +355,7 @@
       const updated  = a.updated_at ? new Date(a.updated_at).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '-'
       const isLaci   = a.account_type==='cash' && (a.name||'').toLowerCase().includes('laci')
 
-      const delBtn = (!isLaci && gRole==='owner')
-        ? `<button class="btn btn-danger" onclick="delAccount('${a.id}')">Hapus</button>`
-        : ``
+      const delBtn = (!isLaci && isOwner()) ? `<button class="btn btn-danger" onclick="delAccount('${a.id}')">Hapus</button>` : ``
 
       return `
         <div class="card">
@@ -391,26 +382,21 @@
     }).join('')
   }
 
-  // pencarian
   $('btnCari').onclick = ()=> renderCards(cacheRows)
   $('btnClear').onclick = ()=> { $('q').value=''; renderCards(cacheRows) }
   $('q').addEventListener('keydown', e => { if(e.key==='Enter') renderCards(cacheRows) })
 
-  // tambah
   function openAdd(){
-    if(gRole!=='owner'){ alert('Hanya Owner yang boleh menambah akun'); return }
+    if(!isOwner()){ alert('Hanya Owner yang boleh menambah akun'); return }
     openModal('Tambah Master Saldo')
   }
   $('btnAdd').onclick = openAdd
   $('fabAdd').onclick = openAdd
 
-  // modal
   $('btnClose').onclick = $('btnCancel').onclick = closeModal
 
-  // EDIT
   window.editAccount = async (id)=>{
-    const { data, error } = await supabase.from('accounts')
-      .select('*').eq('id', id).single()
+    const { data, error } = await supabase.from('accounts').select('*').eq('id', id).single()
     if(error){ alert(error.message); return }
     editId = id
     $('m_type').value  = data.account_type
@@ -419,40 +405,36 @@
     $('m_is_opening').checked = false
     $('m_note').value  = data.note||''
 
-    const nonOwner = (gRole !== 'owner');
+    const nonOwner = !isOwner();
     $('m_type').disabled = nonOwner
     $('m_name').disabled = nonOwner
 
     openModal('Edit Akun Saldo')
   }
 
-  // HAPUS (owner only + bukan Laci)
   window.delAccount = async (id)=>{
     const { data, error } = await supabase.from('accounts')
       .select('id,name,account_type').eq('id', id).single()
     if(error){ alert(error.message); return }
     const isLaci = data && data.account_type==='cash' && (data.name||'').toLowerCase().includes('laci')
     if(isLaci){ alert("Akun LACI TUNAI tidak dapat dihapus."); return }
-
-    if(gRole!=='owner'){ alert('Hanya Owner yang boleh menghapus akun'); return }
+    if(!isOwner()){ alert('Hanya Owner yang boleh menghapus akun'); return }
     if(!confirm('Yakin hapus akun ini?')) return
     const { error:errDel } = await supabase.from('accounts').delete().eq('id', id)
     if(errDel){ alert(errDel.message); return }
     loadAccounts()
   }
 
-  // SIMPAN
   $('btnSave').onclick = async ()=>{
     const type = $('m_type').value
     const name = $('m_name').value.trim()
     const saldo = Number(String($('m_saldo').value).replace(/[^0-9]/g,'')) || 0
     const makeOpening = $('m_is_opening').checked
     const note = $('m_note').value.trim()
-
     const cab = viewBranch || gBranch
 
     if(editId){
-      const nonOwner = (gRole !== 'owner');
+      const nonOwner = !isOwner();
       let patch = { account_type:type, name, saldo, note, updated_at:new Date().toISOString() }
       if(makeOpening) patch.saldo_awal = saldo
       if(nonOwner){
@@ -463,7 +445,7 @@
       if(error){ showErr('Simpan gagal: '+error.message); return }
       showOk('Berhasil diperbarui.')
     }else{
-      if(gRole!=='owner'){ alert('Hanya Owner yang boleh menambah akun'); return }
+      if(!isOwner()){ alert('Hanya Owner yang boleh menambah akun'); return }
       const isLaciCandidate = type==='cash' && /laci/i.test(name)
       if(isLaciCandidate){
         const { data: exist, error: errExist } = await supabase
@@ -472,7 +454,7 @@
         if(errExist){ showErr('Cek duplikasi gagal: '+errExist.message); return }
         if((exist||[]).length>0){ showErr('Akun LACI TUNAI sudah ada.'); return }
       }
-      const row = { account_type:type, name, saldo, saldo_awal: (makeOpening?saldo:0), branch_code:cab, note }
+      const row = { account_type:type, name, saldo, saldo_awal:(makeOpening?saldo:0), branch_code:cab, note }
       const { error } = await supabase.from('accounts').insert(row)
       if(error){ showErr('Simpan gagal: '+error.message); return }
       showOk('Berhasil ditambahkan.')
@@ -481,7 +463,6 @@
     loadAccounts()
   }
 
-  // logout
   document.getElementById('lnk-logout').addEventListener('click', async ()=>{
     await supabase.auth.signOut(); location.href="login.html"
   })
