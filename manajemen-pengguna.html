@@ -15,7 +15,6 @@
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt)}
     button,input,select,textarea{font-family:inherit}
 
-    /* Layout */
     .layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
     .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px}
     .brand{color:#fff;font-weight:800;font-size:20px;margin-bottom:12px}
@@ -27,7 +26,6 @@
     .content{padding:16px;max-width:1100px;margin:0 auto}
     .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px}
 
-    /* Sections / cards */
     .section{margin-top:16px}
     .section h3{margin:0 0 10px 0;font-size:18px}
     .card{background:var(--card);border:1px solid var(--bd);border-radius:18px;box-shadow:var(--shadow);padding:14px}
@@ -46,7 +44,6 @@
     .badge-admin{background:#22c55e}
     .badge-kasir{background:#d97706}
 
-    /* Modal (simple) */
     .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:50}
     .dialog{width:min(560px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column}
     .dlg-hd{background:#0ea5e9;color:#fff;padding:12px 16px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
@@ -58,7 +55,6 @@
     .error{display:none;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:10px;border-radius:10px}
     .ok{display:none;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:10px;border-radius:10px}
 
-    /* Mobile */
     @media (max-width: 840px){
       .layout{grid-template-columns:1fr}
       .sidebar{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:10}
@@ -87,7 +83,7 @@
     <header>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <h2 style="margin:0;font-size:18px">Manajemen Pengguna</h2>
-        <span class="pill">Owner menambah user langsung (server-verified)</span>
+        <span class="pill">Tambah & Edit user (server-verified)</span>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <div id="me" class="pill">memuat…</div>
@@ -224,7 +220,7 @@
           <span>🔑</span>
           <input id="u_password" placeholder="Minimal 6 karakter (atau kosongkan → auto-generate)"/>
         </div>
-        <div class="muted" style="font-size:12px;margin-top:6px">Jika dikosongkan, sistem akan membuat password sementara & menampilkan ke kamu, plus link reset password.</div>
+        <div class="muted" style="font-size:12px;margin-top:6px">Jika dikosongkan, sistem buat password sementara & kirim juga reset link.</div>
       </div>
     </div>
     <div class="dlg-ft">
@@ -234,16 +230,75 @@
   </div>
 </div>
 
+<!-- MODAL: Edit User -->
+<div class="modal" id="modalEdit">
+  <div class="dialog">
+    <div class="dlg-hd">
+      <span>Edit User</span>
+      <button class="btn btn-ghost" id="btnCloseEdit">✖</button>
+    </div>
+    <div class="dlg-bd">
+      <div class="error" id="msgErrEdit"></div>
+      <div class="ok" id="msgOkEdit"></div>
+
+      <input type="hidden" id="e_id"/>
+
+      <div class="row">
+        <div>
+          <label>Nama Lengkap</label>
+          <div class="icon-input">
+            <span>👤</span>
+            <input id="e_name" placeholder="Nama"/>
+          </div>
+        </div>
+        <div>
+          <label>Email (read-only)</label>
+          <div class="icon-input">
+            <span>✉️</span>
+            <input id="e_email" placeholder="email@contoh.com" readonly/>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Role</label>
+          <div class="icon-input">
+            <select id="e_role">
+              <option value="kasir">kasir</option>
+              <option value="admin">admin</option>
+              <option value="owner">owner</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label>Cabang</label>
+          <div class="icon-input">
+            <select id="e_branch"></select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dlg-ft">
+      <button class="btn" id="btnCancelEdit">Tutup</button>
+      <button class="btn btn-primary" id="btnSaveEdit">Simpan</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-  // ====== KONFIG SUPABASE (FRONTEND PAKAI ANON KEY) ======
+  // ===== Supabase (frontend pakai ANON) =====
   const supabaseUrl = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
   const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y"; // ANON
   const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: true, autoRefreshToken: true } });
 
-  // ====== EDGE FUNCTION (server) ======
-  const FUNC_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/clever-processor";
+  // ===== Edge Functions =====
+  // Buat user
+  const FUNC_CREATE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/clever-processor";
+  // Edit user
+  const FUNC_UPDATE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/super-endpoint";
 
   const $ = (id)=>document.getElementById(id)
   const showErr = (el, t)=>{ el.textContent=t; el.style.display='block'; setTimeout(()=>{el.style.display='none'},3500) }
@@ -256,7 +311,7 @@
   function openModal(id){ $(id).style.display='flex' }
   function closeModal(id){ $(id).style.display='none' }
 
-  // ====== BOOT ======
+  // ===== Boot =====
   async function boot(){
     const { data:{ session } } = await supabase.auth.getSession()
     if(!session){ location.href='login.html'; return }
@@ -275,10 +330,10 @@
     renderBranches(); renderUsers(); fillBranchFilters()
   }
 
-  // ====== LOAD ======
+  // ===== Load =====
   async function loadBranches(){
     let q = supabase.from('branches').select('id,code,name')
-    if(gRole!=='owner') q = q.eq('code', gBranch) // non owner hanya melihat cabangnya
+    if(gRole!=='owner') q = q.eq('code', gBranch)
     const { data, error } = await q.order('name')
     if(error){ console.error(error); branches=[]; return }
     branches = data||[]
@@ -292,7 +347,7 @@
     users = data||[]
   }
 
-  // ====== RENDER ======
+  // ===== Render =====
   function renderBranches(){
     const q = $('qBranch').value.trim().toLowerCase()
     const list = (branches||[]).filter(b => !q || (b.name||'').toLowerCase().includes(q) || (b.code||'').toLowerCase().includes(q))
@@ -324,26 +379,29 @@
         <div class="muted">${u.email||'-'}</div>
         <div><span class="badge ${pill(u.role)}">${u.role}</span></div>
         <div><span class="pill">branch: ${u.branch_code||'-'}</span></div>
-        <div style="text-align:right"><button class="btn btn-ghost" disabled>Detail</button></div>
+        <div style="text-align:right">
+          <button class="btn btn-ghost" data-edit="${u.id}">Edit</button>
+        </div>
       </div>`).join('')
     $('noUser').style.display = list.length ? 'none' : 'block'
   }
 
   function fillBranchFilters(){
-    const sel = $('fltBranch'); const sel2 = $('u_branch')
+    const sel = $('fltBranch'); const selAdd = $('u_branch'); const selEdit = $('e_branch')
     sel.innerHTML = ['<option value="">Semua cabang</option>']
       .concat((branches||[]).map(b=>`<option value="${b.code}">${b.name} (${b.code})</option>`)).join('')
-    sel2.innerHTML = (branches||[]).map(b=>`<option value="${b.code}">${b.name} (${b.code})</option>`).join('')
-    sel2.value = gBranch || ''
+    selAdd.innerHTML = (branches||[]).map(b=>`<option value="${b.code}">${b.name} (${b.code})</option>`).join('')
+    selEdit.innerHTML = selAdd.innerHTML
+    selAdd.value = gBranch || ''
   }
 
-  // ====== EVENTS ======
+  // ===== Events =====
   $('qBranch').addEventListener('input', renderBranches)
   $('qUser').addEventListener('input', renderUsers)
   $('fltBranch').addEventListener('change', renderUsers)
   $('fltRole').addEventListener('change', renderUsers)
 
-  // CABANG
+  // Tambah Cabang
   $('btnAddBranch').addEventListener('click', ()=>{
     $('b_name').value=''; $('b_code').value='';
     $('msgErrBranch').style.display='none'; $('msgOkBranch').style.display='none';
@@ -357,12 +415,9 @@
     const code = $('b_code').value.trim()
     if(!name || !code){ showErr($('msgErrBranch'),'Nama & Kode wajib'); return }
     if(/\s/.test(code)){ showErr($('msgErrBranch'),'Kode tanpa spasi'); return }
-
-    // Cek unik
     const { data:exist, error:errChk } = await supabase.from('branches').select('id').eq('code', code).maybeSingle()
     if(errChk){ showErr($('msgErrBranch'),'Cek kode: '+errChk.message); return }
     if(exist){ showErr($('msgErrBranch'),'Kode sudah dipakai'); return }
-
     const { error } = await supabase.from('branches').insert({ name, code })
     if(error){ showErr($('msgErrBranch'),'Gagal tambah cabang: '+error.message); return }
     showOk($('msgOkBranch'),'Cabang ditambahkan')
@@ -370,7 +425,7 @@
     setTimeout(()=>closeModal('modalBranch'), 700)
   })
 
-  // USER (Edge Function)
+  // Tambah User (function buat user)
   $('btnAddUser').addEventListener('click', ()=>{
     $('u_name').value=''; $('u_email').value='';
     $('u_role').value='kasir'; $('u_branch').value = gBranch || '';
@@ -388,7 +443,6 @@
     const branch_code = $('u_branch').value
     const password = $('u_password').value.trim()
     const errBox=$('msgErrUser'), okBox=$('msgOkUser')
-
     const showErrUser = (t)=>{ errBox.textContent=t; errBox.style.display='block'; okBox.style.display='none' }
     const showOkUser  = (t)=>{ okBox.textContent=t; okBox.style.display='block'; errBox.style.display='none' }
 
@@ -400,27 +454,69 @@
     if(!session){ showErrUser('Session habis, login ulang'); return }
 
     try{
-      const res = await fetch(FUNC_URL, {
+      const res = await fetch(FUNC_CREATE_URL, {
         method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
+        headers:{ 'Content-Type':'application/json','Authorization': `Bearer ${session.access_token}` },
         body: JSON.stringify({ email, full_name, role, branch_code, password: password || undefined })
       })
       const out = await res.json()
-      if(!res.ok){
-        showErrUser(out.error || 'Gagal membuat user'); return
-      }
+      if(!res.ok){ showErrUser(out.error || 'Gagal membuat user'); return }
       let msg = 'User berhasil dibuat.'
       if(out.temp_password){ msg += ` Password sementara: ${out.temp_password}` }
       if(out.reset_link){ msg += ` | Reset link: ${out.reset_link}` }
       showOkUser(msg)
       await loadUsers(); renderUsers()
       setTimeout(()=>closeModal('modalUser'), 1400)
-    }catch(e){
-      showErrUser('Network error: '+ e.message)
-    }
+    }catch(e){ showErrUser('Network error: '+e.message) }
+  })
+
+  // ===== Edit User =====
+  // Delegasi klik tombol Edit di daftar user
+  $('usersList').addEventListener('click', (e)=>{
+    const btn = (e.target as HTMLElement).closest('[data-edit]');
+    if(!btn) return;
+    const id = btn.getAttribute('data-edit');
+    const u = (users||[]).find(x => x.id === id);
+    if(!u) return;
+    $('e_id').value = u.id;
+    $('e_name').value = u.full_name || '';
+    $('e_email').value = u.email || '';
+    $('e_role').value = u.role || 'kasir';
+    $('e_branch').value = u.branch_code || '';
+    $('msgErrEdit').style.display='none'; $('msgOkEdit').style.display='none';
+    openModal('modalEdit');
+  });
+
+  $('btnCloseEdit').onclick = ()=>closeModal('modalEdit')
+  $('btnCancelEdit').onclick = ()=>closeModal('modalEdit')
+
+  $('btnSaveEdit').addEventListener('click', async ()=>{
+    const id = $('e_id').value;
+    const full_name = $('e_name').value.trim();
+    const role = $('e_role').value;
+    const branch_code = $('e_branch').value;
+    const errBox=$('msgErrEdit'), okBox=$('msgOkEdit')
+    const showErrEdit=(t)=>{ errBox.textContent=t; errBox.style.display='block'; okBox.style.display='none' }
+    const showOkEdit=(t)=>{ okBox.textContent=t; okBox.style.display='block'; errBox.style.display='none' }
+
+    if(!id){ showErrEdit('User tidak ditemukan'); return }
+    if(!branch_code){ showErrEdit('Cabang wajib diisi'); return }
+
+    const { data:{ session } } = await supabase.auth.getSession()
+    if(!session){ showErrEdit('Session habis, login ulang'); return }
+
+    try{
+      const res = await fetch(FUNC_UPDATE_URL, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}` },
+        body: JSON.stringify({ user_id:id, full_name, role, branch_code })
+      })
+      const out = await res.json()
+      if(!res.ok){ showErrEdit(out.error || 'Gagal menyimpan perubahan'); return }
+      showOkEdit('Perubahan disimpan')
+      await loadUsers(); renderUsers()
+      setTimeout(()=>closeModal('modalEdit'), 900)
+    }catch(e){ showErrEdit('Network error: '+e.message) }
   })
 
   // Logout
