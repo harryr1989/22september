@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AMKO • Login</title>
+  <style>
+    :root{--bg:#f7f7fb;--card:#fff;--ink:#1a1a1a;--muted:#6b7280;--primary:#ef4444;--primary-ink:#fff;--ring:#e5e7eb}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;color:var(--ink)}
+    .wrap{min-height:100vh;display:grid;place-items:center;padding:24px}
+    .card{width:min(420px,94vw);background:var(--card);border:1px solid var(--ring);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.06);padding:24px}
+    h1{margin:0 0 8px;font-size:22px}
+    p.sub{margin:0 0 20px;color:var(--muted);font-size:14px}
+    label{display:block;margin:12px 0 6px;font-weight:600;font-size:14px}
+    .field{position:relative}
+    input{width:100%;padding:12px 14px;border:1px solid var(--ring);border-radius:12px;font-size:15px;background:#fff;outline:none}
+    input:focus{border-color:#d1d5db;box-shadow:0 0 0 4px rgba(239,68,68,.08)}
+    .eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:13px;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;padding:6px 8px;border-radius:10px;user-select:none}
+    .row{display:flex;gap:12px}
+    .row>*{flex:1}
+    button{width:100%;padding:12px 14px;border:none;border-radius:12px;background:var(--primary);color:var(--primary-ink);font-weight:700;font-size:15px;cursor:pointer}
+    button[disabled]{opacity:.65;cursor:not-allowed}
+    .hint{font-size:12px;color:var(--muted);margin-top:8px}
+    .msg{margin-top:12px;font-size:14px;padding:10px 12px;border-radius:10px;display:none}
+    .msg.ok{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+    .msg.err{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+    .footer{margin-top:18px;font-size:12px;color:var(--muted);text-align:center}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Masuk ke AMKO</h1>
+      <p class="sub">Gunakan email & password yang terdaftar. Owner → Dashboard, selain owner → Master Saldo.</p>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="nama@email.com" autocomplete="username" required />
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
+        <span id="toggleEye" class="eye" title="Lihat/Sembunyikan">👁</span>
+      </div>
+
+      <button id="btnLogin">Masuk</button>
+      <div id="msgOk" class="msg ok"></div>
+      <div id="msgErr" class="msg err"></div>
+
+      <div class="footer">
+        <div class="hint">Tip: jika setelah login kembali ke halaman ini, cek <b>Auth → URL Configuration</b> di Supabase (Allowed Redirects harus berisi domain GitHub Pages kamu).</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    // === KONFIGURASI SUPABASE (PROJECT KAMU) ===
+    const SUPABASE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true }
+    });
+
+    // Elemen UI
+    const $ = (sel) => document.querySelector(sel);
+    const emailEl = $("#email");
+    const passEl = $("#password");
+    const btn = $("#btnLogin");
+    const msgOk = $("#msgOk");
+    const msgErr = $("#msgErr");
+    const eye = $("#toggleEye");
+
+    // Show/hide password
+    eye.addEventListener("click", () => {
+      const type = passEl.getAttribute("type") === "password" ? "text" : "password";
+      passEl.setAttribute("type", type);
+      eye.textContent = type === "password" ? "👁" : "🙈";
+    });
+
+    // Helper message
+    function show(el, text){ el.textContent = text; el.style.display = "block"; }
+    function hide(el){ el.style.display = "none"; el.textContent = ""; }
+    function clearMsgs(){ hide(msgOk); hide(msgErr); }
+
+    // Redirect sesuai role
+    async function redirectByRole() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return; // tidak login
+      // Ambil profil untuk cek role & branch_code
+      const { data, error } = await supabase.from("profiles")
+        .select("role, branch_code, full_name, email")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (error) {
+        show(msgErr, "Gagal membaca profil: " + (error.message || error));
+        return;
+      }
+      // Simpan legacy compatibility (opsional)
+      try {
+        const sess = await supabase.auth.getSession();
+        const exp = sess?.data?.session?.expires_at || Math.floor(Date.now()/1000) + 60*60;
+        localStorage.setItem("amko.auth", JSON.stringify({ user, profile: data }));
+        localStorage.setItem("amko.auth:exp", String(exp));
+      } catch (e) {}
+
+      if (data?.role === "owner") {
+        window.location.href = "dashboard.html";
+      } else {
+        window.location.href = "master-saldo-akun.html";
+      }
+    }
+
+    // Jika sudah login, langsung redirect
+    supabase.auth.getSession().then(({ data }) => {
+      if (data?.session) redirectByRole();
+    });
+
+    // Login handler
+    btn.addEventListener("click", async () => {
+      clearMsgs();
+      const email = (emailEl.value || "").trim();
+      const password = passEl.value || "";
+      if (!email || !password) {
+        show(msgErr, "Mohon isi email dan password.");
+        return;
+      }
+
+      btn.disabled = true;
+      try {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+
+        // Ambil profil & redirect
+        await redirectByRole();
+      } catch (e) {
+        console.error(e);
+        show(msgErr, e?.message || "Login gagal. Periksa email/password.");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // Enter submit
+    [emailEl, passEl].forEach(el => el.addEventListener("keydown", (ev) => {
+      if (ev.key === "Enter") btn.click();
+    }));
+  </script>
+</body>
+</html>
