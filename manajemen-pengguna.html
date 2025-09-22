@@ -295,10 +295,12 @@
   const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: true, autoRefreshToken: true } });
 
   // ===== Edge Functions =====
-  // Buat user
-  const FUNC_CREATE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/clever-processor";
-  // Edit user
-  const FUNC_UPDATE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/super-endpoint";
+// Buat user (sudah jalan)
+const FUNC_CREATE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/clever-processor";
+
+// Edit user (pakai endpoint barumu)
+const FUNC_UPDATE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/super-endpoint";
+
 
   const $ = (id)=>document.getElementById(id)
   const showErr = (el, t)=>{ el.textContent=t; el.style.display='block'; setTimeout(()=>{el.style.display='none'},3500) }
