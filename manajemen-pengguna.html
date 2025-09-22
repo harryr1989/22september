@@ -9,12 +9,13 @@
       --bg:#f6f8fb; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#0b63f3;
       --card:#fff; --bd:#e5e7eb; --muted:#64748b; --txt:#0f172a;
       --blue:#1d4ed8; --amber:#d97706; --green:#16a34a; --red:#be123c; --gray:#64748b;
-      --shadow:0 6px 18px rgba(15,23,42,.08); --touch:48px; --radius:16px;
+      --shadow:0 6px 18px rgba(15,23,42,.08);
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt)}
     button,input,select,textarea{font-family:inherit}
 
+    /* Layout */
     .layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
     .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px}
     .brand{color:#fff;font-weight:800;font-size:20px;margin-bottom:12px}
@@ -26,24 +27,38 @@
     .content{padding:16px;max-width:1100px;margin:0 auto}
     .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px}
 
+    /* Sections / cards */
     .section{margin-top:16px}
     .section h3{margin:0 0 10px 0;font-size:18px}
     .card{background:var(--card);border:1px solid var(--bd);border-radius:18px;box-shadow:var(--shadow);padding:14px}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
     .input{border:1px solid var(--bd);background:#fff;border-radius:10px;padding:10px 12px;font-size:15px;height:44px;outline:none}
     .btn{border:none;border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:700;height:44px}
     .btn-primary{background:var(--pri);color:#fff}
     .btn-ghost{background:#f1f5f9}
     .btn-danger{background:#fee2e2;color:#991b1b}
-    .table{width:100%;border-collapse:separate;border-spacing:0 8px}
+
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     .rowcard{display:grid;grid-template-columns:200px 1fr 120px 140px 120px;gap:8px;align-items:center;background:#fff;border:1px solid var(--bd);border-radius:12px;padding:10px}
+    .muted{color:#64748b}
     .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800;color:#fff}
     .badge-owner{background:#0ea5e9}
     .badge-admin{background:#22c55e}
     .badge-kasir{background:#d97706}
-    .muted{color:#64748b}
 
+    /* Modal (simple) */
+    .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:50}
+    .dialog{width:min(560px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column}
+    .dlg-hd{background:#0ea5e9;color:#fff;padding:12px 16px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+    .dlg-bd{padding:14px;display:grid;gap:12px}
+    .dlg-ft{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid var(--bd);background:#fafafa}
+    label{font-size:12px;color:#475569;margin-bottom:6px;display:block}
+    .icon-input{display:flex;gap:8px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:10px;background:#fff}
+    .icon-input input,.icon-input select{border:none;outline:none;flex:1;font-size:15px;background:transparent}
+    .error{display:none;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:10px;border-radius:10px}
+    .ok{display:none;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:10px;border-radius:10px}
+
+    /* Mobile */
     @media (max-width: 840px){
       .layout{grid-template-columns:1fr}
       .sidebar{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:10}
@@ -51,6 +66,7 @@
       .content{padding:12px}
       .row{grid-template-columns:1fr}
       .rowcard{grid-template-columns:1fr;gap:6px}
+      .toolbar{gap:6px}
     }
   </style>
 </head>
@@ -71,7 +87,7 @@
     <header>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <h2 style="margin:0;font-size:18px">Manajemen Pengguna</h2>
-        <span class="pill">Owner bisa tambah user langsung (tanpa undangan)</span>
+        <span class="pill">Owner menambah user langsung (server-verified)</span>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <div id="me" class="pill">memuat…</div>
@@ -90,9 +106,7 @@
             <button id="btnAddBranch" class="btn btn-primary">+ Tambah Cabang</button>
           </div>
           <div id="branchesWrap">
-            <table class="table">
-              <tbody id="branchesBody"></tbody>
-            </table>
+            <div id="branchesList" style="display:grid;gap:8px"></div>
             <div id="noBranch" class="muted" style="padding:8px 2px;display:none">Belum ada cabang.</div>
           </div>
         </div>
@@ -125,29 +139,32 @@
 </div>
 
 <!-- MODAL: Tambah Cabang -->
-<div class="modal" id="modalBranch" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,.45);align-items:center;justify-content:center;padding:12px;z-index:50">
-  <div class="dialog" style="width:min(560px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column">
-    <div class="dlg-hd" style="background:#0ea5e9;color:#fff;padding:12px 16px;font-weight:800;display:flex;justify-content:space-between;align-items:center">
+<div class="modal" id="modalBranch">
+  <div class="dialog">
+    <div class="dlg-hd">
       <span>Tambah Cabang</span>
       <button class="btn btn-ghost" id="btnCloseBranch">✖</button>
     </div>
-    <div class="dlg-bd" style="padding:14px;display:grid;gap:12px">
-      <div id="msgErrBranch" class="error" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:10px;border-radius:10px"></div>
-      <div id="msgOkBranch" class="ok" style="display:none;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:10px;border-radius:10px"></div>
+    <div class="dlg-bd">
+      <div id="msgErrBranch" class="error"></div>
+      <div id="msgOkBranch" class="ok"></div>
+
       <div>
         <label>Nama Cabang</label>
-        <div class="icon-input" style="display:flex;gap:8px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:10px;background:#fff">
-          <span>🏢</span><input id="b_name" placeholder="Contoh: Cabang Samarinda" style="border:none;outline:none;flex:1;font-size:15px;background:transparent"/>
+        <div class="icon-input">
+          <span>🏢</span>
+          <input id="b_name" placeholder="Contoh: Cabang Samarinda"/>
         </div>
       </div>
       <div>
         <label>Kode Cabang (unik, tanpa spasi)</label>
-        <div class="icon-input" style="display:flex;gap:8px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:10px;background:#fff">
-          <span>#</span><input id="b_code" placeholder="Contoh: SMR01" style="border:none;outline:none;flex:1;font-size:15px;background:transparent"/>
+        <div class="icon-input">
+          <span>#</span>
+          <input id="b_code" placeholder="Contoh: SMR01"/>
         </div>
       </div>
     </div>
-    <div class="dlg-ft" style="display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid var(--bd);background:#fafafa">
+    <div class="dlg-ft">
       <button class="btn" id="btnCancelBranch">Batal</button>
       <button class="btn btn-primary" id="btnSaveBranch">Simpan</button>
     </div>
@@ -155,36 +172,38 @@
 </div>
 
 <!-- MODAL: Tambah User -->
-<div class="modal" id="modalUser" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,.45);align-items:center;justify-content:center;padding:12px;z-index:50">
-  <div class="dialog" style="width:min(560px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column">
-    <div class="dlg-hd" style="background:#0ea5e9;color:#fff;padding:12px 16px;font-weight:800;display:flex;justify-content:space-between;align-items:center">
-      <span>Tambah User (Owner)</span>
+<div class="modal" id="modalUser">
+  <div class="dialog">
+    <div class="dlg-hd">
+      <span>Tambah User</span>
       <button class="btn btn-ghost" id="btnCloseUser">✖</button>
     </div>
-    <div class="dlg-bd" style="padding:14px;display:grid;gap:12px">
-      <div class="error" id="msgErrUser" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:10px;border-radius:10px"></div>
-      <div class="ok" id="msgOkUser" style="display:none;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:10px;border-radius:10px"></div>
+    <div class="dlg-bd">
+      <div class="error" id="msgErrUser"></div>
+      <div class="ok" id="msgOkUser"></div>
 
-      <div class="row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="row">
         <div>
           <label>Nama Lengkap</label>
-          <div class="icon-input" style="display:flex;gap:8px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:10px;background:#fff">
-            <span>👤</span><input id="u_name" placeholder="Nama" style="border:none;outline:none;flex:1;font-size:15px;background:transparent"/>
+          <div class="icon-input">
+            <span>👤</span>
+            <input id="u_name" placeholder="Nama"/>
           </div>
         </div>
         <div>
           <label>Email</label>
-          <div class="icon-input" style="display:flex;gap:8px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:10px;background:#fff">
-            <span>✉️</span><input id="u_email" placeholder="email@contoh.com" style="border:none;outline:none;flex:1;font-size:15px;background:transparent"/>
+          <div class="icon-input">
+            <span>✉️</span>
+            <input id="u_email" placeholder="email@contoh.com"/>
           </div>
         </div>
       </div>
 
-      <div class="row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="row">
         <div>
           <label>Role</label>
-          <div class="icon-input" style="display:flex;gap:8px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:10px;background:#fff">
-            <select id="u_role" style="border:none;outline:none;flex:1;font-size:15px;background:transparent">
+          <div class="icon-input">
+            <select id="u_role">
               <option value="kasir">kasir</option>
               <option value="admin">admin</option>
               <option value="owner">owner</option>
@@ -193,21 +212,22 @@
         </div>
         <div>
           <label>Cabang</label>
-          <div class="icon-input" style="display:flex;gap:8px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:10px;background:#fff">
-            <select id="u_branch" style="border:none;outline:none;flex:1;font-size:15px;background:transparent"></select>
+          <div class="icon-input">
+            <select id="u_branch"></select>
           </div>
         </div>
       </div>
 
       <div>
         <label>Password (opsional)</label>
-        <div class="icon-input" style="display:flex;gap:8px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:10px;background:#fff">
-          <span>🔑</span><input id="u_password" placeholder="Minimal 6 karakter (atau kosongkan → auto generate)" style="border:none;outline:none;flex:1;font-size:15px;background:transparent" />
+        <div class="icon-input">
+          <span>🔑</span>
+          <input id="u_password" placeholder="Minimal 6 karakter (atau kosongkan → auto-generate)"/>
         </div>
-        <div class="muted" style="font-size:12px;margin-top:6px">Jika dikosongkan, sistem akan membuat password sementara & menampilkan ke kamu. Ada juga link reset password untuk user.</div>
+        <div class="muted" style="font-size:12px;margin-top:6px">Jika dikosongkan, sistem akan membuat password sementara & menampilkan ke kamu, plus link reset password.</div>
       </div>
     </div>
-    <div class="dlg-ft" style="display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid var(--bd);background:#fafafa">
+    <div class="dlg-ft">
       <button class="btn" id="btnCancelUser">Tutup</button>
       <button class="btn btn-primary" id="btnSaveUser">Simpan</button>
     </div>
@@ -217,65 +237,74 @@
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-  // Project kamu
-const supabaseUrl = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y"; // ini anon, BUKAN service role
+  // ====== KONFIG SUPABASE (FRONTEND PAKAI ANON KEY) ======
+  const supabaseUrl = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y"; // ANON
+  const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: true, autoRefreshToken: true } });
 
-
-
-  // URL Edge Function
-const FUNC_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/clever-processor";
+  // ====== EDGE FUNCTION (server) ======
+  const FUNC_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/clever-processor";
 
   const $ = (id)=>document.getElementById(id)
+  const showErr = (el, t)=>{ el.textContent=t; el.style.display='block'; setTimeout(()=>{el.style.display='none'},3500) }
+  const showOk  = (el, t)=>{ el.textContent=t; el.style.display='block'; setTimeout(()=>{el.style.display='none'},2500) }
+  const pill = (r)=> r==='owner' ? 'badge-owner' : (r==='admin'?'badge-admin':'badge-kasir')
+
   let gRole=null, gBranch=null
   let branches=[], users=[]
 
   function openModal(id){ $(id).style.display='flex' }
   function closeModal(id){ $(id).style.display='none' }
-  const showErr = (el, t)=>{ el.textContent=t; el.style.display='block'; setTimeout(()=>{el.style.display='none'},3500) }
-  const showOk  = (el, t)=>{ el.textContent=t; el.style.display='block'; setTimeout(()=>{el.style.display='none'},2500) }
-  const pill = (r)=> r==='owner' ? 'badge-owner' : (r==='admin'?'badge-admin':'badge-kasir')
 
+  // ====== BOOT ======
   async function boot(){
     const { data:{ session } } = await supabase.auth.getSession()
     if(!session){ location.href='login.html'; return }
-    const { data: prof, error } = await supabase.from('profiles').select('id,full_name,email,role,branch_code').eq('id', session.user.id).single()
+
+    const { data: prof, error } = await supabase
+      .from('profiles').select('id,full_name,email,role,branch_code')
+      .eq('id', session.user.id).single()
     if(error){ alert('Gagal ambil profil: '+error.message); return }
+
     gRole = prof.role; gBranch = prof.branch_code
     $('me').textContent = `${prof.full_name || prof.email}`
     $('roleBadge').textContent = `role: ${prof.role}`
     $('branchBadge').textContent = `branch: ${prof.branch_code}`
 
-    if(gRole!=='owner'){ $('btnAddBranch').style.display='none' } // hanya owner
-
     await Promise.all([loadBranches(), loadUsers()])
     renderBranches(); renderUsers(); fillBranchFilters()
   }
 
+  // ====== LOAD ======
   async function loadBranches(){
     let q = supabase.from('branches').select('id,code,name')
-    if(gRole!=='owner') q = q.eq('code', gBranch)
-    const { data } = await q.order('name'); branches = data||[]
+    if(gRole!=='owner') q = q.eq('code', gBranch) // non owner hanya melihat cabangnya
+    const { data, error } = await q.order('name')
+    if(error){ console.error(error); branches=[]; return }
+    branches = data||[]
   }
 
   async function loadUsers(){
     let q = supabase.from('profiles').select('id,full_name,email,role,branch_code')
     if(gRole!=='owner') q = q.eq('branch_code', gBranch)
-    const { data } = await q.order('full_name', { nullsFirst:true }); users = data||[]
+    const { data, error } = await q.order('full_name', { nullsFirst:true })
+    if(error){ console.error(error); users=[]; return }
+    users = data||[]
   }
 
+  // ====== RENDER ======
   function renderBranches(){
     const q = $('qBranch').value.trim().toLowerCase()
     const list = (branches||[]).filter(b => !q || (b.name||'').toLowerCase().includes(q) || (b.code||'').toLowerCase().includes(q))
-    $('branchesBody').innerHTML = list.map(b=>`
-      <tr><td>
-        <div class="rowcard">
-          <div><strong>${b.name}</strong></div>
-          <div class="muted">Kode: ${b.code}</div>
-          <div>${(users||[]).filter(u=>u.branch_code===b.code).length} user</div>
-          <div></div><div style="text-align:right"><span class="muted">-</span></div>
-        </div>
-      </td></tr>`).join('')
+    $('branchesList').innerHTML = list.map(b=>`
+      <div class="rowcard">
+        <div><strong>${b.name}</strong></div>
+        <div class="muted">Kode: ${b.code}</div>
+        <div>${(users||[]).filter(u=>u.branch_code===b.code).length} user</div>
+        <div></div>
+        <div style="text-align:right"><span class="muted">-</span></div>
+      </div>
+    `).join('')
     $('noBranch').style.display = list.length ? 'none' : 'block'
   }
 
@@ -302,52 +331,64 @@ const FUNC_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/clever-p
 
   function fillBranchFilters(){
     const sel = $('fltBranch'); const sel2 = $('u_branch')
-    sel.innerHTML = ['<option value="">Semua cabang</option>'].concat((branches||[]).map(b=>`<option value="${b.code}">${b.name} (${b.code})</option>`)).join('')
+    sel.innerHTML = ['<option value="">Semua cabang</option>']
+      .concat((branches||[]).map(b=>`<option value="${b.code}">${b.name} (${b.code})</option>`)).join('')
     sel2.innerHTML = (branches||[]).map(b=>`<option value="${b.code}">${b.name} (${b.code})</option>`).join('')
     sel2.value = gBranch || ''
   }
 
-  // Events
+  // ====== EVENTS ======
   $('qBranch').addEventListener('input', renderBranches)
   $('qUser').addEventListener('input', renderUsers)
   $('fltBranch').addEventListener('change', renderUsers)
   $('fltRole').addEventListener('change', renderUsers)
 
-  // Cabang modal (opsional — sama seperti sebelumnya)
-  $('btnAddBranch').addEventListener('click', ()=>{ $('b_name').value=''; $('b_code').value=''; $('msgErrBranch').style.display='none'; $('msgOkBranch').style.display='none'; openModal('modalBranch') })
+  // CABANG
+  $('btnAddBranch').addEventListener('click', ()=>{
+    $('b_name').value=''; $('b_code').value='';
+    $('msgErrBranch').style.display='none'; $('msgOkBranch').style.display='none';
+    openModal('modalBranch')
+  })
   $('btnCloseBranch').onclick = ()=>closeModal('modalBranch')
   $('btnCancelBranch').onclick = ()=>closeModal('modalBranch')
+
   $('btnSaveBranch').addEventListener('click', async ()=>{
-    if(gRole!=='owner'){ alert('Hanya Owner'); return }
-    const name = $('b_name').value.trim(); const code = $('b_code').value.trim()
-    if(!name || !code) { showErr($('msgErrBranch'),'Nama & Kode wajib'); return }
-    if(/\s/.test(code)) { showErr($('msgErrBranch'),'Kode tanpa spasi'); return }
+    const name = $('b_name').value.trim()
+    const code = $('b_code').value.trim()
+    if(!name || !code){ showErr($('msgErrBranch'),'Nama & Kode wajib'); return }
+    if(/\s/.test(code)){ showErr($('msgErrBranch'),'Kode tanpa spasi'); return }
+
+    // Cek unik
     const { data:exist, error:errChk } = await supabase.from('branches').select('id').eq('code', code).maybeSingle()
     if(errChk){ showErr($('msgErrBranch'),'Cek kode: '+errChk.message); return }
     if(exist){ showErr($('msgErrBranch'),'Kode sudah dipakai'); return }
+
     const { error } = await supabase.from('branches').insert({ name, code })
-    if(error){ showErr($('msgErrBranch'),'Gagal tambah: '+error.message); return }
-    showOk($('msgOkBranch'),'Cabang ditambahkan'); await loadBranches(); renderBranches(); fillBranchFilters(); setTimeout(()=>closeModal('modalBranch'), 700)
+    if(error){ showErr($('msgErrBranch'),'Gagal tambah cabang: '+error.message); return }
+    showOk($('msgOkBranch'),'Cabang ditambahkan')
+    await loadBranches(); renderBranches(); fillBranchFilters()
+    setTimeout(()=>closeModal('modalBranch'), 700)
   })
 
-  // Tambah user (panggil Edge Function)
+  // USER (Edge Function)
   $('btnAddUser').addEventListener('click', ()=>{
-    if(gRole!=='owner'){ alert('Hanya Owner'); return }
-    $('u_name').value=''; $('u_email').value=''; $('u_role').value='kasir'; $('u_branch').value=gBranch||''; $('u_password').value=''
-    $('msgErrUser').style.display='none'; $('msgOkUser').style.display='none'
+    $('u_name').value=''; $('u_email').value='';
+    $('u_role').value='kasir'; $('u_branch').value = gBranch || '';
+    $('u_password').value='';
+    $('msgErrUser').style.display='none'; $('msgOkUser').style.display='none';
     openModal('modalUser')
   })
   $('btnCloseUser').onclick = ()=>closeModal('modalUser')
   $('btnCancelUser').onclick = ()=>closeModal('modalUser')
 
   $('btnSaveUser').addEventListener('click', async ()=>{
-    if(gRole!=='owner'){ alert('Hanya Owner'); return }
     const full_name = $('u_name').value.trim()
     const email = $('u_email').value.trim().toLowerCase()
     const role = $('u_role').value
     const branch_code = $('u_branch').value
     const password = $('u_password').value.trim()
     const errBox=$('msgErrUser'), okBox=$('msgOkUser')
+
     const showErrUser = (t)=>{ errBox.textContent=t; errBox.style.display='block'; okBox.style.display='none' }
     const showOkUser  = (t)=>{ okBox.textContent=t; okBox.style.display='block'; errBox.style.display='none' }
 
@@ -355,7 +396,6 @@ const FUNC_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/clever-p
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ showErrUser('Format email tidak valid'); return }
     if(password && password.length < 6){ showErrUser('Password minimal 6 karakter'); return }
 
-    // Token session utk Authorization Bearer
     const { data:{ session } } = await supabase.auth.getSession()
     if(!session){ showErrUser('Session habis, login ulang'); return }
 
@@ -374,7 +414,7 @@ const FUNC_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/clever-p
       }
       let msg = 'User berhasil dibuat.'
       if(out.temp_password){ msg += ` Password sementara: ${out.temp_password}` }
-      if(out.reset_link){ msg += ` | Link reset: ${out.reset_link}` }
+      if(out.reset_link){ msg += ` | Reset link: ${out.reset_link}` }
       showOkUser(msg)
       await loadUsers(); renderUsers()
       setTimeout(()=>closeModal('modalUser'), 1400)
