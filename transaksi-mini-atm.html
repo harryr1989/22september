@@ -383,7 +383,7 @@ const AUTH_KEY='amko.auth', EXP_KEY=AUTH_KEY+':exp', LOGIN_PAGE='login.html';
     if(exp && Date.now()>exp){ localStorage.removeItem(AUTH_KEY); localStorage.removeItem(EXP_KEY); }
     location.href=LOGIN_PAGE;
   }
-  document.body.setAttribute('data-role', (s?.role||'').toLowerCase());
+  document.body.setAttribute('data-role', s?.role||'');
 
   const root=document.documentElement, app=document.getElementById('root'), sidebar=document.getElementById('sidebar');
   document.getElementById('today').textContent=new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -415,13 +415,60 @@ const PAGE_SIZE=10;
 function loadJSON(k,def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def }catch{ return def } }
 function saveJSON(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
 
+
 /* ===== Multi-cabang ===== */
 const BR_KEY='amko.branches', USERS_KEY='amko.users';
 const AKUN_KEY='akun', TRANS_KEY='transMini';
 
-let branches = loadJSON(BR_KEY, []);
-if(!Array.isArray(branches) || !branches.length){ branches=['AMKO 18']; saveJSON(BR_KEY, branches); }
+// --- PATCH: kumpulkan cabang dari berbagai sumber localStorage agar sinkron dengan Manajemen Pengguna ---
+function safeJSON(v, fb){ try { return JSON.parse(v) } catch { return fb } }
 
+function collectBranchesFromLocal(){
+  const out=[];
+  const keys=['amko.branches','branches','AMKO_BRANCHES','amko.users','users','amko.manajemenPengguna','amko.accounts','accounts','amko.masterAkunSaldo'];
+  for(const k of keys){
+    const raw=localStorage.getItem(k); if(!raw) continue;
+    const data=safeJSON(raw,null); if(!data) continue;
+
+    // array of branch objects or strings
+    if(Array.isArray(data)){
+      for(const r of data){
+        if(typeof r==='string'){ const code=r.trim(); if(code) out.push(code); continue; }
+        const code=(r.code||r.branch||r.branch_code||'').toString().trim();
+        if(code) out.push(code);
+      }
+    }
+    // object with arrays
+    if(data && Array.isArray(data.branches)){
+      for(const r of data.branches){
+        const code=(r.code||r.branch||r.branch_code||'').toString().trim();
+        if(code) out.push(code);
+      }
+    }
+    if(Array.isArray(data.users)){
+      for(const u of data.users){
+        const code=(u.branch||u.branch_code||'').toString().trim();
+        if(code) out.push(code);
+      }
+    }
+    if(Array.isArray(data.accounts)){
+      for(const a of data.accounts){
+        const code=(a.branch||a.branch_code||'').toString().trim();
+        if(code) out.push(code);
+      }
+    }
+  }
+  const vb=(localStorage.getItem('view.branch')||'').trim(); if(vb) out.push(vb);
+  const mb=(localStorage.getItem('my.branch')||localStorage.getItem('myBranch')||'').trim(); if(mb) out.push(mb);
+  // dedup + sort
+  return Array.from(new Set(out.filter(Boolean))).sort((a,b)=>a.localeCompare(b));
+}
+
+let branches = collectBranchesFromLocal();
+if(!Array.isArray(branches) || !branches.length){ 
+  branches = loadJSON(BR_KEY, []); 
+}
+if(!Array.isArray(branches) || !branches.length){ branches=['AMKO 18']; saveJSON(BR_KEY, branches); }
 let session = loadJSON(AUTH_KEY,null);
 let users = loadJSON(USERS_KEY,[]).map(u=>({name2:'',...u}));
 const me = users.find(u => (u.username||'').toLowerCase()===(session?.username||'').toLowerCase());
@@ -517,7 +564,8 @@ function styleTableHeadByBranch(){
 function switchBranch(newBranch, persist=true){
   if(!newBranch) return;
   currentBranch = newBranch;
-  if(persist && isOwner){ localStorage.setItem('trans.branch', currentBranch); localStorage.setItem('view.branch', currentBranch); }
+  if(persist && isOwner) localStorage.setItem('trans.branch', currentBranch);
+  localStorage.setItem('view.branch', currentBranch);
   akun = loadAkunByBranch(currentBranch);
   transaksi = loadTransByBranch(currentBranch);
   const selBranch = document.getElementById('selBranch');
