@@ -83,6 +83,7 @@
       <a href="master-saldo-akun.html">💳 Master Akun</a>
       <a href="transaksi-mini-atm.html">🏧 Mini ATM</a>
       <a class="active" href="manajemen-pengguna.html">⚙️ Manajemen</a>
+      <a id="menu-manajemen" href="manajemen-pengguna.html" style="display:none">⚙️ Manajemen</a>
       <a href="#" id="lnk-logout">🚪 Logout</a>
     </nav>
   </aside>
@@ -116,9 +117,7 @@
               <thead>
                 <tr><th>Nama</th><th>Kode</th><th>Jumlah User</th><th>Aksi</th></tr>
               </thead>
-              <tbody id="branchesBody">
-                <!-- rows injected -->
-              </tbody>
+              <tbody id="branchesBody"></tbody>
             </table>
             <div id="noBranch" class="muted" style="padding:8px 2px;display:none">Belum ada cabang.</div>
           </div>
@@ -141,14 +140,12 @@
               <option value="kasir">kasir</option>
             </select>
             <button id="btnAddUser" class="btn btn-ghost">+ Tambah User</button>
-            <span class="hint">Tambah user perlu jalur “invite” (akan kita aktifkan di step berikutnya)</span>
+            <span class="hint">Simpan undangan → user daftar dengan email tsb → role & cabang otomatis</span>
           </div>
 
           <div id="usersWrap">
             <div class="muted" style="margin:6px 0">Menampilkan pengguna berdasarkan kebijakan akses (RLS) kamu.</div>
-            <div id="usersList" style="display:grid;gap:8px">
-              <!-- rowcards -->
-            </div>
+            <div id="usersList" style="display:grid;gap:8px"></div>
             <div id="noUser" class="muted" style="padding:8px 2px;display:none">Belum ada pengguna.</div>
           </div>
         </div>
@@ -191,18 +188,16 @@
   </div>
 </div>
 
-<!-- MODAL: Tambah User (UI only / disabled action) -->
+<!-- MODAL: Tambah User -->
 <div class="modal" id="modalUser">
   <div class="dialog">
     <div class="dlg-hd">
-      <span>Tambah User (UI)</span>
+      <span>Tambah User</span>
       <button class="btn btn-ghost" id="btnCloseUser">✖</button>
     </div>
     <div class="dlg-bd">
-      <div class="error" id="msgErrUser" style="display:block">
-        Untuk menambah user lewat UI, kita perlu jalur **invite** (admin API / edge function).  
-        Di versi wireframe ini, tombol Simpan dimatikan dulu agar aman. Kita aktifkan di step berikutnya. 🙂
-      </div>
+      <div class="error" id="msgErrUser" style="display:none"></div>
+      <div class="ok" id="msgOkUser" style="display:none"></div>
 
       <div class="row">
         <div>
@@ -240,11 +235,11 @@
         </div>
       </div>
 
-      <div class="hint">Nantinya: klik “Simpan” akan mengirim **undangan** (magic link) dan buat profile dengan role & cabang yang dipilih.</div>
+      <div class="hint">Setelah “Simpan”, minta user mendaftar/login dengan email yang sama di halaman login aplikasi ini.</div>
     </div>
     <div class="dlg-ft">
       <button class="btn" id="btnCancelUser">Tutup</button>
-      <button class="btn btn-primary" id="btnSaveUser" disabled>Simpan (nonaktif)</button>
+      <button class="btn btn-primary" id="btnSaveUser">Simpan</button>
     </div>
   </div>
 </div>
@@ -258,24 +253,14 @@
   const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: true, autoRefreshToken: true } });
 
   const $ = (id)=>document.getElementById(id)
-  const cls = (q)=>document.querySelector(q)
 
   let gRole=null, gBranch=null, gMe=null
   let branches=[], users=[]
 
   const showErr = (el, t)=>{ el.textContent=t; el.style.display='block'; setTimeout(()=>{el.style.display='none'},3500) }
   const showOk  = (el, t)=>{ el.textContent=t; el.style.display='block'; setTimeout(()=>{el.style.display='none'},2000) }
-
-  function pillRole(r){
-    if(r==='owner') return '<span class="badge badge-owner">owner</span>'
-    if(r==='admin') return '<span class="badge badge-admin">admin</span>'
-    return '<span class="badge badge-kasir">kasir</span>'
-  }
-
-  function ensureOwner(action){
-    if(gRole!=='owner'){ alert('Hanya Owner yang boleh '+action); return false }
-    return true
-  }
+  function pillRole(r){ if(r==='owner') return '<span class="badge badge-owner">owner</span>'; if(r==='admin') return '<span class="badge badge-admin">admin</span>'; return '<span class="badge badge-kasir">kasir</span>'; }
+  function ensureOwner(action){ if(gRole!=='owner'){ alert('Hanya Owner yang boleh '+action); return false } return true }
 
   // ====== Boot ======
   async function boot(){
@@ -287,14 +272,13 @@
       .eq('id', session.user.id).single()
     if(error){ alert('Gagal ambil profil: '+error.message); return }
 
-    gMe = prof
-    gRole = prof.role
-    gBranch = prof.branch_code
+    gMe = prof; gRole = prof.role; gBranch = prof.branch_code
     $('me').textContent = `${prof.full_name || prof.email}`
     $('roleBadge').textContent = `role: ${prof.role}`
     $('branchBadge').textContent = `branch: ${prof.branch_code}`
+    const menuMgmt = document.getElementById('menu-manajemen')
+    if (menuMgmt) menuMgmt.style.display = (prof.role === 'owner') ? '' : 'none'
 
-    // sembunyikan tombol tambah cabang untuk non-owner
     if(gRole!=='owner'){ $('btnAddBranch').style.display='none' }
 
     await Promise.all([loadBranches(), loadUsers()])
@@ -305,7 +289,6 @@
 
   // ====== Load Data ======
   async function loadBranches(){
-    // kalau RLS membatasi, owner boleh lihat semua; pengguna biasa bisa kita batasi per branch
     let query = supabase.from('branches').select('id,code,name')
     if(gRole!=='owner'){ query = query.eq('code', gBranch) }
     const { data, error } = await query.order('name')
@@ -314,7 +297,6 @@
   }
 
   async function loadUsers(){
-    // tampilkan user; untuk non-owner batasi ke branch sendiri
     let query = supabase.from('profiles')
       .select('id,full_name,email,role,branch_code')
     if(gRole!=='owner'){ query = query.eq('branch_code', gBranch) }
@@ -387,6 +369,8 @@
     )
     sel.innerHTML = opts.join('')
     sel2.innerHTML = (branches||[]).map(b=>`<option value="${b.code}">${b.name} (${b.code})</option>`).join('')
+    // default pilih cabang saat tambah user
+    sel2.value = gBranch || ''
   }
 
   // ====== Modal helpers ======
@@ -399,6 +383,7 @@
   $('fltBranch').addEventListener('change', renderUsers)
   $('fltRole').addEventListener('change', renderUsers)
 
+  // Tambah Cabang
   $('btnAddBranch').addEventListener('click', ()=>{
     if(!ensureOwner('menambah cabang')) return
     $('b_name').value=''; $('b_code').value=''
@@ -415,7 +400,6 @@
     if(!name || !code){ showErr($('msgErrBranch'), 'Nama & Kode wajib diisi'); return }
     if(/\s/.test(code)){ showErr($('msgErrBranch'),'Kode tidak boleh mengandung spasi'); return }
 
-    // Cek unik
     const { data:exist, error:errChk } = await supabase.from('branches').select('id').eq('code', code).maybeSingle()
     if(errChk){ showErr($('msgErrBranch'), 'Gagal cek kode: '+errChk.message); return }
     if(exist){ showErr($('msgErrBranch'), 'Kode sudah dipakai cabang lain'); return }
@@ -427,14 +411,59 @@
     setTimeout(()=>closeModal('modalBranch'), 600)
   })
 
+  // Tambah User
   $('btnAddUser').addEventListener('click', ()=>{
-    // UI saja dulu — aksi simpan dimatikan
+    if(!ensureOwner('menambah user')) return
     $('u_name').value=''; $('u_email').value=''; $('u_role').value='kasir'
-    $('msgErrUser').style.display='block'
+    $('u_branch').value = gBranch || ''
+    $('msgErrUser').style.display='none'
+    $('msgOkUser').style.display='none'
     openModal('modalUser')
   })
   $('btnCloseUser').onclick = ()=>closeModal('modalUser')
   $('btnCancelUser').onclick = ()=>closeModal('modalUser')
+
+  // Simpan undangan user -> tabel invites
+  $('btnSaveUser').addEventListener('click', async ()=>{
+    if(!ensureOwner('menambah user')) return;
+
+    const full_name = $('u_name').value.trim();
+    const email     = $('u_email').value.trim().toLowerCase();
+    const role      = $('u_role').value;
+    const branch    = $('u_branch').value;
+
+    const errBox = $('msgErrUser'), okBox = $('msgOkUser');
+    const showErrUser = (t)=>{ errBox.textContent=t; errBox.style.display='block'; okBox.style.display='none' }
+    const showOkUser  = (t)=>{ okBox.textContent=t; okBox.style.display='block'; errBox.style.display='none' }
+
+    if(!email || !branch){ showErrUser('Email & cabang wajib diisi'); return; }
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ showErrUser('Format email tidak valid'); return; }
+
+    // Cek: apakah sudah ada profil dengan email ini?
+    const { data: profExist, error: profErr } = await supabase
+      .from('profiles').select('id').eq('email', email).maybeSingle();
+    if (profErr){ showErrUser('Gagal cek profil: '+profErr.message); return; }
+    if (profExist){ showErrUser('Email ini sudah terdaftar sebagai user.'); return; }
+
+    // Cek undangan aktif yang sama
+    const { data:exist, error:chk } = await supabase
+      .from('invites').select('id, used_at')
+      .eq('email', email).maybeSingle();
+    if(chk){ showErrUser('Gagal cek undangan: '+chk.message); return; }
+    if(exist && !exist.used_at){ showErrUser('Undangan untuk email ini sudah dibuat.'); return; }
+
+    // Buat undangan
+    const { data: me } = await supabase.auth.getUser();
+    const invited_by = me?.user?.id || null;
+
+    const { error:ins } = await supabase.from('invites').insert({
+      email, full_name, role, branch_code: branch, invited_by
+    });
+    if(ins){ showErrUser('Gagal membuat undangan: '+ins.message); return; }
+
+    showOkUser('Undangan dibuat. Minta user daftar/login pakai email ini — role & cabang akan terisi otomatis.');
+    setTimeout(()=>{ closeModal('modalUser'); }, 1200);
+  });
 
   // Logout
   $('lnk-logout').addEventListener('click', async ()=>{
