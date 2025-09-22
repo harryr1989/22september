@@ -1,113 +1,168 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AMKO • Dashboard</title>
   <style>
-    :root{--sb-bg:#0d1b2a;--sb-fg:#cbd5e1;--sb-ac:#3b82f6;--sb-acfg:#fff}
-    body{margin:0;font-family:Inter,system-ui,Arial,Helvetica,sans-serif}
-    .layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
-    .sidebar{background:var(--sb-bg);color:var(--sb-fg);padding:16px 12px;position:sticky;top:0;height:100vh}
-    .brand{color:#fff;font-weight:700;font-size:18px;padding:8px 10px;margin-bottom:8px}
-    .nav{display:flex;flex-direction:column;gap:4px}
-    .nav a{color:var(--sb-fg);text-decoration:none;padding:10px 12px;border-radius:8px;display:flex;gap:10px;align-items:center}
-    .nav a:hover{background:rgba(255,255,255,.06)}
-    .nav a.active{background:var(--sb-ac);color:var(--sb-acfg)}
-    .nav .section{margin:10px 8px 4px;font-size:11px;letter-spacing:.04em;color:#94a3b8;text-transform:uppercase}
-    .main{background:#f5f7fa;min-height:100vh}
-    .main > header{background:#fff;border-bottom:1px solid #e5e7eb;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
-    .me-pill{background:#eef2ff;color:#1f2937;border-radius:999px;padding:4px 10px;font-size:12px}
-    @media(max-width:860px){
-      .layout{grid-template-columns:1fr}
-      .sidebar{position:fixed;left:-270px;transition:left .2s ease;z-index:30}
-      .sidebar.show{left:0}
-      .main{padding-top:52px}
-      .hamburger{position:fixed;left:12px;top:10px;z-index:40}
+    :root{
+      --bg:#f7f7fb;--card:#fff;--ink:#111827;--muted:#6b7280;
+      --ring:#e5e7eb;--primary:#ef4444;--good:#16a34a;--warn:#f59e0b
     }
-    .btn{border:none;border-radius:8px;padding:8px 12px;cursor:pointer}
-    .btn-ghost{background:#eef3ff}
-    .content{padding:16px}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif}
+    .app{min-height:100vh;display:grid;grid-template-rows:auto 1fr}
+    header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--ring);padding:12px 16px;display:flex;align-items:center;gap:12px;z-index:5}
+    .brand{font-weight:800;letter-spacing:.2px}
+    .spacer{flex:1}
+    .pill{padding:6px 10px;border:1px solid var(--ring);border-radius:999px;font-size:12px;color:#374151;background:#f9fafb}
+    .role{background:#fee2e2;border-color:#fecaca;color:#991b1b}
+    main{padding:20px;display:grid;gap:16px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+    .card{background:var(--card);border:1px solid var(--ring);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.06);padding:16px}
+    .card h3{margin:0 0 8px;font-size:16px}
+    .muted{color:var(--muted);font-size:13px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid var(--ring);background:#fff;cursor:pointer}
+    .btn.primary{background:var(--primary);color:#fff;border-color:#ef4444}
+    .btn.warn{background:#fff3; border-color:#f59e0b;color:#b45309}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .list{display:grid;gap:8px}
+    .item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1px solid var(--ring);border-radius:12px;background:#fff}
+    .small{font-size:12px;color:var(--muted)}
+    footer{padding:16px;text-align:center;color:var(--muted);font-size:12px}
   </style>
 </head>
 <body>
-  <script>window.__ACTIVE_SIDEBAR_KEY = 'dashboard';</script>
+<div class="app">
+  <header>
+    <div class="brand">AMKO • Dashboard</div>
+    <div class="spacer"></div>
+    <div id="badgeBranch" class="pill">Branch: …</div>
+    <div id="badgeUser" class="pill">User: …</div>
+    <div id="badgeRole" class="pill role">Role: …</div>
+    <button id="btnLogout" class="btn" title="Keluar">🚪 Logout</button>
+  </header>
 
-  <div class="layout">
-    <aside id="sb" class="sidebar">
-      <div class="brand">AMKO</div>
-      <div class="section">Menu</div>
-      <nav class="nav">
-        <a id="sb-dashboard" href="dashboard.html">🏠 Dashboard</a>
-        <a id="sb-master" href="master-saldo-akun.html">💳 Master Akun Saldo</a>
-        <a id="sb-atm" href="transaksi-mini-atm.html">🏧 Transaksi Mini ATM</a>
-        <a id="sb-users" href="manajemen-pengguna.html" style="display:none">👥 Manajemen Pengguna</a>
-        <a id="sb-logout" href="#" onclick="return false;">🚪 Logout</a>
-      </nav>
-    </aside>
+  <main>
+    <div class="grid">
+      <div class="card">
+        <h3>Langkah Cepat</h3>
+        <div class="row">
+          <a class="btn primary" href="master-saldo-akun.html">📒 Master Akun Saldo</a>
+          <a class="btn" href="login.html">🔑 Login</a>
+        </div>
+        <p class="muted">Tip: Owner bisa menambah/ubah akun saldo di halaman Master. Non-owner hanya baca.</p>
+      </div>
 
-    <div class="main">
-      <header>
-        <button class="btn btn-ghost hamburger" onclick="document.getElementById('sb').classList.toggle('show')">☰</button>
-        <div id="page_title">Dashboard</div>
-        <div class="me-pill" id="me_badge">Memuat…</div>
-      </header>
+      <div class="card">
+        <h3>Status Singkat</h3>
+        <div class="list">
+          <div class="item"><span>Cabang aktif</span><span id="vBranch" class="small">—</span></div>
+          <div class="item"><span>Nama lengkap</span><span id="vName" class="small">—</span></div>
+          <div class="item"><span>Email</span><span id="vEmail" class="small">—</span></div>
+          <div class="item"><span>Peran</span><span id="vRole" class="small">—</span></div>
+        </div>
+      </div>
 
-      <!-- ====== KONTEN DASHBOARD ====== -->
-      <div class="content">
-        <h2>Selamat datang di Dashboard</h2>
-        <p>Ini adalah halaman ringkasan operasional AMKO.</p>
-        <!-- tambahkan widget ringkasan sesuai kebutuhan -->
+      <div class="card">
+        <h3>Ringkas Akun (per cabang)</h3>
+        <div class="list">
+          <div class="item"><span>Cash (Laci Tunai)</span><span id="vCash" class="small">—</span></div>
+          <div class="item"><span>Rekening</span><span id="vBank" class="small">—</span></div>
+          <div class="item"><span>Server Pulsa</span><span id="vPulsa" class="small">—</span></div>
+        </div>
+        <p class="muted">Angka menunjukkan jumlah akun (bukan saldo). Sumber: tabel <code>accounts</code>.</p>
       </div>
     </div>
-  </div>
+  </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-  dashboard
+  <footer>© AMKO • Terhubung Supabase</footer>
+</div>
 
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+<script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    async function initSidebar(activeKey, pageTitle){
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { location.href = 'login.html'; return; }
+  // === Konfigurasi Supabase (punya kamu) ===
+  const SUPABASE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: true, autoRefreshToken: true } });
 
-      const { data: p, error } = await supabase
-        .from('profiles').select('full_name, role, branch_code, email').eq('id', user.id).single();
+  const $ = (s)=>document.querySelector(s);
+  const badgeBranch = $("#badgeBranch");
+  const badgeUser = $("#badgeUser");
+  const badgeRole = $("#badgeRole");
+  const vBranch = $("#vBranch");
+  const vName = $("#vName");
+  const vEmail = $("#vEmail");
+  const vRole = $("#vRole");
+  const vCash = $("#vCash");
+  const vBank = $("#vBank");
+  const vPulsa = $("#vPulsa");
+  const btnLogout = $("#btnLogout");
 
-      if (error) { console.error(error); alert('Gagal ambil profil'); return; }
-      // Refresh legacy localStorage session for pages that still check it
-      try {
-        const legacyAuth = {
-          username: user.email,
-          name: p.full_name || p.email,
-          role: p.role,
-          branch: p.branch_code
-        };
-        localStorage.setItem('amko.auth', JSON.stringify(legacyAuth));
-        localStorage.setItem('amko.auth:exp', String(Date.now() + 12*60*60*1000));
-      } catch(_) {}
-    
+  // Redirect ke login jika belum login
+  const { data: sess } = await supabase.auth.getSession();
+  if (!sess.session) {
+    location.href = "login.html";
+  }
 
-      document.getElementById('me_badge').textContent =
-        `${p.role} • ${p.full_name || p.email} • ${p.branch_code || '-'}`;
+  // Ambil profil user
+  const { data: userRes } = await supabase.auth.getUser();
+  const user = userRes?.user;
+  try {
+    const { data: prof, error } = await supabase
+      .from("profiles")
+      .select("full_name, email, role, branch_code")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (error) throw error;
 
-      if (p.role === 'owner') document.getElementById('sb-users').style.display = 'block';
+    const name = prof?.full_name || (user?.email ?? "Pengguna");
+    const email = prof?.email || user?.email || "-";
+    const role = prof?.role || "admin";
+    const branch = prof?.branch_code || "-";
+    // Tampilkan badge & status
+    badgeBranch.textContent = "Branch: " + branch;
+    badgeUser.textContent = "User: " + name;
+    badgeRole.textContent = "Role: " + role;
+    vBranch.textContent = branch;
+    vName.textContent = name;
+    vEmail.textContent = email;
+    vRole.textContent = role;
 
-      const idMap = { dashboard: 'sb-dashboard', master: 'sb-master', atm: 'sb-atm', users: 'sb-users' };
-      const el = document.getElementById(idMap[activeKey]);
-      if (el) el.classList.add('active');
+    // Simpan legacy (opsional) agar halaman lain kompatibel
+    try {
+      const exp = sess?.session?.expires_at || Math.floor(Date.now()/1000) + 3600;
+      localStorage.setItem("amko.auth", JSON.stringify({ user, profile: prof }));
+      localStorage.setItem("amko.auth:exp", String(exp));
+    } catch {}
 
-      document.getElementById('page_title').textContent = pageTitle;
+    // Hitung jumlah akun per tipe di cabang user
+    const { data: counts, error: e2 } = await supabase
+      .from("accounts")
+      .select("account_type", { count: "exact", head: false })
+      .eq("branch_code", branch);
+    if (e2) throw e2;
+    const agg = { cash:0, rekening:0, server_pulsa:0 };
+    (counts||[]).forEach(r => { agg[r.account_type] = (agg[r.account_type]||0) + 1; });
+    vCash.textContent = String(agg.cash);
+    vBank.textContent = String(agg.rekening);
+    vPulsa.textContent = String(agg.server_pulsa);
 
-      document.getElementById('sb-logout').onclick = async () => {
-        await supabase.auth.signOut();
-        location.href = 'login.html';
-      };
-    }
+  } catch (e) {
+    console.error(e);
+    alert("Gagal memuat profil/akun. Periksa RLS dan struktur tabel.\n" + (e?.message || e));
+  }
 
-    initSidebar(window.__ACTIVE_SIDEBAR_KEY || 'dashboard', 'Dashboard');
-  </script>
+  // Logout
+  btnLogout.addEventListener("click", async () => {
+    btnLogout.disabled = true;
+    await supabase.auth.signOut();
+    localStorage.removeItem("amko.auth");
+    localStorage.removeItem("amko.auth:exp");
+    location.href = "login.html";
+  });
+</script>
 </body>
 </html>
