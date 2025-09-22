@@ -8,7 +8,7 @@
     :root{
       --bg:#ecf1f7; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#1363df;
       --card:#fff; --bd:#e5e7eb; --muted:#64748b; --txt:#0f172a;
-      --blue:#1d4ed8; --amber:#d97706; --yellow:#f59e0b; --red:#be123c; --green:#16a34a;
+      --blue:#1d4ed8; --amber:#d97706; --yellow:#f59e0b; --red:#be123c;
       --shadow:0 6px 18px rgba(15,23,42,.08);
     }
     *{box-sizing:border-box}
@@ -78,7 +78,7 @@
     <header>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <h2 style="margin:0">Master Akun Saldo</h2>
-        <span class="hint">Owner: CRUD penuh • Non-owner: boleh edit <b>Saldo</b>, <b>Saldo Awal</b> (via checklist), <b>Keterangan</b>; tidak boleh Tambah/Hapus/ubah Nama/Jenis</span>
+        <span class="hint">Owner: CRUD penuh • Non-owner: boleh edit <b>Saldo</b>, set <b>Saldo Awal</b> via checklist, & <b>Keterangan</b>; tidak boleh Tambah/Hapus/ubah Nama/Jenis</span>
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <div id="me" class="pill">memuat…</div>
@@ -134,8 +134,8 @@
         </div>
       </div>
 
-      <!-- Saldo + CHECKLIST Saldo Awal -->
-      <div class="row">
+      <!-- Saldo + CHECKLIST Saldo Awal (1 kolom agar pasti terlihat di HP) -->
+      <div class="row" style="grid-template-columns:1fr">
         <div>
           <label>Saldo</label>
           <div class="icon-input">
@@ -143,6 +143,7 @@
             <input id="m_saldo" inputmode="numeric" placeholder="0" />
           </div>
         </div>
+
         <div>
           <label>&nbsp;</label>
           <label class="icon-input" style="gap:10px">
@@ -320,12 +321,12 @@
     $('m_type').value  = data.account_type
     $('m_name').value  = data.name
     $('m_saldo').value = new Intl.NumberFormat('id-ID').format(Number(data.saldo||0))
-    $('m_is_opening').checked = false       // default: tidak set saldo_awal dari saldo
+    $('m_is_opening').checked = false  // default tidak set saldo_awal dari saldo
     $('m_note').value  = data.note||''
 
     const nonOwner = (gRole !== 'owner');
-    $('m_type').disabled = nonOwner         // non-owner tidak boleh ganti jenis
-    $('m_name').disabled = nonOwner         // non-owner tidak boleh ganti nama
+    $('m_type').disabled = nonOwner   // non-owner tidak boleh ganti jenis
+    $('m_name').disabled = nonOwner   // non-owner tidak boleh ganti nama
 
     openModal('Edit Akun Saldo')
   }
