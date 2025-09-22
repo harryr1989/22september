@@ -10,7 +10,6 @@
       --card:#fff; --bd:#e5e7eb; --muted:#64748b; --txt:#0f172a;
       --blue:#1d4ed8; --amber:#d97706; --yellow:#f59e0b; --red:#be123c; --green:#16a34a;
       --shadow:0 6px 18px rgba(15,23,42,.08);
-      --radius:18px;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt)}
@@ -26,10 +25,9 @@
     .topbar{display:grid;grid-template-columns:1fr 520px;gap:12px;align-items:center;margin-bottom:18px}
     .btn{border:none;border-radius:10px;padding:12px 14px;cursor:pointer;font-weight:600}
     .btn-primary{background:#0b63f3;color:#fff}
-    .searchbar{display:grid;grid-template-columns:1fr 90px 90px;gap:8px}
-    .input{border:1px solid var(--bd);background:#fff;border-radius:10px;padding:12px 12px;font-size:14px;outline:none}
     .btn-blue{background:#2563eb;color:#fff}
     .btn-gray{background:#efefef}
+    .input{border:1px solid var(--bd);background:#fff;border-radius:10px;padding:12px 12px;font-size:14px;outline:none}
     .grid{display:grid;grid-template-columns:repeat(3,minmax(280px,1fr));gap:24px}
     @media(max-width:1200px){.grid{grid-template-columns:repeat(2,minmax(280px,1fr))}}
     @media(max-width:760px){.layout{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.topbar{grid-template-columns:1fr}}
@@ -80,7 +78,7 @@
     <header>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <h2 style="margin:0">Master Akun Saldo</h2>
-        <span class="hint">Owner: CRUD penuh • Non-owner: boleh edit <b>Saldo</b>, <b>Saldo Awal</b>, <b>Keterangan</b>; tidak boleh Tambah/Hapus/ubah Nama/Jenis</span>
+        <span class="hint">Owner: CRUD penuh • Non-owner: boleh edit <b>Saldo</b>, <b>Saldo Awal</b> (via checklist), <b>Keterangan</b>; tidak boleh Tambah/Hapus/ubah Nama/Jenis</span>
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <div id="me" class="pill">memuat…</div>
@@ -136,20 +134,21 @@
         </div>
       </div>
 
+      <!-- Saldo + CHECKLIST Saldo Awal -->
       <div class="row">
-        <div>
-          <label>Saldo Awal</label>
-          <div class="icon-input">
-            <span>Rp</span>
-            <input id="m_saldo_awal" inputmode="numeric" placeholder="0" />
-          </div>
-        </div>
         <div>
           <label>Saldo</label>
           <div class="icon-input">
             <span>Rp</span>
             <input id="m_saldo" inputmode="numeric" placeholder="0" />
           </div>
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <label class="icon-input" style="gap:10px">
+            <input id="m_is_opening" type="checkbox" />
+            Jadikan Saldo Awal (saldo_awal = Saldo)
+          </label>
         </div>
       </div>
 
@@ -200,14 +199,15 @@
     $('m_type').value=''
     $('m_name').value=''
     $('m_saldo').value=''
-    $('m_saldo_awal').value=''
+    $('m_is_opening').checked = false
     $('m_note').value=''
     $('m_type').disabled=false
     $('m_name').disabled=false
   }
 
-  function wireCurrencyInput(id){
-    const el = $(id)
+  // format ribuan untuk input saldo
+  (function wireCurrencyInput(){
+    const el = $('m_saldo')
     el.addEventListener('input', e=>{
       const raw = e.target.value.replace(/\D/g,'')
       e.target.value = raw ? new Intl.NumberFormat('id-ID').format(Number(raw)) : ''
@@ -218,9 +218,7 @@
       const digits = (text||'').replace(/\D/g,'')
       el.value = digits ? new Intl.NumberFormat('id-ID').format(Number(digits)) : ''
     })
-  }
-  wireCurrencyInput('m_saldo')
-  wireCurrencyInput('m_saldo_awal')
+  })();
 
   async function boot(){
     const { data:{ session } } = await supabase.auth.getSession()
@@ -248,6 +246,8 @@
       .order('name')
     if(error){ alert("Gagal ambil akun: "+error.message); return }
     cacheRows = data || []
+
+    // PIN Laci Tunai ke depan
     cacheRows.sort((a,b)=>{
       const aLaci = a.account_type==='cash' && (a.name||'').toLowerCase().includes('laci')
       const bLaci = b.account_type==='cash' && (b.name||'').toLowerCase().includes('laci')
@@ -255,6 +255,7 @@
       if(!aLaci && bLaci) return 1
       return (a.name||'').localeCompare(b.name||'')
     })
+
     renderCards(cacheRows)
   }
 
@@ -298,15 +299,19 @@
     }).join('')
   }
 
+  // cari
   $('btnCari').onclick = ()=> renderCards(cacheRows)
   $('btnClear').onclick = ()=> { $('q').value=''; renderCards(cacheRows) }
+  $('q').addEventListener('keydown', e => { if(e.key==='Enter') renderCards(cacheRows) })
 
+  // modal
   $('btnAdd').onclick = ()=>{
     if(gRole!=='owner'){ alert('Hanya Owner yang boleh menambah akun'); return }
     openModal('Tambah Master Saldo')
   }
   $('btnClose').onclick = $('btnCancel').onclick = closeModal
 
+  // EDIT
   window.editAccount = async (id)=>{
     const { data, error } = await supabase.from('accounts')
       .select('*').eq('id', id).single()
@@ -315,16 +320,17 @@
     $('m_type').value  = data.account_type
     $('m_name').value  = data.name
     $('m_saldo').value = new Intl.NumberFormat('id-ID').format(Number(data.saldo||0))
-    $('m_saldo_awal').value = new Intl.NumberFormat('id-ID').format(Number(data.saldo_awal||0))
+    $('m_is_opening').checked = false       // default: tidak set saldo_awal dari saldo
     $('m_note').value  = data.note||''
 
     const nonOwner = (gRole !== 'owner');
-    $('m_type').disabled = nonOwner
-    $('m_name').disabled = nonOwner
+    $('m_type').disabled = nonOwner         // non-owner tidak boleh ganti jenis
+    $('m_name').disabled = nonOwner         // non-owner tidak boleh ganti nama
 
     openModal('Edit Akun Saldo')
   }
 
+  // HAPUS (owner only, dan bukan Laci)
   window.delAccount = async (id)=>{
     const { data, error } = await supabase.from('accounts')
       .select('id,name,account_type').eq('id', id).single()
@@ -339,28 +345,40 @@
     loadAccounts()
   }
 
+  // SIMPAN (Insert/Update)
   $('btnSave').onclick = async ()=>{
     const type = $('m_type').value
     const name = $('m_name').value.trim()
     const saldo = Number(String($('m_saldo').value).replace(/[^0-9]/g,'')) || 0
-    const saldo_awal = Number(String($('m_saldo_awal').value).replace(/[^0-9]/g,'')) || 0
+    const makeOpening = $('m_is_opening').checked
     const note = $('m_note').value.trim()
 
     if(editId){
+      // UPDATE
       const nonOwner = (gRole !== 'owner');
+
+      // Owner boleh ubah name/type; non-owner tidak.
       let patch = {
         account_type: type,
-        name, saldo, saldo_awal, note,
+        name, saldo, note,
         updated_at: new Date().toISOString()
-      }
+      };
+      if (makeOpening) patch.saldo_awal = saldo;
+
       if(nonOwner){
-        patch = { saldo, saldo_awal, note, updated_at: new Date().toISOString() }
+        // Non-owner hanya saldo, note, (opsional saldo_awal via checklist)
+        patch = { saldo, note, updated_at: new Date().toISOString() };
+        if (makeOpening) patch.saldo_awal = saldo;
       }
+
       const { error } = await supabase.from('accounts').update(patch).eq('id', editId)
       if(error){ showErr('Simpan gagal: '+error.message); return }
       showOk('Berhasil diperbarui.')
     }else{
+      // INSERT (Owner only)
       if(gRole!=='owner'){ alert('Hanya Owner yang boleh menambah akun'); return }
+
+      // Anti-duplikasi Laci saat insert
       const isLaciCandidate = type==='cash' && /laci/i.test(name)
       if(isLaciCandidate){
         const { data: exist, error: errExist } = await supabase
@@ -371,7 +389,15 @@
         if(errExist){ showErr('Cek duplikasi gagal: '+errExist.message); return }
         if((exist||[]).length>0){ showErr('Akun LACI TUNAI sudah ada.'); return }
       }
-      const row = { account_type: type, name, saldo, saldo_awal, branch_code: gBranch, note }
+
+      const row = {
+        account_type: type,
+        name,
+        saldo,
+        saldo_awal: makeOpening ? saldo : 0,
+        branch_code: gBranch,
+        note
+      }
       const { error } = await supabase.from('accounts').insert(row)
       if(error){ showErr('Simpan gagal: '+error.message); return }
       showOk('Berhasil ditambahkan.')
@@ -380,6 +406,7 @@
     loadAccounts()
   }
 
+  // logout
   document.getElementById('lnk-logout').addEventListener('click', async ()=>{
     await supabase.auth.signOut(); location.href="login.html"
   })
