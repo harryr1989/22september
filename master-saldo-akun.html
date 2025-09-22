@@ -166,11 +166,12 @@
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-  // GANTI jika perlu (punya kamu sendiri)
- const supabaseUrl = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
+  // Supabase project (kamu)
+  const supabaseUrl = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
 
-  )
+  // ✅ FIX: inisialisasi client Supabase + hapus tanda ')' yang bikin error
+  const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession:true, autoRefreshToken:true } });
 
   const $ = (id)=>document.getElementById(id)
   const fmtRp = n => "Rp " + new Intl.NumberFormat('id-ID').format(Number(n||0))
