@@ -83,6 +83,13 @@
     .kpi-value{font-size:18px;font-weight:800}
     .kpi-sub{font-size:11px;color:#6b7280}
 
+    /* Highlight KPI Omset & Profit */
+    .kpi-card.kpi-omset  { border-left:4px solid #6366f1; }
+    .kpi-card.kpi-omset .kpi-value{ font-size:20px; }
+    .kpi-card.kpi-profit { border-left:4px solid #16a34a; background:linear-gradient(180deg,#f0fdf4, #ffffff 55%); }
+    .kpi-card.kpi-profit .kpi-title{ color:#166534; }
+    .kpi-card.kpi-profit .kpi-value{ font-size:22px; }
+
     /* filter bar */
     .filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 16px 0 16px}
     .date{height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:#fff}
@@ -154,7 +161,7 @@
       <div class="card">
         <h3 style="margin-bottom:10px">KPI Transaksi <span id="kpiTglLabel" class="pill" style="margin-left:8px">Hari ini</span></h3>
         <div class="kpi-grid">
-          <div class="kpi-card">
+          <div class="kpi-card kpi-omset">
             <div class="kpi-title">Omset</div>
             <div id="kpi_omset" class="kpi-value">Rp 0</div>
             <div class="kpi-sub">Σ nominal</div>
@@ -174,7 +181,7 @@
             <div id="kpi_fee" class="kpi-value">Rp 0</div>
             <div class="kpi-sub">Σ fee_bank</div>
           </div>
-          <div class="kpi-card" id="kpi_profit_wrap" style="display:none">
+          <div class="kpi-card kpi-profit" id="kpi_profit_wrap" style="display:none">
             <div class="kpi-title">Profit <span class="kpi-sub">(owner only)</span></div>
             <div id="kpi_profit" class="kpi-value">Rp 0</div>
             <div class="kpi-sub">Σ (adm_dlm+adm_luar−fee)</div>
@@ -368,9 +375,9 @@
   let filterJenis='all'
 
   // ====== DATE RANGE STATE ======
-  let range = { from: null, to: null } // string 'YYYY-MM-DD'
+  let range = { from: null, to: null } // 'YYYY-MM-DD'
   // ====== EXPORT STATE ======
-  let lastRiwayatRows = []  // diset ulang setiap loadRiwayat()
+  let lastRiwayatRows = []
 
   const isOwner = ()=> gRole==='owner'
   function toastErr(t){ const m=$('msgErr'); m.textContent=t; m.style.display='block'; setTimeout(()=>m.style.display='none',3000) }
@@ -815,13 +822,12 @@
       $('rowPulsa').style.display='grid'         // modal & jual
     }
     else if(jenis==='jasa'){
-      // sumber: N/A; terima: Laci (locked)
-      fillSelect(sumber, []); sumber.innerHTML='<option value="">(Tidak berlaku)</option>'; sumber.disabled=true
-      fillSelect(terima, laci? [laci] : []); terima.disabled=true
+      // Sembunyikan baris sumber/terima di UI, tapi tetap set terima = Laci agar kas bertambah
+      $('rowSumber').style.display='none'
+      if(laci){ terima.innerHTML = `<option value="${laci.id}">${laci.name}</option>`; }
 
       $('rowAdminLuarOnly').style.display='grid' // hanya admin luar
-      // nominal tidak ada di form; akan diisi sama dengan admin luar saat simpan
-      $('labelNominal').textContent = 'Nominal (diisi otomatis = Admin Luar)'
+      // nominal disembunyikan; diisi otomatis saat simpan = admin luar
     }
   }
 
