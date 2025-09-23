@@ -277,27 +277,64 @@
         </div>
       </div>
 
-      <div class="row">
+      <!-- ROW NOMINAL -->
+      <div class="row" id="rowNominal">
         <div>
-          <label>Nominal (Rp)</label>
+          <label id="labelNominal">Nominal (Rp)</label>
           <div class="icon-input"><span>Rp</span>
             <input id="f_nom" inputmode="numeric" placeholder="0" />
           </div>
         </div>
+      </div>
+
+      <!-- ROW ADMIN DALAM & LUAR (dua kolom) -->
+      <div class="row" id="rowAdminDua">
         <div>
-          <label>Admin Dalam / Luar</label>
+          <label>Admin Dalam</label>
           <div class="icon-input"><span>💸</span>
-            <input id="f_admin_dalam" inputmode="numeric" placeholder="Admin Dalam (opsional)" style="width:50%">
-            <input id="f_admin_luar" inputmode="numeric" placeholder="Admin Luar (opsional)" style="width:50%">
+            <input id="f_admin_dalam" inputmode="numeric" placeholder="0" />
+          </div>
+        </div>
+        <div>
+          <label>Admin Luar</label>
+          <div class="icon-input"><span>💸</span>
+            <input id="f_admin_luar" inputmode="numeric" placeholder="0" />
           </div>
         </div>
       </div>
 
+      <!-- ROW ADMIN LUAR SAJA -->
+      <div class="row" id="rowAdminLuarOnly" style="display:none">
+        <div>
+          <label>Admin Luar</label>
+          <div class="icon-input"><span>💸</span>
+            <input id="f_admin_luar_only" inputmode="numeric" placeholder="0" />
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW FEE BANK -->
       <div class="row" id="rowFeeBank" style="display:none">
         <div>
           <label>Fee Bank (Transfer)</label>
           <div class="icon-input"><span>🏦</span>
             <input id="f_fee_bank" inputmode="numeric" placeholder="0" />
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW PULSA (MODAL & JUAL) -->
+      <div class="row" id="rowPulsa" style="display:none">
+        <div>
+          <label>Modal (harga modal)</label>
+          <div class="icon-input"><span>Rp</span>
+            <input id="f_modal" inputmode="numeric" placeholder="0" />
+          </div>
+        </div>
+        <div>
+          <label>Jual (harga jual)</label>
+          <div class="icon-input"><span>Rp</span>
+            <input id="f_jual" inputmode="numeric" placeholder="0" />
           </div>
         </div>
       </div>
@@ -341,10 +378,10 @@
   // helpers tanggal
   const fmtHuman = (d)=> d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric', hour:'2-digit', minute:'2-digit'})
   const fmtHumanDateOnly = (d)=> d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
-  const toISODate = (d)=> d.toISOString().slice(0,10) // YYYY-MM-DD
+  const toISODate = (d)=> d.toISOString().slice(0,10)
   function startOfDayISO(d){ const x=new Date(d); x.setHours(0,0,0,0); return x.toISOString() }
   function endOfDayISO(d){ const x=new Date(d); x.setHours(23,59,59,999); return x.toISOString() }
-  function setPreset(days){ // days=1 (today),7,30
+  function setPreset(days){
     const end = new Date()
     const start = new Date(); start.setHours(0,0,0,0); start.setDate(end.getDate()-(days-1))
     range.from = toISODate(start); range.to = toISODate(end)
@@ -368,7 +405,7 @@
   }
 
   ;(()=>{ // input numeric formatters
-    const ids=['f_nom','f_admin_dalam','f_admin_luar','f_fee_bank']
+    const ids=['f_nom','f_admin_dalam','f_admin_luar','f_fee_bank','f_admin_luar_only','f_modal','f_jual']
     ids.forEach(id=>{
       const el=$(id); if(!el) return
       el.addEventListener('input', e=>{
@@ -480,7 +517,7 @@
     if(gRole==='owner') $('kpi_profit').textContent = fmtRp(profit)
   }
 
-  // ====== KPI MASTER SALDO (DINAMIS & URUTAN DISARANKAN) ======
+  // ====== KPI MASTER SALDO (DINAMIS) ======
   function renderKPISaldoCards(accounts){
     const wrap = $('kpiSaldoWrap')
     const list = Array.isArray(accounts) ? accounts : []
@@ -567,7 +604,7 @@
     }
 
     const rows = (data||[]).filter(r=> filterJenis==='all' ? true : (r.jenis===filterJenis))
-    lastRiwayatRows = rows   // simpan untuk Export
+    lastRiwayatRows = rows
 
     if(rows.length===0){
       $('tb').innerHTML = `<tr><td colspan="13" style="color:#64748b">Belum ada transaksi dalam rentang ini.</td></tr>`
@@ -579,8 +616,6 @@
       const user = r.created_by_name || '-'
       const tgl = fmtHuman(new Date(r.created_at))
       const sumberDana = `${r.src_account_name || '-'}${r.dst_account_name ? ' → '+r.dst_account_name : ''}`
-
-      // User & Tanggal: ( user, tanggal ), user biru; lainnya hitam
       const userTanggal = `(<span style="color:#1d4ed8">${user}</span>, ${tgl})`
 
       return `<tr data-id="${r.id}">
@@ -646,7 +681,6 @@
     const csv = lines.join('\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
 
-    // nama file sesuai rentang
     const f = range.from || toISODate(new Date())
     const t = range.to   || toISODate(new Date())
     const same = f===t
@@ -732,64 +766,141 @@
     sel.innerHTML = (items||[]).map(i=>`<option value="${i.id}">${i.name}</option>`).join('')
     if(!items || !items.length){ sel.innerHTML = '<option value="">(Tidak ada opsi)</option>' }
   }
+  function findLaci(){ return (cacheAcc.cash||[]).find(a=>/laci/i.test(a.name||'')) || null }
 
   function setupForm(jenis){
+    // reset
     $('dlgTitle').textContent = `Form ${jenis.toUpperCase()}`
     $('f_jenis').value = jenis
     $('f_branch').value = viewBranch || gBranch
-    $('f_nom').value = ''
-    $('f_admin_dalam').value=''
-    $('f_admin_luar').value=''
-    $('f_fee_bank').value=''
-    $('f_ket').value=''
+    ;['f_nom','f_admin_dalam','f_admin_luar','f_admin_luar_only','f_fee_bank','f_ket','f_modal','f_jual']
+      .forEach(id=>{ const el=$(id); if(el) el.value='' })
 
     const sumber=$('f_sumber'), terima=$('f_terima')
+    const laci = findLaci()
+
+    // default hide
+    $('rowNominal').style.display='none'
+    $('rowAdminDua').style.display='none'
+    $('rowAdminLuarOnly').style.display='none'
+    $('rowFeeBank').style.display='none'
+    $('rowPulsa').style.display='none'
+    $('rowSumber').style.display='grid'
+    $('labelNominal').textContent = 'Nominal (Rp)'
 
     if(jenis==='tarik'){
-      const laci = (cacheAcc.cash||[]).filter(a=>/laci/i.test(a.name))
-      fillSelect(sumber, laci); sumber.disabled=true
+      // sumber: Laci (locked), terima: Rekening
+      fillSelect(sumber, laci? [laci] : []); sumber.disabled=true
       fillSelect(terima, cacheAcc.rekening||[]); terima.disabled=false
-      $('rowFeeBank').style.display='none'
+
+      $('rowNominal').style.display='grid'
+      $('rowAdminDua').style.display='grid'      // admin dalam & admin luar
     }
     else if(jenis==='transfer'){
-      fillSelect(sumber, cacheAcc.rekening||[]); sumber.disabled=false
-      const laci = (cacheAcc.cash||[]).filter(a=>/laci/i.test(a.name))
-      fillSelect(terima, laci); terima.disabled=true
-      $('rowFeeBank').style.display='block'
+      // sumber: Rekening & Server; terima: Laci (locked)
+      const sumberList = [...(cacheAcc.rekening||[]), ...(cacheAcc.server_pulsa||[])]
+      fillSelect(sumber, sumberList); sumber.disabled=false
+      fillSelect(terima, laci? [laci] : []); terima.disabled=true
+
+      $('rowNominal').style.display='grid'
+      $('rowAdminLuarOnly').style.display='grid' // hanya admin luar
+      $('rowFeeBank').style.display='grid'
     }
     else if(jenis==='pulsa'){
-      fillSelect(sumber, cacheAcc.server_pulsa||[]); sumber.disabled=false
-      const laci = (cacheAcc.cash||[]).filter(a=>/laci/i.test(a.name))
-      fillSelect(terima, laci); terima.disabled=true
-      $('rowFeeBank').style.display='none'
+      // sumber: Rekening & Server; terima: Laci (locked)
+      const sumberList = [...(cacheAcc.rekening||[]), ...(cacheAcc.server_pulsa||[])]
+      fillSelect(sumber, sumberList); sumber.disabled=false
+      fillSelect(terima, laci? [laci] : []); terima.disabled=true
+
+      $('rowPulsa').style.display='grid'         // modal & jual
     }
     else if(jenis==='jasa'){
-      const laci = (cacheAcc.cash||[]).filter(a=>/laci/i.test(a.name))
-      fillSelect(terima, laci); terima.disabled=true
-      fillSelect(sumber, []); sumber.innerHTML = `<option value="">(Tidak berlaku)</option>`; sumber.disabled=true
-      $('rowFeeBank').style.display='none'
+      // sumber: N/A; terima: Laci (locked)
+      fillSelect(sumber, []); sumber.innerHTML='<option value="">(Tidak berlaku)</option>'; sumber.disabled=true
+      fillSelect(terima, laci? [laci] : []); terima.disabled=true
+
+      $('rowAdminLuarOnly').style.display='grid' // hanya admin luar
+      // nominal tidak ada di form; akan diisi sama dengan admin luar saat simpan
+      $('labelNominal').textContent = 'Nominal (diisi otomatis = Admin Luar)'
     }
   }
+
+  // enforce TARIK: hanya salah satu admin terisi
+  $('f_admin_dalam').addEventListener('input', ()=>{
+    if(parseNum($('f_admin_dalam').value)>0){ $('f_admin_luar').value='' }
+  })
+  $('f_admin_luar').addEventListener('input', ()=>{
+    if(parseNum($('f_admin_luar').value)>0){ $('f_admin_dalam').value='' }
+  })
 
   $('simpanForm').onclick = async ()=>{
     const jenis = $('f_jenis').value
     const branch = viewBranch || gBranch
     const sumber = $('f_sumber').value || null
     const terima = $('f_terima').value || null
-    const nominal = parseNum($('f_nom').value)
-    const admin_dalam = parseNum($('f_admin_dalam').value)
-    const admin_luar = parseNum($('f_admin_luar').value)
-    const fee_bank = parseNum($('f_fee_bank').value)
     const note = $('f_ket').value.trim()
 
-    if(!jenis){ toastErr('Jenis wajib.'); return }
-    if(nominal<=0){ toastErr('Nominal harus > 0.'); return }
-    if(jenis==='tarik' && (!terima)) { toastErr('Terima Dana (rekening) wajib diisi.'); return }
-    if(jenis==='transfer' && (!sumber)) { toastErr('Sumber Dana (rekening) wajib diisi.'); return }
-    if(jenis==='pulsa' && (!sumber)) { toastErr('Sumber Dana (server pulsa) wajib diisi.'); return }
-
     try{
-      const row={ branch_code: branch, jenis, src_account_id: sumber, dst_account_id: terima, nominal, admin_dalam, admin_luar, fee_bank, note }
+      let row = { branch_code: branch, jenis, src_account_id: sumber, dst_account_id: terima, nominal: 0, admin_dalam: 0, admin_luar: 0, fee_bank: 0, note }
+
+      if(jenis==='tarik'){
+        if(!terima) throw new Error('Terima Dana (rekening) wajib diisi.')
+        const laci = findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai di cabang ini.')
+        row.src_account_id = laci.id
+
+        const nominal = parseNum($('f_nom').value)
+        const ad = parseNum($('f_admin_dalam').value)
+        const al = parseNum($('f_admin_luar').value)
+        if(nominal<=0) throw new Error('Nominal harus > 0.')
+        if(ad>0 && al>0) throw new Error('Isi salah satu: Admin Dalam ATAU Admin Luar.')
+        row.nominal = nominal
+        row.admin_dalam = ad>0 ? ad : 0
+        row.admin_luar  = al>0 ? al : 0
+        row.fee_bank = 0
+      }
+      else if(jenis==='transfer'){
+        if(!sumber) throw new Error('Sumber Dana (rekening/server) wajib diisi.')
+        const laci = findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai di cabang ini.')
+        row.dst_account_id = laci.id
+
+        const nominal = parseNum($('f_nom').value)
+        const al = parseNum($('f_admin_luar_only').value)
+        const fb = parseNum($('f_fee_bank').value)
+        if(nominal<=0) throw new Error('Nominal harus > 0.')
+        row.nominal = nominal
+        row.admin_dalam = 0
+        row.admin_luar  = al
+        row.fee_bank    = fb
+      }
+      else if(jenis==='pulsa'){
+        if(!sumber) throw new Error('Sumber Dana (rekening/server) wajib diisi.')
+        const laci = findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai di cabang ini.')
+        row.dst_account_id = laci.id
+
+        const modal = parseNum($('f_modal').value)
+        const jual  = parseNum($('f_jual').value)
+        if(modal<=0) throw new Error('Modal harus > 0.')
+        if(jual<modal) throw new Error('Jual tidak boleh kurang dari Modal.')
+        const margin = Math.max(jual - modal, 0)
+        row.nominal = modal
+        row.admin_dalam = 0
+        row.admin_luar  = margin
+        row.fee_bank    = 0
+        row.note = note ? note : `Pulsa: modal ${fmtRp(modal)}, jual ${fmtRp(jual)}, margin ${fmtRp(margin)}`
+      }
+      else if(jenis==='jasa'){
+        const laci = findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai di cabang ini.')
+        row.src_account_id = null
+        row.dst_account_id = laci.id
+
+        const al = parseNum($('f_admin_luar_only').value)
+        if(al<=0) throw new Error('Fee Admin (Admin Luar) harus > 0.')
+        row.nominal    = al     // nominal = admin luar (otomatis)
+        row.admin_luar = al
+        row.admin_dalam = 0
+        row.fee_bank = 0
+      }
+
       const { error } = await supabase.from('transactions').insert(row)
       if(error) throw error
 
@@ -799,6 +910,9 @@
   }
 
   $('lnk-logout').addEventListener('click', async ()=>{ await supabase.auth.signOut(); location.href='login.html' })
+
+  // ====== Export button ======
+  document.getElementById('btnExport').onclick = ()=> exportCSV()
 
   // start
   boot()
