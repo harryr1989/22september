@@ -38,7 +38,6 @@
     .btn-danger{background:#fee2e2;color:#991b1b}
 
     .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
-    /* Kartu baris fleksibel: aman di desktop & mobile, tidak keluar area */
     .rowcard{
       display:grid;
       grid-template-columns: minmax(160px,1.2fr) minmax(140px,1fr) minmax(110px,.7fr) minmax(160px,1fr) minmax(160px,1fr);
@@ -239,6 +238,7 @@
           <div class="icon-input">
             <select id="u_branch"></select>
           </div>
+          <div id="hintOwnerAdd" class="muted" style="display:none;font-size:12px;margin-top:6px">Untuk role owner, cabang dikosongkan. Owner memilih cabang lewat dropdown di halaman lain.</div>
         </div>
       </div>
 
@@ -304,6 +304,7 @@
           <div class="icon-input">
             <select id="e_branch"></select>
           </div>
+          <div id="hintOwnerEdit" class="muted" style="display:none;font-size:12px;margin-top:6px">Untuk role owner, cabang dikosongkan. Owner memilih cabang lewat dropdown di halaman lain.</div>
         </div>
       </div>
     </div>
@@ -319,7 +320,7 @@
 
   // ===== Supabase (frontend pakai ANON) =====
   const supabaseUrl = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
-  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y"; // ANON
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
   const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: true, autoRefreshToken: true } });
 
   // ===== Edge Functions (ganti kalau endpoint kamu beda) =====
@@ -339,6 +340,23 @@
   function openModal(id){ $(id).style.display='flex' }
   function closeModal(id){ $(id).style.display='none' }
 
+  // ==== Helper: toggle field cabang berdasarkan role ====
+  function applyBranchFieldByRole(roleSelId, branchSelId, hintId){
+    const roleSel = $(roleSelId), brSel = $(branchSelId), hint = $(hintId)
+    if(!roleSel || !brSel) return
+    const isOwner = (roleSel.value === 'owner')
+    if(isOwner){
+      brSel.value = ''
+      brSel.disabled = true
+      if(hint) hint.style.display = 'block'
+    }else{
+      brSel.disabled = false
+      if(hint) hint.style.display = 'none'
+      // Prefill default saat tambah user
+      if(roleSelId==='u_role' && !brSel.value) brSel.value = gBranch || (branches[0]?.code || '')
+    }
+  }
+
   // ===== Boot =====
   async function boot(){
     const { data:{ session } } = await supabase.auth.getSession()
@@ -356,6 +374,14 @@
 
     await Promise.all([loadBranches(), loadUsers()])
     renderBranches(); renderUsers(); fillBranchFilters()
+
+    // Apply default state for role->branch linkage (Add & Edit forms)
+    applyBranchFieldByRole('u_role','u_branch','hintOwnerAdd')
+    applyBranchFieldByRole('e_role','e_branch','hintOwnerEdit')
+
+    // Hook change events untuk role select
+    $('u_role').addEventListener('change', ()=> applyBranchFieldByRole('u_role','u_branch','hintOwnerAdd'))
+    $('e_role').addEventListener('change', ()=> applyBranchFieldByRole('e_role','e_branch','hintOwnerEdit'))
   }
 
   // ===== Load data =====
@@ -437,6 +463,10 @@
     selAdd.innerHTML = opts
     selEdit.innerHTML = opts
     selAdd.value = gBranch || ''
+
+    // Terapkan aturan owner (kosongkan & disable) bila role saat ini = owner
+    applyBranchFieldByRole('u_role','u_branch','hintOwnerAdd')
+    applyBranchFieldByRole('e_role','e_branch','hintOwnerEdit')
   }
 
   // ===== Events =====
@@ -525,9 +555,12 @@
   // Tambah User
   $('btnAddUser').addEventListener('click', function(){
     $('u_name').value=''; $('u_email').value='';
-    $('u_role').value='kasir'; $('u_branch').value = gBranch || '';
+    $('u_role').value='kasir';
+    $('u_branch').value = gBranch || (branches[0]?.code || '');
     $('u_password').value='';
     $('msgErrUser').style.display='none'; $('msgOkUser').style.display='none';
+    // sinkronkan aturan owner saat modal dibuka
+    applyBranchFieldByRole('u_role','u_branch','hintOwnerAdd')
     openModal('modalUser')
   })
   $('btnCloseUser').onclick = ()=> closeModal('modalUser')
@@ -537,26 +570,34 @@
     const full_name = $('u_name').value.trim()
     const email = $('u_email').value.trim().toLowerCase()
     const role = $('u_role').value
-    const branch_code = $('u_branch').value
+    let branch_code = $('u_branch').value
     const password = $('u_password').value.trim()
     const errBox=$('msgErrUser'), okBox=$('msgOkUser')
 
     function showErrUser(t){ errBox.textContent=t; errBox.style.display='block'; okBox.style.display='none' }
     function showOkUser(t){ okBox.textContent=t; okBox.style.display='block'; errBox.style.display='none' }
 
-    if(!email || !branch_code){ showErrUser('Email & cabang wajib'); return }
+    if(!email){ showErrUser('Email wajib'); return }
+    if(role!=='owner' && !branch_code){ showErrUser('Cabang wajib untuk role non-owner'); return }
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ showErrUser('Format email tidak valid'); return }
     if(password && password.length < 6){ showErrUser('Password minimal 6 karakter'); return }
+
+    // Untuk owner, kosongkan branch_code (biarkan null)
+    if(role==='owner') branch_code = null
 
     const sess = await supabase.auth.getSession()
     const session = sess && sess.data ? sess.data.session : null
     if(!session){ showErrUser('Session habis, login ulang'); return }
 
     try{
+      const payload = { email, full_name, role }
+      if(branch_code !== null) payload.branch_code = branch_code
+      if(password) payload.password = password
+
       const res = await fetch(FUNC_CREATE_URL, {
         method:'POST',
         headers:{ 'Content-Type':'application/json','Authorization': 'Bearer '+session.access_token },
-        body: JSON.stringify({ email, full_name, role, branch_code, password: password || undefined })
+        body: JSON.stringify(payload)
       })
       const out = await res.json()
       if(!res.ok){ showErrUser(out.error || 'Gagal membuat user'); return }
@@ -588,6 +629,8 @@
       $('e_role').value = u.role || 'kasir';
       $('e_branch').value = u.branch_code || '';
       $('msgErrEdit').style.display='none'; $('msgOkEdit').style.display='none';
+      // Terapkan aturan owner pada modal edit
+      applyBranchFieldByRole('e_role','e_branch','hintOwnerEdit')
       openModal('modalEdit');
       return;
     }
@@ -650,24 +693,28 @@
     const id = $('e_id').value;
     const full_name = $('e_name').value.trim();
     const role = $('e_role').value;
-    const branch_code = $('e_branch').value;
+    let branch_code = $('e_branch').value;
     const errBox=$('msgErrEdit'), okBox=$('msgOkEdit')
 
     function showErrEdit(t){ errBox.textContent=t; errBox.style.display='block'; okBox.style.display='none' }
     function showOkEdit(t){ okBox.textContent=t; okBox.style.display='block'; errBox.style.display='none' }
 
     if(!id){ showErrEdit('User tidak ditemukan'); return }
-    if(!branch_code){ showErrEdit('Cabang wajib diisi'); return }
+    if(role!=='owner' && !branch_code){ showErrEdit('Cabang wajib untuk role non-owner'); return }
+    if(role==='owner') branch_code = null
 
     const sess = await supabase.auth.getSession()
     const session = sess && sess.data ? sess.data.session : null
     if(!session){ showErrEdit('Session habis, login ulang'); return }
 
     try{
+      const payload = { user_id:id, full_name, role }
+      if(branch_code !== null) payload.branch_code = branch_code
+
       const res = await fetch(FUNC_UPDATE_URL, {
         method:'POST',
         headers:{ 'Content-Type':'application/json','Authorization': 'Bearer '+session.access_token },
-        body: JSON.stringify({ user_id:id, full_name, role, branch_code })
+        body: JSON.stringify(payload)
       })
       const out = await res.json()
       if(!res.ok){ showErrEdit(out.error || 'Gagal menyimpan perubahan'); return }
