@@ -8,7 +8,6 @@
     :root{
       --bg:#f6f8fb; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#0b63f3;
       --card:#fff; --bd:#e5e7eb; --muted:#64748b; --txt:#0f172a;
-      --blue:#1d4ed8; --amber:#d97706; --yellow:#f59e0b; --red:#be123c;
       --shadow:0 6px 18px rgba(15,23,42,.08);
       --touch:48px; --radius:16px; --safe-bottom: env(safe-area-inset-bottom, 0);
     }
@@ -28,7 +27,6 @@
     header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
     .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px}
 
-    /* FIX: hilangkan typo var(--bd') yang bikin CSS korup */
     .topbar{position:sticky;top:54px;z-index:9;background:linear-gradient(#fff,#fff 75%,transparent);padding:12px 16px;border-bottom:1px solid var(--bd)}
     .input{border:1px solid var(--bd);background:#fff;border-radius:10px;padding:12px 12px;font-size:16px;height:var(--touch);outline:none}
     .btn{border:none;border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:700;height:var(--touch)}
@@ -37,6 +35,7 @@
     .btn-gray{background:#eef2f6}
     .btn-ghost{background:#f1f5f9}
     .btn-danger{background:#fee2e2;color:#991b1b}
+    .btn-sm{height:36px;padding:6px 10px;border-radius:10px;font-weight:700}
 
     .chips{display:flex;gap:8px;flex-wrap:wrap}
     .chip{border:1px solid var(--bd);padding:8px 10px;border-radius:999px;background:#fff;font-size:12px;cursor:pointer}
@@ -47,7 +46,7 @@
     .card h3{margin:0 0 6px 0}
 
     table{width:100%;border-collapse:collapse}
-    th,td{padding:10px;border-bottom:1px solid var(--bd);font-size:14px;text-align:left}
+    th,td{padding:10px;border-bottom:1px solid var(--bd);font-size:14px;text-align:left;vertical-align:top}
     th{background:#f8fafc}
 
     .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:50}
@@ -73,9 +72,9 @@
       .row{grid-template-columns:1fr}
     }
 
-    .fab{position:fixed;right:14px;bottom:calc(14px + var(--safe-bottom));width:56px;height:56px;border-radius:999px;background:var(--pri);color:#fff;display:none;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(11,99,243,.35);z-index:15;font-size:26px;font-weight:900}
+    .fab{position:fixed;right:14px;bottom:calc(14px + var(--safe-bottom));width:56px;height:56px;border-radius:999px;background:#0b63f3;color:#fff;display:none;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(11,99,243,.35);z-index:15;font-size:26px;font-weight:900}
 
-    /* KPI style: pakai card mini agar konsisten */
+    /* KPI cards */
     .kpi-grid{display:grid;grid-template-columns:repeat(1,1fr);gap:10px}
     @media(min-width:560px){ .kpi-grid{grid-template-columns:repeat(2,1fr)} }
     @media(min-width:900px){ .kpi-grid{grid-template-columns:repeat(5,1fr)} }
@@ -83,6 +82,11 @@
     .kpi-title{font-size:12px;color:#475569}
     .kpi-value{font-size:18px;font-weight:800}
     .kpi-sub{font-size:11px;color:#6b7280}
+
+    /* filter bar */
+    .filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 16px 0 16px}
+    .date{height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:#fff}
+    .sep{color:#94a3b8}
   </style>
 </head>
 <body>
@@ -130,8 +134,21 @@
       </div>
     </div>
 
+    <!-- FILTER TANGGAL -->
+    <div class="filters">
+      <button class="btn-sm btn-ghost" id="presetToday">Hari ini</button>
+      <button class="btn-sm btn-ghost" id="preset7">7H</button>
+      <button class="btn-sm btn-ghost" id="preset30">30H</button>
+      <span class="sep">|</span>
+      <input type="date" id="dateFrom" class="date">
+      <span>–</span>
+      <input type="date" id="dateTo" class="date">
+      <button class="btn-sm btn-blue" id="applyRange">Terapkan</button>
+      <span class="pill" id="activeRangeLabel">Rentang: -</span>
+    </div>
+
     <div class="grid">
-      <!-- KPI Transaksi: gaya card -->
+      <!-- KPI Transaksi -->
       <div class="card">
         <h3 style="margin-bottom:10px">KPI Transaksi <span id="kpiTglLabel" class="pill" style="margin-left:8px">Hari ini</span></h3>
         <div class="kpi-grid">
@@ -163,36 +180,10 @@
         </div>
       </div>
 
-      <!-- KPI Master Saldo Akun -->
+      <!-- KPI Master Saldo Akun (DINAMIS) -->
       <div class="card">
         <h3 style="margin-bottom:10px">KPI Master Saldo Akun</h3>
-        <div class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-title">Laci Tunai</div>
-            <div id="kpi_laci" class="kpi-value">Rp 0</div>
-            <div class="kpi-sub">cash: nama mengandung “laci”</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-title">Mandiri</div>
-            <div id="kpi_mandiri" class="kpi-value">Rp 0</div>
-            <div class="kpi-sub">rekening Mandiri</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-title">BRI</div>
-            <div id="kpi_bri" class="kpi-value">Rp 0</div>
-            <div class="kpi-sub">rekening BRI</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-title">BNI</div>
-            <div id="kpi_bni" class="kpi-value">Rp 0</div>
-            <div class="kpi-sub">rekening BNI</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-title">Total Rekening</div>
-            <div id="kpi_rek_total" class="kpi-value">Rp 0</div>
-            <div class="kpi-sub">Σ semua rekening</div>
-          </div>
-        </div>
+        <div id="kpiSaldoWrap" class="kpi-grid"></div>
       </div>
 
       <!-- Riwayat -->
@@ -201,12 +192,19 @@
         <table>
           <thead>
             <tr>
-              <th>Waktu</th>
+              <th>No urut</th>
+              <th>User & Tanggal</th>
+              <th>id trx</th>
+              <th>Sumber Dana</th>
               <th>Jenis</th>
-              <th>Route</th>
+              <th>Saldo Awal</th>
               <th>Nominal</th>
-              <th>Admin</th>
+              <th>Admin Dalam</th>
+              <th>Admin Luar</th>
+              <th>Fee Bank</th>
+              <th>Saldo Akhir</th>
               <th>Keterangan</th>
+              <th>Aksi</th>
             </tr>
           </thead>
           <tbody id="tb"></tbody>
@@ -330,15 +328,44 @@
   let cacheAcc={ cash:[], rekening:[], server_pulsa:[] }
   let filterJenis='all'
 
-  const isOwner = ()=> gRole==='owner'
+  // ====== DATE RANGE STATE ======
+  let range = { from: null, to: null } // string 'YYYY-MM-DD'
 
+  const isOwner = ()=> gRole==='owner'
   function toastErr(t){ const m=$('msgErr'); m.textContent=t; m.style.display='block'; setTimeout(()=>m.style.display='none',3000) }
+
+  // helpers tanggal
+  const fmtHuman = (d)=> d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
+  const toISODate = (d)=> d.toISOString().slice(0,10) // YYYY-MM-DD
+  function startOfDayISO(d){ const x=new Date(d); x.setHours(0,0,0,0); return x.toISOString() }
+  function endOfDayISO(d){ const x=new Date(d); x.setHours(23,59,59,999); return x.toISOString() }
+  function setPreset(days){ // days=1 (today),7,30
+    const end = new Date()
+    const start = new Date(); start.setHours(0,0,0,0); start.setDate(end.getDate()-(days-1))
+    range.from = toISODate(start); range.to = toISODate(end)
+    $('dateFrom').value = range.from
+    $('dateTo').value = range.to
+    updateRangeLabel()
+  }
+  function getRangeISO(){
+    if(!range.from || !range.to){
+      const t=new Date(); const s=new Date(); s.setHours(0,0,0,0)
+      return { tmin: s.toISOString(), tmax: endOfDayISO(t) }
+    }
+    return { tmin: startOfDayISO(new Date(range.from)), tmax: endOfDayISO(new Date(range.to)) }
+  }
+  function updateRangeLabel(){
+    const f = range.from ? fmtHuman(new Date(range.from)) : '-'
+    const t = range.to ? fmtHuman(new Date(range.to)) : '-'
+    const same = range.from===range.to
+    $('activeRangeLabel').textContent = `Rentang: ${f} ${same?'':'– '+t}`
+    $('kpiTglLabel').textContent = same? 'Hari ini' : `${f} – ${t}`
+  }
 
   ;(()=>{ // input numeric formatters
     const ids=['f_nom','f_admin_dalam','f_admin_luar','f_fee_bank']
     ids.forEach(id=>{
-      const el=$(id)
-      if(!el) return
+      const el=$(id); if(!el) return
       el.addEventListener('input', e=>{
         const raw=e.target.value.replace(/\D/g,'')
         e.target.value = raw? new Intl.NumberFormat('id-ID').format(Number(raw)) : ''
@@ -347,6 +374,9 @@
   })()
 
   async function boot(){
+    // default preset: Hari ini
+    setPreset(1)
+
     const { data:{ session } } = await supabase.auth.getSession()
     if(!session){ location.href='login.html'; return }
     const { data: prof, error } = await supabase.from('profiles').select('role,branch_code,full_name,email').eq('id', session.user.id).single()
@@ -360,7 +390,6 @@
     $('roleBadge').textContent = `role: ${gRole}`
     $('branchBadge').textContent = `branch: ${viewBranch || '-'}`
 
-    // Tampilkan profit KPI hanya untuk owner
     $('kpi_profit_wrap').style.display = isOwner()? 'block':'none'
 
     if(isOwner()){
@@ -368,12 +397,15 @@
       $('fabAdd').style.display='flex'
       await loadBranches()
     }else{
-      // non-owner: tetap tampil tombol tambah
       $('branchRow').style.display='grid'
       $('btnTambah').style.display='inline-block'
     }
 
     await loadAccounts()
+    await refreshByRange()
+  }
+
+  async function refreshByRange(){
     await loadKPITransaksi()
     await loadKPISaldo()
     await loadRiwayat()
@@ -400,9 +432,7 @@
       viewBranch = sel.value;
       $('branchBadge').textContent = `branch: ${viewBranch}`;
       await loadAccounts();
-      await loadKPITransaksi();
-      await loadKPISaldo();
-      await loadRiwayat();
+      await refreshByRange();
     }
   }
 
@@ -418,101 +448,170 @@
     ;(data||[]).forEach(a=>{ if(cacheAcc[a.account_type]) cacheAcc[a.account_type].push(a) })
   }
 
-  async function loadRiwayat(){
-    // Asumsi view v_tx_summary: created_at, jenis, route, nominal, admin_total, note, branch_code
-    const cab = viewBranch || gBranch
-    let query = supabase.from('v_tx_summary').select('created_at,jenis,route,nominal,admin_total,note,branch_code').eq('branch_code', cab).order('created_at', { ascending:false }).limit(100)
-    if(filterJenis!=='all') query = query.eq('jenis', filterJenis)
-    const { data, error } = await query
-    if(error){
-      document.getElementById('tb').innerHTML = `<tr><td colspan="6" style="color:#991b1b">Riwayat belum tersedia (buat view v_tx_summary atau sesuaikan query).</td></tr>`
-      return
-    }
-    const rows = (data||[])
-    if(rows.length===0){ document.getElementById('tb').innerHTML = `<tr><td colspan="6" style="color:#64748b">Belum ada transaksi.</td></tr>`; return }
-    document.getElementById('tb').innerHTML = rows.map(r=>{
-      const t = new Date(r.created_at).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric', hour:'2-digit', minute:'2-digit'})
-      return `<tr>
-        <td>${t}</td>
-        <td style="text-transform:capitalize">${r.jenis}</td>
-        <td>${r.route||'-'}</td>
-        <td>${fmtRp(r.nominal||0)}</td>
-        <td>${r.admin_total? fmtRp(r.admin_total): '-'}</td>
-        <td>${r.note||'-'}</td>
-      </tr>`
-    }).join('')
-  }
-
-  // ====== KPI ======
-  function startOfTodayISO(){
-    const d = new Date()
-    d.setHours(0,0,0,0)
-    return d.toISOString()
-  }
-  function endOfTodayISO(){
-    const d = new Date()
-    d.setHours(23,59,59,999)
-    return d.toISOString()
-  }
-
+  // ====== KPI TRANSAKSI (respect range) ======
   async function loadKPITransaksi(){
     const cab = viewBranch || gBranch
-    const tmin = startOfTodayISO()
-    const tmax = endOfTodayISO()
-    document.getElementById('kpiTglLabel').textContent = 'Hari ini'
+    const { tmin, tmax } = getRangeISO()
 
     const { data, error } = await supabase
       .from('transactions')
       .select('jenis, nominal, admin_dalam, admin_luar, fee_bank, branch_code, created_at')
-      .eq('branch_code', cab)
-      .gte('created_at', tmin)
-      .lte('created_at', tmax)
+      .eq('branch_code', cab).gte('created_at', tmin).lte('created_at', tmax)
 
     let omset=0, tarik=0, transfer=0, fee=0, profit=0
     if(!error){
       for(const r of (data||[])){
-        const n = Number(r.nominal||0)
-        const ad = Number(r.admin_dalam||0)
-        const al = Number(r.admin_luar||0)
-        const fb = Number(r.fee_bank||0)
-        omset += n
-        fee += fb
+        const n = Number(r.nominal||0), ad=Number(r.admin_dalam||0), al=Number(r.admin_luar||0), fb=Number(r.fee_bank||0)
+        omset += n; fee += fb
         if((r.jenis||'')==='tarik') tarik += n
         if((r.jenis||'')==='transfer') transfer += n
         profit += (ad + al - fb)
       }
     }
-    document.getElementById('kpi_omset').textContent = fmtRp(omset)
-    document.getElementById('kpi_tarik').textContent = fmtRp(tarik)
-    document.getElementById('kpi_transfer').textContent = fmtRp(transfer)
-    document.getElementById('kpi_fee').textContent = fmtRp(fee)
-    if(isOwner()) document.getElementById('kpi_profit').textContent = fmtRp(profit)
+    $('kpi_omset').textContent = fmtRp(omset)
+    $('kpi_tarik').textContent = fmtRp(tarik)
+    $('kpi_transfer').textContent = fmtRp(transfer)
+    $('kpi_fee').textContent = fmtRp(fee)
+    if(gRole==='owner') $('kpi_profit').textContent = fmtRp(profit)
+  }
+
+  // ====== KPI MASTER SALDO (DINAMIS & URUTAN DISARANKAN) ======
+  function renderKPISaldoCards(accounts){
+    const wrap = $('kpiSaldoWrap')
+    const list = Array.isArray(accounts) ? accounts : []
+    const totalAsset = list.reduce((s,a)=> s + Number(a.saldo||0), 0)
+
+    const laci = list.filter(a=> a.account_type==='cash' && /laci/i.test(a.name||''))
+    const rek  = list.filter(a=> a.account_type==='rekening').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
+    const srv  = list.filter(a=> a.account_type==='server_pulsa').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
+
+    let html = `
+      <div class="kpi-card">
+        <div class="kpi-title">Total Asset</div>
+        <div class="kpi-value">${fmtRp(totalAsset)}</div>
+        <div class="kpi-sub">Σ semua akun (cash + rekening + server)</div>
+      </div>
+    `
+    const pushCard = (a)=> {
+      html += `
+        <div class="kpi-card">
+          <div class="kpi-title">${a.name || (a.account_type||'').toUpperCase()}</div>
+          <div class="kpi-value">${fmtRp(a.saldo||0)}</div>
+          <div class="kpi-sub">${a.account_type}</div>
+        </div>
+      `
+    }
+    laci.forEach(pushCard); rek.forEach(pushCard); srv.forEach(pushCard)
+
+    if(list.length===0){
+      html = `
+        <div class="kpi-card">
+          <div class="kpi-title">Total Asset</div>
+          <div class="kpi-value">Rp 0</div>
+          <div class="kpi-sub">Belum ada akun</div>
+        </div>
+      `
+    }
+    wrap.innerHTML = html
   }
 
   async function loadKPISaldo(){
     const cab = viewBranch || gBranch
     const { data, error } = await supabase
       .from('accounts')
-      .select('name, account_type, saldo, branch_code')
+      .select('id,name,account_type,branch_code,saldo')
       .eq('branch_code', cab)
-
-    let laci=0, mandiri=0, bri=0, bni=0, rek_total=0
-    if(!error){
-      for(const a of (data||[])){
-        const saldo = Number(a.saldo||0)
-        if(a.account_type==='rekening') rek_total += saldo
-        if(a.account_type==='cash' && /laci/i.test(a.name||'')) laci += saldo
-        if(a.account_type==='rekening' && /mandiri/i.test(a.name||'')) mandiri += saldo
-        if(a.account_type==='rekening' && /\bbri\b/i.test(a.name||'')) bri += saldo
-        if(a.account_type==='rekening' && /\bbni\b/i.test(a.name||'')) bni += saldo
-      }
-    }
-    document.getElementById('kpi_laci').textContent = fmtRp(laci)
-    document.getElementById('kpi_mandiri').textContent = fmtRp(mandiri)
-    document.getElementById('kpi_bri').textContent = fmtRp(bri)
-    document.getElementById('kpi_bni').textContent = fmtRp(bni)
-    document.getElementById('kpi_rek_total').textContent = fmtRp(rek_total)
+      .order('name')
+    if(error){ renderKPISaldoCards([]); return }
+    renderKPISaldoCards(data||[])
   }
+
+  // ====== RIWAYAT (respect range) ======
+  async function loadRiwayat(){
+    const cab = viewBranch || gBranch
+    const { tmin, tmax } = getRangeISO()
+
+    const { data, error } = await supabase
+      .from('v_tx_summary')
+      .select(`
+        id,
+        id_trx,
+        jenis,
+        src_account_name,
+        dst_account_name,
+        nominal,
+        admin_dalam,
+        admin_luar,
+        fee_bank,
+        saldo_awal,
+        saldo_akhir,
+        note,
+        created_by_name,
+        created_at,
+        branch_code
+      `)
+      .eq('branch_code', cab)
+      .gte('created_at', tmin)
+      .lte('created_at', tmax)
+      .order('created_at', { ascending:false })
+      .limit(500)
+
+    if(error){
+      $('tb').innerHTML = `<tr><td colspan="13" style="color:#991b1b">Gagal memuat riwayat: ${error.message}</td></tr>`
+      return
+    }
+
+    const rows = (data||[]).filter(r=> filterJenis==='all' ? true : (r.jenis===filterJenis))
+    if(rows.length===0){
+      $('tb').innerHTML = `<tr><td colspan="13" style="color:#64748b">Belum ada transaksi dalam rentang ini.</td></tr>`
+      return
+    }
+
+    let i = 1
+    $('tb').innerHTML = rows.map(r=>{
+      const user = r.created_by_name || '-'
+      const tgl = new Date(r.created_at).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric', hour:'2-digit', minute:'2-digit'})
+      const sumberDana = `${r.src_account_name || '-'}${r.dst_account_name ? ' → '+r.dst_account_name : ''}`
+
+      return `<tr data-id="${r.id}">
+        <td>${i++}</td>
+        <td>${user}<br><span style="color:#64748b;font-size:12px">${tgl}</span></td>
+        <td><code>${r.id_trx}</code></td>
+        <td>${sumberDana}</td>
+        <td style="text-transform:capitalize">${r.jenis}</td>
+        <td>${fmtRp(r.saldo_awal || 0)}</td>
+        <td>${fmtRp(r.nominal || 0)}</td>
+        <td>${r.admin_dalam ? fmtRp(r.admin_dalam) : '-'}</td>
+        <td>${r.admin_luar ? fmtRp(r.admin_luar) : '-'}</td>
+        <td>${r.fee_bank ? fmtRp(r.fee_bank) : '-'}</td>
+        <td>${fmtRp(r.saldo_akhir || 0)}</td>
+        <td>${r.note || '-'}</td>
+        <td>
+          <button class="btn btn-ghost" data-act="edit" title="Edit" style="height:32px;padding:4px 8px">✏️</button>
+          <button class="btn btn-danger" data-act="del" title="Hapus" style="height:32px;padding:4px 8px">🗑️</button>
+        </td>
+      </tr>`
+    }).join('')
+  }
+
+  // Delegasi klik untuk Aksi Edit/Hapus
+  document.addEventListener('click', async (e)=>{
+    const btn = e.target.closest('button[data-act]')
+    if(!btn) return
+    const tr = btn.closest('tr[data-id]')
+    if(!tr) return
+    const id = tr.getAttribute('data-id')
+    const act = btn.getAttribute('data-act')
+
+    if(act==='del'){
+      if(!confirm('Hapus transaksi ini?')) return
+      const { error } = await supabase.from('transactions').delete().eq('id', id)
+      if(error){ alert('Gagal hapus: '+error.message); return }
+      await refreshByRange()
+    } else if(act==='edit'){
+      alert('Edit: akan diaktifkan. (Form edit memuat data transaksi & update baris.)')
+    }
+  })
 
   // ====== UI: filter chips ======
   document.querySelectorAll('.chip').forEach(ch=>{
@@ -524,16 +623,28 @@
     })
   })
 
-  // ====== Tambah transaksi (popup jenis -> form) ======
-  function openJenis(){ document.getElementById('modalJenis').classList.add('show') }
-  function closeJenis(){ document.getElementById('modalJenis').classList.remove('show') }
-  function openForm(){ document.getElementById('modalForm').classList.add('show') }
-  function closeForm(){ document.getElementById('modalForm').classList.remove('show') }
+  // ====== Date preset & apply ======
+  $('presetToday').onclick = async ()=>{ setPreset(1); await refreshByRange() }
+  $('preset7').onclick     = async ()=>{ setPreset(7); await refreshByRange() }
+  $('preset30').onclick    = async ()=>{ setPreset(30); await refreshByRange() }
+  $('applyRange').onclick  = async ()=>{
+    const f = $('dateFrom').value, t = $('dateTo').value
+    if(!f || !t){ alert('Pilih tanggal Dari dan Sampai.'); return }
+    if(new Date(f) > new Date(t)){ alert('Tanggal Dari tidak boleh melewati Sampai.'); return }
+    range.from = f; range.to = t; updateRangeLabel()
+    await refreshByRange()
+  }
 
-  document.getElementById('btnTambah').onclick = openJenis
-  document.getElementById('fabAdd').onclick = openJenis
-  document.getElementById('xJenis').onclick = document.getElementById('batalJenis').onclick = closeJenis
-  document.getElementById('xForm').onclick = document.getElementById('batalForm').onclick = ()=>{ closeForm(); }
+  // ====== Tambah transaksi (popup jenis -> form) ======
+  function openJenis(){ $('modalJenis').classList.add('show') }
+  function closeJenis(){ $('modalJenis').classList.remove('show') }
+  function openForm(){ $('modalForm').classList.add('show') }
+  function closeForm(){ $('modalForm').classList.remove('show') }
+
+  $('btnTambah').onclick = openJenis
+  $('fabAdd').onclick = openJenis
+  $('xJenis').onclick = $('batalJenis').onclick = closeJenis
+  $('xForm').onclick = $('batalForm').onclick = ()=>{ closeForm(); }
 
   // pilih jenis
   document.querySelectorAll('#modalJenis [data-pilih]').forEach(btn=>{
@@ -551,53 +662,53 @@
   }
 
   function setupForm(jenis){
-    document.getElementById('dlgTitle').textContent = `Form ${jenis.toUpperCase()}`
-    document.getElementById('f_jenis').value = jenis
-    document.getElementById('f_branch').value = viewBranch || gBranch
-    document.getElementById('f_nom').value = ''
-    document.getElementById('f_admin_dalam').value=''
-    document.getElementById('f_admin_luar').value=''
-    document.getElementById('f_fee_bank').value=''
-    document.getElementById('f_ket').value=''
+    $('dlgTitle').textContent = `Form ${jenis.toUpperCase()}`
+    $('f_jenis').value = jenis
+    $('f_branch').value = viewBranch || gBranch
+    $('f_nom').value = ''
+    $('f_admin_dalam').value=''
+    $('f_admin_luar').value=''
+    $('f_fee_bank').value=''
+    $('f_ket').value=''
 
-    const sumber=document.getElementById('f_sumber'), terima=document.getElementById('f_terima')
+    const sumber=$('f_sumber'), terima=$('f_terima')
 
     if(jenis==='tarik'){
       const laci = (cacheAcc.cash||[]).filter(a=>/laci/i.test(a.name))
       fillSelect(sumber, laci); sumber.disabled=true
       fillSelect(terima, cacheAcc.rekening||[]); terima.disabled=false
-      document.getElementById('rowFeeBank').style.display='none'
+      $('rowFeeBank').style.display='none'
     }
     else if(jenis==='transfer'){
       fillSelect(sumber, cacheAcc.rekening||[]); sumber.disabled=false
       const laci = (cacheAcc.cash||[]).filter(a=>/laci/i.test(a.name))
       fillSelect(terima, laci); terima.disabled=true
-      document.getElementById('rowFeeBank').style.display='block'
+      $('rowFeeBank').style.display='block'
     }
     else if(jenis==='pulsa'){
       fillSelect(sumber, cacheAcc.server_pulsa||[]); sumber.disabled=false
       const laci = (cacheAcc.cash||[]).filter(a=>/laci/i.test(a.name))
       fillSelect(terima, laci); terima.disabled=true
-      document.getElementById('rowFeeBank').style.display='none'
+      $('rowFeeBank').style.display='none'
     }
     else if(jenis==='jasa'){
       const laci = (cacheAcc.cash||[]).filter(a=>/laci/i.test(a.name))
       fillSelect(terima, laci); terima.disabled=true
       fillSelect(sumber, []); sumber.innerHTML = `<option value="">(Tidak berlaku)</option>`; sumber.disabled=true
-      document.getElementById('rowFeeBank').style.display='none'
+      $('rowFeeBank').style.display='none'
     }
   }
 
-  document.getElementById('simpanForm').onclick = async ()=>{
-    const jenis = document.getElementById('f_jenis').value
+  $('simpanForm').onclick = async ()=>{
+    const jenis = $('f_jenis').value
     const branch = viewBranch || gBranch
-    const sumber = document.getElementById('f_sumber').value || null
-    const terima = document.getElementById('f_terima').value || null
-    const nominal = parseNum(document.getElementById('f_nom').value)
-    const admin_dalam = parseNum(document.getElementById('f_admin_dalam').value)
-    const admin_luar = parseNum(document.getElementById('f_admin_luar').value)
-    const fee_bank = parseNum(document.getElementById('f_fee_bank').value)
-    const note = document.getElementById('f_ket').value.trim()
+    const sumber = $('f_sumber').value || null
+    const terima = $('f_terima').value || null
+    const nominal = parseNum($('f_nom').value)
+    const admin_dalam = parseNum($('f_admin_dalam').value)
+    const admin_luar = parseNum($('f_admin_luar').value)
+    const fee_bank = parseNum($('f_fee_bank').value)
+    const note = $('f_ket').value.trim()
 
     if(!jenis){ toastErr('Jenis wajib.'); return }
     if(nominal<=0){ toastErr('Nominal harus > 0.'); return }
@@ -606,30 +717,16 @@
     if(jenis==='pulsa' && (!sumber)) { toastErr('Sumber Dana (server pulsa) wajib diisi.'); return }
 
     try{
-      const row={
-        branch_code: branch,
-        jenis,
-        src_account_id: sumber,
-        dst_account_id: terima,
-        nominal,
-        admin_dalam,
-        admin_luar,
-        fee_bank,
-        note
-      }
+      const row={ branch_code: branch, jenis, src_account_id: sumber, dst_account_id: terima, nominal, admin_dalam, admin_luar, fee_bank, note }
       const { error } = await supabase.from('transactions').insert(row)
       if(error) throw error
 
-      // refresh tampilan
-      document.getElementById('modalForm').classList.remove('show')
-      await loadRiwayat()
-      await loadKPITransaksi()
-      await loadKPISaldo()
+      $('modalForm').classList.remove('show')
+      await refreshByRange()
     }catch(e){ toastErr('Gagal simpan: '+(e.message||e)) }
   }
 
-  // logout
-  document.getElementById('lnk-logout').addEventListener('click', async ()=>{ await supabase.auth.signOut(); location.href='login.html' })
+  $('lnk-logout').addEventListener('click', async ()=>{ await supabase.auth.signOut(); location.href='login.html' })
 
   // start
   boot()
