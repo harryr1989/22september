@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>Transaksi Mini‑ATM | AMKO</title>
+  <title>Transaksi Mini-ATM | AMKO</title>
   <style>
     :root{
       --bg:#f6f8fb; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#0b63f3;
@@ -28,6 +28,7 @@
     header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
     .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px}
 
+    /* FIX: hilangkan typo var(--bd') yang bikin CSS korup */
     .topbar{position:sticky;top:54px;z-index:9;background:linear-gradient(#fff,#fff 75%,transparent);padding:12px 16px;border-bottom:1px solid var(--bd)}
     .input{border:1px solid var(--bd);background:#fff;border-radius:10px;padding:12px 12px;font-size:16px;height:var(--touch);outline:none}
     .btn{border:none;border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:700;height:var(--touch)}
@@ -73,6 +74,15 @@
     }
 
     .fab{position:fixed;right:14px;bottom:calc(14px + var(--safe-bottom));width:56px;height:56px;border-radius:999px;background:var(--pri);color:#fff;display:none;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(11,99,243,.35);z-index:15;font-size:26px;font-weight:900}
+
+    /* KPI style: pakai card mini agar konsisten */
+    .kpi-grid{display:grid;grid-template-columns:repeat(1,1fr);gap:10px}
+    @media(min-width:560px){ .kpi-grid{grid-template-columns:repeat(2,1fr)} }
+    @media(min-width:900px){ .kpi-grid{grid-template-columns:repeat(5,1fr)} }
+    .kpi-card{background:#fff;border:1px solid var(--bd);border-radius:16px;box-shadow:var(--shadow);padding:12px;display:flex;flex-direction:column;gap:6px}
+    .kpi-title{font-size:12px;color:#475569}
+    .kpi-value{font-size:18px;font-weight:800}
+    .kpi-sub{font-size:11px;color:#6b7280}
   </style>
 </head>
 <body>
@@ -90,8 +100,8 @@
   <div>
     <header>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <h2 style="margin:0;font-size:18px">Transaksi Mini‑ATM</h2>
-        <span class="pill" style="font-size:11px">Owner bisa pilih cabang • Non‑owner terkunci cabang profil</span>
+        <h2 style="margin:0;font-size:18px">Transaksi Mini-ATM</h2>
+        <span class="pill" style="font-size:11px">Owner bisa pilih cabang • Non-owner terkunci cabang profil</span>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <div id="me" class="pill">memuat…</div>
@@ -121,6 +131,71 @@
     </div>
 
     <div class="grid">
+      <!-- KPI Transaksi: gaya card -->
+      <div class="card">
+        <h3 style="margin-bottom:10px">KPI Transaksi <span id="kpiTglLabel" class="pill" style="margin-left:8px">Hari ini</span></h3>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-title">Omset</div>
+            <div id="kpi_omset" class="kpi-value">Rp 0</div>
+            <div class="kpi-sub">Σ nominal</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Tarik Tunai</div>
+            <div id="kpi_tarik" class="kpi-value">Rp 0</div>
+            <div class="kpi-sub">jenis=tarik</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Transfer</div>
+            <div id="kpi_transfer" class="kpi-value">Rp 0</div>
+            <div class="kpi-sub">jenis=transfer</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Fee Bank</div>
+            <div id="kpi_fee" class="kpi-value">Rp 0</div>
+            <div class="kpi-sub">Σ fee_bank</div>
+          </div>
+          <div class="kpi-card" id="kpi_profit_wrap" style="display:none">
+            <div class="kpi-title">Profit <span class="kpi-sub">(owner only)</span></div>
+            <div id="kpi_profit" class="kpi-value">Rp 0</div>
+            <div class="kpi-sub">Σ (adm_dlm+adm_luar−fee)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Master Saldo Akun -->
+      <div class="card">
+        <h3 style="margin-bottom:10px">KPI Master Saldo Akun</h3>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-title">Laci Tunai</div>
+            <div id="kpi_laci" class="kpi-value">Rp 0</div>
+            <div class="kpi-sub">cash: nama mengandung “laci”</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Mandiri</div>
+            <div id="kpi_mandiri" class="kpi-value">Rp 0</div>
+            <div class="kpi-sub">rekening Mandiri</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">BRI</div>
+            <div id="kpi_bri" class="kpi-value">Rp 0</div>
+            <div class="kpi-sub">rekening BRI</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">BNI</div>
+            <div id="kpi_bni" class="kpi-value">Rp 0</div>
+            <div class="kpi-sub">rekening BNI</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Total Rekening</div>
+            <div id="kpi_rek_total" class="kpi-value">Rp 0</div>
+            <div class="kpi-sub">Σ semua rekening</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Riwayat -->
       <div class="card">
         <h3>Riwayat Transaksi</h3>
         <table>
@@ -257,9 +332,6 @@
 
   const isOwner = ()=> gRole==='owner'
 
-  function show(el){ el.style.display='flex'}
-  function hide(el){ el.style.display='none'}
-
   function toastErr(t){ const m=$('msgErr'); m.textContent=t; m.style.display='block'; setTimeout(()=>m.style.display='none',3000) }
 
   ;(()=>{ // input numeric formatters
@@ -288,16 +360,22 @@
     $('roleBadge').textContent = `role: ${gRole}`
     $('branchBadge').textContent = `branch: ${viewBranch || '-'}`
 
+    // Tampilkan profit KPI hanya untuk owner
+    $('kpi_profit_wrap').style.display = isOwner()? 'block':'none'
+
     if(isOwner()){
       $('branchRow').style.display='flex'
       $('fabAdd').style.display='flex'
       await loadBranches()
     }else{
-      $('branchRow').style.display='grid' // tampil baris untuk tombol tambah
+      // non-owner: tetap tampil tombol tambah
+      $('branchRow').style.display='grid'
       $('btnTambah').style.display='inline-block'
     }
 
     await loadAccounts()
+    await loadKPITransaksi()
+    await loadKPISaldo()
     await loadRiwayat()
   }
 
@@ -318,14 +396,21 @@
     sel.innerHTML = list.map(b=>`<option value="${b.code}">${b.code} — ${b.name}</option>`).join('')
     sel.value = viewBranch || list[0].code
     if(!viewBranch) viewBranch = sel.value
-    sel.onchange = ()=>{ viewBranch = sel.value; $('branchBadge').textContent = `branch: ${viewBranch}`; loadAccounts(); loadRiwayat(); }
+    sel.onchange = async ()=>{
+      viewBranch = sel.value;
+      $('branchBadge').textContent = `branch: ${viewBranch}`;
+      await loadAccounts();
+      await loadKPITransaksi();
+      await loadKPISaldo();
+      await loadRiwayat();
+    }
   }
 
   async function loadAccounts(){
     const cab = viewBranch || gBranch
     const { data, error } = await supabase
       .from('accounts')
-      .select('id,name,account_type,branch_code')
+      .select('id,name,account_type,branch_code,saldo')
       .eq('branch_code', cab)
       .order('name')
     if(error){ alert('Gagal ambil akun: '+error.message); return }
@@ -334,19 +419,18 @@
   }
 
   async function loadRiwayat(){
-    // Catatan: sesuaikan nama tabel/view riwayatmu. Di sini diasumsikan v_tx_summary punya kolom: created_at, jenis, route, nominal, admin_total, note, branch_code
+    // Asumsi view v_tx_summary: created_at, jenis, route, nominal, admin_total, note, branch_code
     const cab = viewBranch || gBranch
     let query = supabase.from('v_tx_summary').select('created_at,jenis,route,nominal,admin_total,note,branch_code').eq('branch_code', cab).order('created_at', { ascending:false }).limit(100)
     if(filterJenis!=='all') query = query.eq('jenis', filterJenis)
     const { data, error } = await query
     if(error){
-      // fallback sederhana kalau view tidak ada
-      $('tb').innerHTML = `<tr><td colspan="6" style="color:#991b1b">Riwayat belum tersedia (buat view v_tx_summary atau sesuaikan query).</td></tr>`
+      document.getElementById('tb').innerHTML = `<tr><td colspan="6" style="color:#991b1b">Riwayat belum tersedia (buat view v_tx_summary atau sesuaikan query).</td></tr>`
       return
     }
-    const rows = data||[]
-    if(rows.length===0){ $('tb').innerHTML = `<tr><td colspan="6" style="color:#64748b">Belum ada transaksi.</td></tr>`; return }
-    $('tb').innerHTML = rows.map(r=>{
+    const rows = (data||[])
+    if(rows.length===0){ document.getElementById('tb').innerHTML = `<tr><td colspan="6" style="color:#64748b">Belum ada transaksi.</td></tr>`; return }
+    document.getElementById('tb').innerHTML = rows.map(r=>{
       const t = new Date(r.created_at).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric', hour:'2-digit', minute:'2-digit'})
       return `<tr>
         <td>${t}</td>
@@ -357,6 +441,77 @@
         <td>${r.note||'-'}</td>
       </tr>`
     }).join('')
+  }
+
+  // ====== KPI ======
+  function startOfTodayISO(){
+    const d = new Date()
+    d.setHours(0,0,0,0)
+    return d.toISOString()
+  }
+  function endOfTodayISO(){
+    const d = new Date()
+    d.setHours(23,59,59,999)
+    return d.toISOString()
+  }
+
+  async function loadKPITransaksi(){
+    const cab = viewBranch || gBranch
+    const tmin = startOfTodayISO()
+    const tmax = endOfTodayISO()
+    document.getElementById('kpiTglLabel').textContent = 'Hari ini'
+
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('jenis, nominal, admin_dalam, admin_luar, fee_bank, branch_code, created_at')
+      .eq('branch_code', cab)
+      .gte('created_at', tmin)
+      .lte('created_at', tmax)
+
+    let omset=0, tarik=0, transfer=0, fee=0, profit=0
+    if(!error){
+      for(const r of (data||[])){
+        const n = Number(r.nominal||0)
+        const ad = Number(r.admin_dalam||0)
+        const al = Number(r.admin_luar||0)
+        const fb = Number(r.fee_bank||0)
+        omset += n
+        fee += fb
+        if((r.jenis||'')==='tarik') tarik += n
+        if((r.jenis||'')==='transfer') transfer += n
+        profit += (ad + al - fb)
+      }
+    }
+    document.getElementById('kpi_omset').textContent = fmtRp(omset)
+    document.getElementById('kpi_tarik').textContent = fmtRp(tarik)
+    document.getElementById('kpi_transfer').textContent = fmtRp(transfer)
+    document.getElementById('kpi_fee').textContent = fmtRp(fee)
+    if(isOwner()) document.getElementById('kpi_profit').textContent = fmtRp(profit)
+  }
+
+  async function loadKPISaldo(){
+    const cab = viewBranch || gBranch
+    const { data, error } = await supabase
+      .from('accounts')
+      .select('name, account_type, saldo, branch_code')
+      .eq('branch_code', cab)
+
+    let laci=0, mandiri=0, bri=0, bni=0, rek_total=0
+    if(!error){
+      for(const a of (data||[])){
+        const saldo = Number(a.saldo||0)
+        if(a.account_type==='rekening') rek_total += saldo
+        if(a.account_type==='cash' && /laci/i.test(a.name||'')) laci += saldo
+        if(a.account_type==='rekening' && /mandiri/i.test(a.name||'')) mandiri += saldo
+        if(a.account_type==='rekening' && /\bbri\b/i.test(a.name||'')) bri += saldo
+        if(a.account_type==='rekening' && /\bbni\b/i.test(a.name||'')) bni += saldo
+      }
+    }
+    document.getElementById('kpi_laci').textContent = fmtRp(laci)
+    document.getElementById('kpi_mandiri').textContent = fmtRp(mandiri)
+    document.getElementById('kpi_bri').textContent = fmtRp(bri)
+    document.getElementById('kpi_bni').textContent = fmtRp(bni)
+    document.getElementById('kpi_rek_total').textContent = fmtRp(rek_total)
   }
 
   // ====== UI: filter chips ======
@@ -370,15 +525,15 @@
   })
 
   // ====== Tambah transaksi (popup jenis -> form) ======
-  function openJenis(){ $('modalJenis').classList.add('show') }
-  function closeJenis(){ $('modalJenis').classList.remove('show') }
-  function openForm(){ $('modalForm').classList.add('show') }
-  function closeForm(){ $('modalForm').classList.remove('show') }
+  function openJenis(){ document.getElementById('modalJenis').classList.add('show') }
+  function closeJenis(){ document.getElementById('modalJenis').classList.remove('show') }
+  function openForm(){ document.getElementById('modalForm').classList.add('show') }
+  function closeForm(){ document.getElementById('modalForm').classList.remove('show') }
 
-  $('btnTambah').onclick = openJenis
-  $('fabAdd').onclick = openJenis
-  $('xJenis').onclick = $('batalJenis').onclick = closeJenis
-  $('xForm').onclick = $('batalForm').onclick = ()=>{ closeForm(); }
+  document.getElementById('btnTambah').onclick = openJenis
+  document.getElementById('fabAdd').onclick = openJenis
+  document.getElementById('xJenis').onclick = document.getElementById('batalJenis').onclick = closeJenis
+  document.getElementById('xForm').onclick = document.getElementById('batalForm').onclick = ()=>{ closeForm(); }
 
   // pilih jenis
   document.querySelectorAll('#modalJenis [data-pilih]').forEach(btn=>{
@@ -391,77 +546,59 @@
   })
 
   function fillSelect(sel, items){
-    sel.innerHTML = items.map(i=>`<option value="${i.id}">${i.name}</option>`).join('')
+    sel.innerHTML = (items||[]).map(i=>`<option value="${i.id}">${i.name}</option>`).join('')
+    if(!items || !items.length){ sel.innerHTML = '<option value="">(Tidak ada opsi)</option>' }
   }
 
   function setupForm(jenis){
-    $('dlgTitle').textContent = `Form ${jenis.toUpperCase()}`
-    $('f_jenis').value = jenis
-    $('f_branch').value = viewBranch || gBranch
-    $('f_nom').value = ''
-    $('f_admin_dalam').value=''
-    $('f_admin_luar').value=''
-    $('f_fee_bank').value=''
-    $('f_ket').value=''
+    document.getElementById('dlgTitle').textContent = `Form ${jenis.toUpperCase()}`
+    document.getElementById('f_jenis').value = jenis
+    document.getElementById('f_branch').value = viewBranch || gBranch
+    document.getElementById('f_nom').value = ''
+    document.getElementById('f_admin_dalam').value=''
+    document.getElementById('f_admin_luar').value=''
+    document.getElementById('f_fee_bank').value=''
+    document.getElementById('f_ket').value=''
 
-    const cab = viewBranch || gBranch
-    const sumber=$('f_sumber'), terima=$('f_terima')
+    const sumber=document.getElementById('f_sumber'), terima=document.getElementById('f_terima')
 
-    // aturan pengisian akun per jenis
     if(jenis==='tarik'){
-      // Sumber: CASH (Laci Tunai), kunci ke yang mengandung "laci"
-      const laci = cacheAcc.cash.filter(a=>/laci/i.test(a.name))
-      fillSelect(sumber, laci)
-      sumber.disabled=true
-      // Terima: BANK (rekening saja)
-      fillSelect(terima, cacheAcc.rekening)
-      terima.disabled=false
-      $('rowFeeBank').style.display='none'
+      const laci = (cacheAcc.cash||[]).filter(a=>/laci/i.test(a.name))
+      fillSelect(sumber, laci); sumber.disabled=true
+      fillSelect(terima, cacheAcc.rekening||[]); terima.disabled=false
+      document.getElementById('rowFeeBank').style.display='none'
     }
     else if(jenis==='transfer'){
-      // Sumber: BANK (rekening)
-      fillSelect(sumber, cacheAcc.rekening)
-      sumber.disabled=false
-      // Terima: CASH (Laci Tunai), kunci
-      const laci = cacheAcc.cash.filter(a=>/laci/i.test(a.name))
-      fillSelect(terima, laci)
-      terima.disabled=true
-      $('rowFeeBank').style.display='block'
+      fillSelect(sumber, cacheAcc.rekening||[]); sumber.disabled=false
+      const laci = (cacheAcc.cash||[]).filter(a=>/laci/i.test(a.name))
+      fillSelect(terima, laci); terima.disabled=true
+      document.getElementById('rowFeeBank').style.display='block'
     }
     else if(jenis==='pulsa'){
-      // Sumber: SERVER PULSA
-      fillSelect(sumber, cacheAcc.server_pulsa)
-      sumber.disabled=false
-      // Terima: CASH (Laci)
-      const laci = cacheAcc.cash.filter(a=>/laci/i.test(a.name))
-      fillSelect(terima, laci)
-      terima.disabled=true
-      $('rowFeeBank').style.display='none'
+      fillSelect(sumber, cacheAcc.server_pulsa||[]); sumber.disabled=false
+      const laci = (cacheAcc.cash||[]).filter(a=>/laci/i.test(a.name))
+      fillSelect(terima, laci); terima.disabled=true
+      document.getElementById('rowFeeBank').style.display='none'
     }
     else if(jenis==='jasa'){
-      // Jasa: fee admin -> CASH (Laci). Kita cukup kunci Terima = Laci, Sumber optional kosong.
-      const laci = cacheAcc.cash.filter(a=>/laci/i.test(a.name))
-      fillSelect(terima, laci)
-      terima.disabled=true
-      fillSelect(sumber, [])
-      sumber.innerHTML = `<option value="">(Tidak berlaku)</option>`
-      sumber.disabled=true
-      $('rowFeeBank').style.display='none'
+      const laci = (cacheAcc.cash||[]).filter(a=>/laci/i.test(a.name))
+      fillSelect(terima, laci); terima.disabled=true
+      fillSelect(sumber, []); sumber.innerHTML = `<option value="">(Tidak berlaku)</option>`; sumber.disabled=true
+      document.getElementById('rowFeeBank').style.display='none'
     }
   }
 
-  $('simpanForm').onclick = async ()=>{
-    const jenis = $('f_jenis').value
+  document.getElementById('simpanForm').onclick = async ()=>{
+    const jenis = document.getElementById('f_jenis').value
     const branch = viewBranch || gBranch
-    const sumber = $('f_sumber').value || null
-    const terima = $('f_terima').value || null
-    const nominal = parseNum($('f_nom').value)
-    const admin_dalam = parseNum($('f_admin_dalam').value)
-    const admin_luar = parseNum($('f_admin_luar').value)
-    const fee_bank = parseNum($('f_fee_bank').value)
-    const note = $('f_ket').value.trim()
+    const sumber = document.getElementById('f_sumber').value || null
+    const terima = document.getElementById('f_terima').value || null
+    const nominal = parseNum(document.getElementById('f_nom').value)
+    const admin_dalam = parseNum(document.getElementById('f_admin_dalam').value)
+    const admin_luar = parseNum(document.getElementById('f_admin_luar').value)
+    const fee_bank = parseNum(document.getElementById('f_fee_bank').value)
+    const note = document.getElementById('f_ket').value.trim()
 
-    // Validasi minimal
     if(!jenis){ toastErr('Jenis wajib.'); return }
     if(nominal<=0){ toastErr('Nominal harus > 0.'); return }
     if(jenis==='tarik' && (!terima)) { toastErr('Terima Dana (rekening) wajib diisi.'); return }
@@ -469,8 +606,6 @@
     if(jenis==='pulsa' && (!sumber)) { toastErr('Sumber Dana (server pulsa) wajib diisi.'); return }
 
     try{
-      // Simpan transaksi dasar.
-      // Catatan: sesuaikan nama tabel kolom bila berbeda.
       const row={
         branch_code: branch,
         jenis,
@@ -485,14 +620,16 @@
       const { error } = await supabase.from('transactions').insert(row)
       if(error) throw error
 
-      closeForm()
+      // refresh tampilan
+      document.getElementById('modalForm').classList.remove('show')
       await loadRiwayat()
-      // opsional: update saldo realtime bisa didelegasikan ke trigger DB / edge function.
+      await loadKPITransaksi()
+      await loadKPISaldo()
     }catch(e){ toastErr('Gagal simpan: '+(e.message||e)) }
   }
 
   // logout
-  $('lnk-logout').addEventListener('click', async ()=>{ await supabase.auth.signOut(); location.href='login.html' })
+  document.getElementById('lnk-logout').addEventListener('click', async ()=>{ await supabase.auth.signOut(); location.href='login.html' })
 
   // start
   boot()
