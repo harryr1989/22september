@@ -317,6 +317,7 @@ table thead th:last-child{ border-top-right-radius:8px }
               <tr>
                 <th class="text-center" style="width:60px">No</th>
                 <th>User & Tanggal</th>
+                <th>ID Trx</th>
                 <th>Sumber Dana</th>
                 <th>Jenis</th>
                 <th class="text-end">Saldo Awal</th>
@@ -949,6 +950,7 @@ function renderTable(){
     return `<tr class="${rowCls}">
       <td class="text-center">${no}</td>
       <td><div class="user-name">${t.user||'-'}</div><small>${viewTime(t.at)}</small></td>
+      <td title="${t.id}"><code>${(t.id||"").slice(0,8)}</code></td>
       <td>${t.akunSumber||'-'}</td>
       <td>${t.jenis}</td>
       <td class="text-end">${renderSaldo(t.sAwal,t.akunSumber,t.akunTujuan)}</td>
@@ -1001,7 +1003,7 @@ function hookFilters(){
   document.getElementById('btnExport').addEventListener('click', ()=>{
     const rows=getFiltered();
     if(!rows.length){ alert('Tidak ada data untuk diexport pada filter ini.'); return; }
-    const header=['Tanggal','User','Jenis','Akun','Nominal','Adm Dalam','Adm Luar','Adm Bank','Profit','Saldo Awal (akun)','Saldo Akhir (akun)','Keterangan','Status'];
+    const header=['Tanggal','User','ID','Jenis','Akun','Nominal','Adm Dalam','Adm Luar','Adm Bank','Profit','Saldo Awal (akun)','Saldo Akhir (akun)','Keterangan','Status'];
     const lines=[header.join(',')];
     rows.forEach(t=>{
       const akunLbl=t.akunSumber||t.akunTujuan||'';
@@ -1009,10 +1011,7 @@ function hookFilters(){
       const profit=profitOf(t);
       const sAwal = t.sAwal && akunLbl && t.sAwal[akunLbl]!==undefined ? t.sAwal[akunLbl] : '';
       const sAkhir= t.sAkhir && akunLbl && t.sAkhir[akunLbl]!==undefined ? t.sAkhir[akunLbl] : '';
-      const cols=[
-        viewTime(t.at).replaceAll(',',''),
-        (t.user||'').replaceAll(',',''),
-        t.jenis,
+      const cols=[viewTime(t.at).replaceAll(',',''),(t.user||'').replaceAll(',',''),(t.id||'').toString().replaceAll(',',''),t.jenis,
         akunLbl.replaceAll(',',''),
         Number(t.nominal||0),
         Number(t.admDalam||0),
