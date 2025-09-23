@@ -176,6 +176,13 @@ table thead th:last-child{ border-top-right-radius:8px }
 .stat .val{ color: var(--kpi-text); }
 
 </style>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+    const supabaseUrl = 'https://kfqcdcvcnyhisbmwftzb.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y';
+    window.supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: true, autoRefreshToken: true } });
+  </script>
 </head>
 <body>
 <div id="root" class="app">
@@ -469,7 +476,7 @@ let branches = collectBranchesFromLocal();
 if(!Array.isArray(branches) || !branches.length){ 
   branches = loadJSON(BR_KEY, []); 
 }
-if(!Array.isArray(branches) || !branches.length){ branches=['AMKO 18']; saveJSON(BR_KEY, branches); }
+if(!Array.isArray(branches) || !branches.length){ branches=['AMKO 018','AMKO 020','AMKO 025']; saveJSON(BR_KEY, branches); }
 let session = loadJSON(AUTH_KEY,null);
 let users = loadJSON(USERS_KEY,[]).map(u=>({name2:'',...u}));
 const me = users.find(u => (u.username||'').toLowerCase()===(session?.username||'').toLowerCase());
@@ -1097,5 +1104,92 @@ function init(){
 }
 init();
 </script>
+
+<script>
+(function(){
+  function normalizeBranchCode(s){
+    if(!s) return s;
+    var m = String(s).trim().match(/^(\s*amko)\s*0*(\d+)\s*$/i);
+    if(m){ return "AMKO " + String(m[2]).padStart(3,'0'); }
+    return String(s).trim().toUpperCase().replace(/\s+/g,' ');
+  }
+
+  var sel = document.getElementById('branchSelect') || document.querySelector('select[name*=branch i], select[name*=cabang i]');
+  if(sel){
+    Array.from(sel.options).forEach(function(opt){
+      opt.value = normalizeBranchCode(opt.value||opt.text);
+      opt.text  = normalizeBranchCode(opt.text||opt.value);
+    });
+    if(sel.value){ sel.value = normalizeBranchCode(sel.value); }
+  }
+
+  var badge = document.getElementById('badgeKPI');
+  if(!badge){
+    badge = document.createElement('span');
+    badge.id = 'badgeKPI';
+    badge.className = 'pill';
+    badge.style.margin = '0 16px 8px';
+    badge.textContent = 'KPI Cabang: (memuat...)';
+    var kpiAnchor = document.getElementById('saldoCash')?.closest('.card')?.parentElement;
+    if(kpiAnchor && kpiAnchor.parentElement){
+      kpiAnchor.parentElement.insertBefore(badge, kpiAnchor);
+    }else{
+      document.body.insertBefore(badge, document.body.firstChild);
+    }
+  }
+
+  async function refreshKPI(){
+    try{
+      var cab = null;
+      if(sel && sel.value) cab = normalizeBranchCode(sel.value);
+      if(!cab && badge && badge.textContent.includes(': ')){
+        cab = badge.textContent.split(': ').pop();
+      }
+      if(!cab) return;
+
+      badge.textContent = 'KPI Cabang: ' + cab;
+
+      if(!(window.supabase && window.supabase.from)) return;
+      const { data, error } = await window.supabase
+        .from('v_kpi_saldo_by_type')
+        .select('account_type,saldo_tipe')
+        .eq('branch_code', cab);
+      if(error) throw error;
+
+      var map = {};
+      (data||[]).forEach(function(r){
+        var k = String(r.account_type||'').toLowerCase();
+        map[k] = Number(r.saldo_tipe||0);
+      });
+
+      var elCash = document.getElementById('saldoCash');
+      var elBank = document.getElementById('saldoBank');
+      var elPulsa= document.getElementById('saldoPulsa');
+      function fmt(n){ return "Rp " + (new Intl.NumberFormat('id-ID').format(Number(n||0))); }
+
+      if(elCash)  elCash.textContent  = fmt(map['cash']||0);
+      if(elBank)  elBank.textContent  = fmt(map['rekening']||0);
+      if(elPulsa) elPulsa.textContent = fmt(map['server_pulsa']||0);
+    }catch(e){
+      console.warn('KPI refresh failed:', e.message||e);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    refreshKPI();
+  });
+
+  if(sel){
+    sel.addEventListener('change', function(){
+      sel.value = normalizeBranchCode(sel.value);
+      refreshKPI();
+    });
+  }
+
+  window.__amkoNormalizeBranchCode = normalizeBranchCode;
+  window.__amkoRefreshKPI = refreshKPI;
+})();
+</script>
 </body>
+
 </html>
