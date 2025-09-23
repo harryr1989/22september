@@ -11,6 +11,7 @@
       --shadow:0 6px 18px rgba(15,23,42,.08);
     }
     *{box-sizing:border-box}
+    html,body{height:100%}
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt)}
     button,input,select,textarea{font-family:inherit}
 
@@ -18,46 +19,54 @@
     .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px}
     .brand{color:#fff;font-weight:800;font-size:20px;margin-bottom:12px}
     .nav{display:flex;flex-direction:column;gap:6px}
-    .nav a{color:var(--sbfg);text-decoration:none;padding:10px 12px;border-radius:10px}
+    .nav a{color:var(--sbfg);text-decoration:none;padding:10px 12px;border-radius:10px;line-height:1.2}
     .nav a:hover{background:rgba(255,255,255,.10)}
     .nav a.active{background:var(--pri);color:#fff}
 
     header{position:sticky;top:0;z-index:9;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
     .content{padding:16px;max-width:1100px;margin:0 auto}
-    .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px}
+    .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px;white-space:nowrap}
 
     .section{margin-top:16px}
     .section h3{margin:0 0 10px 0;font-size:18px}
     .card{background:var(--card);border:1px solid var(--bd);border-radius:18px;box-shadow:var(--shadow);padding:14px}
     .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
-    .input{border:1px solid var(--bd);background:#fff;border-radius:10px;padding:10px 12px;font-size:15px;height:44px;outline:none}
-    .btn{border:none;border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:700;height:44px}
+    .input{border:1px solid var(--bd);background:#fff;border-radius:10px;padding:10px 12px;font-size:15px;height:44px;outline:none;min-width:0}
+    .btn{border:none;border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:700;height:44px;white-space:nowrap}
     .btn-primary{background:var(--pri);color:#fff}
     .btn-ghost{background:#f1f5f9}
+    .btn-danger{background:#fee2e2;color:#991b1b}
 
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .rowcard{display:grid;grid-template-columns:200px 1fr 140px 200px 300px;gap:8px;align-items:center;background:#fff;border:1px solid var(--bd);border-radius:12px;padding:10px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+    /* Kartu baris fleksibel: aman di desktop & mobile, tidak keluar area */
+    .rowcard{
+      display:grid;
+      grid-template-columns: minmax(160px,1.2fr) minmax(140px,1fr) minmax(110px,.7fr) minmax(160px,1fr) minmax(160px,1fr);
+      gap:8px;align-items:center;background:#fff;border:1px solid var(--bd);border-radius:12px;padding:10px;min-width:0
+    }
+    .rowcard > *{min-width:0}
+    .rowcard strong, .rowcard .muted, .rowcard span, .rowcard div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .muted{color:#64748b}
     .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800;color:#fff}
     .badge-owner{background:#0ea5e9}
     .badge-admin{background:#22c55e}
     .badge-kasir{background:#d97706}
 
+    .actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+    .actions .btn{height:36px;padding:8px 10px;border-radius:10px}
+
     .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:50}
-    .dialog{width:min(560px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column}
+    .dialog{width:min(560px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:92vh}
     .dlg-hd{background:#0ea5e9;color:#fff;padding:12px 16px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
-    .dlg-bd{padding:14px;display:grid;gap:12px}
+    .dlg-bd{padding:14px;display:grid;gap:12px;overflow:auto}
     .dlg-ft{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid var(--bd);background:#fafafa}
     label{font-size:12px;color:#475569;margin-bottom:6px;display:block}
     .icon-input{display:flex;gap:8px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:10px;background:#fff}
-    .icon-input input,.icon-input select{border:none;outline:none;flex:1;font-size:15px;background:transparent}
+    .icon-input input,.icon-input select{border:none;outline:none;flex:1;font-size:15px;background:transparent;min-width:0}
     .error{display:none;background:#fee2e2;border:1px solid #fecaca;color:#991b1b;padding:10px;border-radius:10px}
     .ok{display:none;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:10px;border-radius:10px}
 
-    @media (max-width: 960px){
-      .layout{grid-template-columns:1fr}
-      .sidebar{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:10}
-      .brand{margin:0}
+    @media (max-width: 1100px){
       .content{padding:12px}
       .row{grid-template-columns:1fr}
       .rowcard{grid-template-columns:1fr;gap:6px}
@@ -82,7 +91,7 @@
     <header>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <h2 style="margin:0;font-size:18px">Manajemen Pengguna</h2>
-        <span class="pill">Tambah • Edit • Reset Password • Aktif/Nonaktif</span>
+        <span class="pill">Tambah • Edit • Reset Password • Aktif/Nonaktif • Kelola Cabang</span>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <div id="me" class="pill">memuat…</div>
@@ -137,13 +146,14 @@
 <div class="modal" id="modalBranch">
   <div class="dialog">
     <div class="dlg-hd">
-      <span>Tambah Cabang</span>
+      <span id="titleBranch">Tambah Cabang</span>
       <button class="btn btn-ghost" id="btnCloseBranch">✖</button>
     </div>
     <div class="dlg-bd">
       <div id="msgErrBranch" class="error"></div>
       <div id="msgOkBranch" class="ok"></div>
 
+      <input type="hidden" id="b_id"/>
       <div>
         <label>Nama Cabang</label>
         <div class="icon-input">
@@ -162,6 +172,25 @@
     <div class="dlg-ft">
       <button class="btn" id="btnCancelBranch">Batal</button>
       <button class="btn btn-primary" id="btnSaveBranch">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Hapus Cabang -->
+<div class="modal" id="modalDelBranch">
+  <div class="dialog">
+    <div class="dlg-hd">
+      <span>Hapus Cabang</span>
+      <button class="btn btn-ghost" id="btnCloseDelBranch">✖</button>
+    </div>
+    <div class="dlg-bd">
+      <div class="error" id="msgErrDelBranch" style="display:none"></div>
+      <p id="delText" style="margin:0">Yakin ingin menghapus cabang ini?</p>
+      <input type="hidden" id="del_id"/>
+    </div>
+    <div class="dlg-ft">
+      <button class="btn" id="btnCancelDelBranch">Batal</button>
+      <button class="btn btn-danger" id="btnDoDelBranch">Hapus</button>
     </div>
   </div>
 </div>
@@ -320,9 +349,9 @@
       .eq('id', session.user.id).single()
     if(error){ alert('Gagal ambil profil: '+error.message); return }
 
-    gRole = prof.role; gBranch = prof.branch_code
+    gRole = (prof.role||'').toLowerCase(); gBranch = prof.branch_code
     $('me').textContent = `${prof.full_name || prof.email}`
-    $('roleBadge').textContent = `role: ${prof.role}`
+    $('roleBadge').textContent = `role: ${gRole}`
     $('branchBadge').textContent = `branch: ${prof.branch_code}`
 
     await Promise.all([loadBranches(), loadUsers()])
@@ -331,7 +360,6 @@
 
   // ===== Load data =====
   async function loadBranches(){
-    // Muat semua cabang untuk daftar & dropdown
     const { data, error } = await supabase
       .from('branches')
       .select('id,code,name')
@@ -350,22 +378,25 @@
 
   // ===== Render =====
   function renderBranches(){
-    const q = $('qBranch').value.trim().toLowerCase()
+    const q = $('qBranch').value?.trim().toLowerCase() || ''
     const list = (branches||[]).filter(b => !q || (b.name||'').toLowerCase().includes(q) || (b.code||'').toLowerCase().includes(q))
     $('branchesList').innerHTML = list.map(b=>`
       <div class="rowcard">
-        <div><strong>${b.name}</strong></div>
-        <div class="muted">Kode: ${b.code}</div>
+        <div title="${b.name||''}"><strong>${b.name||'-'}</strong></div>
+        <div class="muted">Kode: ${b.code||'-'}</div>
         <div>${(users||[]).filter(u=>u.branch_code===b.code).length} user</div>
         <div></div>
-        <div style="text-align:right"><span class="muted">-</span></div>
+        <div class="actions">
+          <button class="btn btn-ghost" data-bedit="${b.id}">Edit</button>
+          <button class="btn btn-danger" data-bdel="${b.id}" data-bname="${(b.name||'').replace(/"/g,'&quot;')}">Hapus</button>
+        </div>
       </div>
     `).join('')
     $('noBranch').style.display = list.length ? 'none' : 'block'
   }
 
   function renderUsers(){
-    const q = $('qUser').value.trim().toLowerCase()
+    const q = $('qUser').value?.trim().toLowerCase() || ''
     const fB = $('fltBranch').value
     const fR = $('fltRole').value
     const list = (users||[]).filter(function(u){
@@ -375,7 +406,7 @@
       return true
     })
     $('usersList').innerHTML = list.map(function(u){
-      const isActive = (u.is_active !== false); // treat undefined as active
+      const isActive = (u.is_active !== false)
       const statusPill = isActive
         ? '<span class="pill" style="border-color:#86efac;background:#ecfdf5;color:#166534">aktif</span>'
         : '<span class="pill" style="border-color:#fecaca;background:#fef2f2;color:#991b1b">nonaktif</span>';
@@ -384,11 +415,11 @@
         : '';
       return `
         <div class="rowcard">
-          <div><strong>${u.full_name || '-'}</strong></div>
-          <div class="muted">${u.email||'-'}</div>
+          <div title="${u.full_name||''}"><strong>${u.full_name || '-'}</strong></div>
+          <div class="muted" title="${u.email||''}">${u.email||'-'}</div>
           <div><span class="badge ${pill(u.role)}">${u.role}</span></div>
           <div><span class="pill">branch: ${u.branch_code||'-'}</span> &nbsp; ${statusPill}</div>
-          <div style="text-align:right; display:flex; gap:6px; justify-content:flex-end">
+          <div class="actions">
             <button class="btn btn-ghost" data-edit="${u.id}">Edit</button>
             ${gRole==='owner' ? `<button class="btn btn-ghost" data-reset="${u.id}">Reset PW</button>` : ``}
             ${toggleBtn}
@@ -401,8 +432,8 @@
   function fillBranchFilters(){
     const sel = $('fltBranch'); const selAdd = $('u_branch'); const selEdit = $('e_branch')
     sel.innerHTML = ['<option value="">Semua cabang</option>']
-      .concat((branches||[]).map(function(b){ return `<option value="${b.code}">${b.name} (${b.code})</option>` })).join('')
-    const opts = (branches||[]).map(function(b){ return `<option value="${b.code}">${b.name} (${b.code})</option>` }).join('')
+      .concat((branches||[]).map(b=> `<option value="${b.code}">${b.name} (${b.code})</option>`)).join('')
+    const opts = (branches||[]).map(b=> `<option value="${b.code}">${b.name} (${b.code})</option>`).join('')
     selAdd.innerHTML = opts
     selEdit.innerHTML = opts
     selAdd.value = gBranch || ''
@@ -414,30 +445,81 @@
   $('fltBranch').addEventListener('change', renderUsers)
   $('fltRole').addEventListener('change', renderUsers)
 
-  // Cabang
+  // Cabang: Tambah
   $('btnAddBranch').addEventListener('click', function(){
+    $('titleBranch').textContent = 'Tambah Cabang'
+    $('b_id').value = ''
     $('b_name').value=''; $('b_code').value='';
     $('msgErrBranch').style.display='none'; $('msgOkBranch').style.display='none';
     openModal('modalBranch')
   })
-  $('btnCloseBranch').onclick = function(){ closeModal('modalBranch') }
-  $('btnCancelBranch').onclick = function(){ closeModal('modalBranch') }
+  $('btnCloseBranch').onclick = ()=> closeModal('modalBranch')
+  $('btnCancelBranch').onclick = ()=> closeModal('modalBranch')
 
+  // Cabang: Simpan (tambah / edit)
   $('btnSaveBranch').addEventListener('click', async function(){
+    const id = $('b_id').value
     const name = $('b_name').value.trim()
     const code = $('b_code').value.trim()
     if(!name || !code){ showErr($('msgErrBranch'),'Nama & Kode wajib'); return }
     if(/\s/.test(code)){ showErr($('msgErrBranch'),'Kode tanpa spasi'); return }
 
-    const existRes = await supabase.from('branches').select('id').eq('code', code).maybeSingle()
-    if(existRes.error){ showErr($('msgErrBranch'),'Cek kode: '+existRes.error.message); return }
-    if(existRes.data){ showErr($('msgErrBranch'),'Kode sudah dipakai'); return }
+    // cek unik code (kecuali kalau code tidak berubah pada edit)
+    const exist = await supabase.from('branches').select('id,code').eq('code', code).maybeSingle()
+    if(exist.error && exist.error.code!=='PGRST116'){ showErr($('msgErrBranch'),'Cek kode: '+exist.error.message); return }
+    if(exist.data && (!id || exist.data.id!==id)){ showErr($('msgErrBranch'),'Kode sudah dipakai'); return }
 
-    const ins = await supabase.from('branches').insert({ name, code })
-    if(ins.error){ showErr($('msgErrBranch'),'Gagal tambah cabang: '+ins.error.message); return }
-    showOk($('msgOkBranch'),'Cabang ditambahkan')
+    let res
+    if(id){
+      res = await supabase.from('branches').update({ name, code }).eq('id', id)
+    }else{
+      res = await supabase.from('branches').insert({ name, code })
+    }
+    if(res.error){ showErr($('msgErrBranch'), (id?'Gagal menyimpan: ':'Gagal tambah cabang: ')+res.error.message); return }
+    showOk($('msgOkBranch'), id?'Perubahan disimpan':'Cabang ditambahkan')
     await loadBranches(); renderBranches(); fillBranchFilters()
-    setTimeout(function(){ closeModal('modalBranch') }, 700)
+    setTimeout(()=> closeModal('modalBranch'), 700)
+  })
+
+  // Cabang: Edit & Hapus (delegasi)
+  $('branchesList').addEventListener('click', function(e){
+    const t = e.target.closest('[data-bedit],[data-bdel]')
+    if(!t) return
+    if(t.hasAttribute('data-bedit')){
+      const id = t.getAttribute('data-bedit')
+      const b = (branches||[]).find(x=> x.id===id)
+      if(!b) return
+      $('titleBranch').textContent = 'Edit Cabang'
+      $('b_id').value = b.id
+      $('b_name').value = b.name || ''
+      $('b_code').value = b.code || ''
+      $('msgErrBranch').style.display='none'; $('msgOkBranch').style.display='none';
+      openModal('modalBranch')
+    }else if(t.hasAttribute('data-bdel')){
+      const id = t.getAttribute('data-bdel')
+      const nm = t.getAttribute('data-bname') || ''
+      $('del_id').value = id
+      $('msgErrDelBranch').style.display='none'
+      $('delText').innerHTML = `Yakin ingin menghapus cabang <strong>${nm}</strong>?<br/>Data terkait (user/akun) bisa menghalangi penghapusan.`
+      openModal('modalDelBranch')
+    }
+  })
+
+  // Cabang: Konfirmasi Hapus
+  $('btnCloseDelBranch').onclick = ()=> closeModal('modalDelBranch')
+  $('btnCancelDelBranch').onclick = ()=> closeModal('modalDelBranch')
+  $('btnDoDelBranch').addEventListener('click', async function(){
+    const id = $('del_id').value
+    if(!id) return
+    const del = await supabase.from('branches').delete().eq('id', id)
+    if(del.error){
+      const box = $('msgErrDelBranch')
+      box.textContent = 'Gagal hapus: '+ del.error.message + ' (Pastikan tidak ada user/akun yang masih pakai kode cabang ini)'
+      box.style.display='block'
+      return
+    }
+    await loadBranches(); renderBranches(); fillBranchFilters()
+    closeModal('modalDelBranch')
   })
 
   // Tambah User
@@ -448,8 +530,8 @@
     $('msgErrUser').style.display='none'; $('msgOkUser').style.display='none';
     openModal('modalUser')
   })
-  $('btnCloseUser').onclick = function(){ closeModal('modalUser') }
-  $('btnCancelUser').onclick = function(){ closeModal('modalUser') }
+  $('btnCloseUser').onclick = ()=> closeModal('modalUser')
+  $('btnCancelUser').onclick = ()=> closeModal('modalUser')
 
   $('btnSaveUser').addEventListener('click', async function(){
     const full_name = $('u_name').value.trim()
@@ -483,13 +565,13 @@
       if(out.reset_link){ msg += ' | Reset link: '+out.reset_link }
       showOkUser(msg)
       await loadUsers(); renderUsers()
-      setTimeout(function(){ closeModal('modalUser') }, 1400)
+      setTimeout(()=> closeModal('modalUser'), 1400)
     }catch(e){
       showErrUser('Network error: '+ e.message)
     }
   })
 
-  // Edit / Reset / Toggle: delegasi klik di daftar user
+  // Edit / Reset / Toggle User
   $('usersList').addEventListener('click', async function(e){
     var target = e.target;
     if(!(target instanceof Element)) return;
@@ -498,7 +580,7 @@
     var btnEdit = target.closest('[data-edit]');
     if(btnEdit){
       var id = btnEdit.getAttribute('data-edit');
-      var u = (users||[]).find(function(x){ return x.id === id });
+      var u = (users||[]).find(x=> x.id === id);
       if(!u) return;
       $('e_id').value = u.id;
       $('e_name').value = u.full_name || '';
@@ -563,7 +645,7 @@
     }
   })
 
-  // Simpan Edit
+  // Simpan Edit User
   $('btnSaveEdit').addEventListener('click', async function(){
     const id = $('e_id').value;
     const full_name = $('e_name').value.trim();
@@ -591,15 +673,15 @@
       if(!res.ok){ showErrEdit(out.error || 'Gagal menyimpan perubahan'); return }
       showOkEdit('Perubahan disimpan')
       await loadUsers(); renderUsers()
-      setTimeout(function(){ closeModal('modalEdit') }, 900)
+      setTimeout(()=> closeModal('modalEdit'), 900)
     }catch(e){
       showErrEdit('Network error: '+ e.message)
     }
   })
 
   // Tutup modal Edit
-  $('btnCloseEdit').onclick = function(){ closeModal('modalEdit') }
-  $('btnCancelEdit').onclick = function(){ closeModal('modalEdit') }
+  $('btnCloseEdit').onclick = ()=> closeModal('modalEdit')
+  $('btnCancelEdit').onclick = ()=> closeModal('modalEdit')
 
   // Logout
   $('lnk-logout').addEventListener('click', async function(){
