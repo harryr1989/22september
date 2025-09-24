@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Laporan Tahunan • AMKO</title>
+
+  <!-- Chart.js & Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root{
+      --blue:#1769aa; --blue-900:#0f4c81; --ring:#cbd5e1;
+      --green:#1ca85c; --red:#e74c3c; --orange:#ff8f00;
+      --gray-100:#f3f4f6; --gray-200:#e5e7eb; --gray-300:#d1d5db; --txt:#0f172a;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",sans-serif;background:#f6f9fb;color:var(--txt)}
+    .container{max-width:1200px;margin:16px auto;padding:0 16px}
+
+    /* toolbar */
+    .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+    .select,.btn{height:38px;padding:0 12px;border:1px solid var(--ring);border-radius:8px;background:#fff}
+    .btn{background:linear-gradient(180deg,#1f7cc5,#1769aa);color:#fff;border:none;cursor:pointer}
+    .badge{padding:6px 10px;border-radius:999px;background:#0f4c81;color:#fff;font-size:12px}
+    .muted{color:#6b7280;font-size:12px;margin-left:auto}
+
+    /* section */
+    .panel{background:#fff;border:1px solid var(--gray-200);border-radius:12px;overflow:hidden;box-shadow:0 8px 24px rgba(16,24,40,.06);margin-top:12px}
+    .panel-h{background:var(--blue);color:#fff;padding:10px 12px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+    .panel-b{padding:12px}
+
+    /* table */
+    table{width:100%;border-collapse:collapse}
+    thead th{background:#eef6ff;text-transform:uppercase;font-size:12px;letter-spacing:.3px;border-bottom:1px solid var(--gray-300);padding:10px}
+    tbody td{border-bottom:1px solid var(--gray-200);padding:8px}
+    tfoot td{background:#fafafa;font-weight:800;border-top:2px solid var(--gray-300);padding:10px}
+    .t-right{text-align:right}
+    .t-green{color:var(--green);font-weight:700}
+    .t-red{color:var(--red);font-weight:700}
+    .t-orange{color:var(--orange);font-weight:700}
+
+    /* toast */
+    .toast{position:fixed;right:16px;bottom:16px;background:#111827;color:#fff;padding:12px 14px;border-radius:10px;display:none}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <select id="tahun" class="select" aria-label="Tahun"></select>
+      <button id="btnFilter" class="btn">🔎 FILTER</button>
+      <span class="badge" id="badgeToko">TOKO: -</span>
+      <a class="btn" href="./dashboard.html" style="margin-left:auto">⬅️ Kembali Dashboard</a>
+    </div>
+
+    <!-- Tabel -->
+    <div class="panel">
+      <div class="panel-h">Tabel Statistik Profit Tahun <span id="capYear"></span></div>
+      <div class="panel-b" style="overflow:auto">
+        <table id="tbl">
+          <thead>
+            <tr>
+              <th>Bulan</th>
+              <th class="t-right">Admin Bank</th>
+              <th class="t-right">Operasional</th>
+              <th class="t-right">Profit</th>
+              <th class="t-right">Pengeluaran</th>
+              <th class="t-right">Profit Bersih</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+          <tfoot>
+            <tr>
+              <td>TOTAL</td>
+              <td class="t-right" id="t_admin">Rp 0</td>
+              <td class="t-right" id="t_operasional">Rp 0</td>
+              <td class="t-right t-green" id="t_profit">Rp 0</td>
+              <td class="t-right t-red" id="t_pengeluaran">Rp 0</td>
+              <td class="t-right t-green" id="t_bersih">Rp 0</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Grafik -->
+    <div class="panel">
+      <div class="panel-h">Statistik Profit</div>
+      <div class="panel-b">
+        <canvas id="chart" height="120"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ====== Konfigurasi Supabase (pakai yang sama seperti dashboard) ======
+    const SUPABASE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // ====== Utils ======
+    const bulanNama = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+    const rupiah = n => (n==null||isNaN(n))?"Rp 0": "Rp "+Math.abs(+n).toLocaleString("id-ID");
+    const toast = (m,ms=2500)=>{const t=document.getElementById('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',ms);};
+
+    // ====== Params ======
+    const params = new URLSearchParams(location.search);
+    const BRANCH_CODE = params.get('branch_code') || params.get('branch') || "AMKO1";
+    const BRANCH_NAME = params.get('branch_name') || BRANCH_CODE;
+    const YEAR_DEFAULT = new Date().getFullYear();
+    let YEAR = parseInt(params.get('year') || YEAR_DEFAULT, 10);
+
+    document.getElementById('badgeToko').textContent = `TOKO: ${BRANCH_NAME}`;
+    const tahunSel = document.getElementById('tahun');
+    for(let y=YEAR_DEFAULT-2; y<=YEAR_DEFAULT+1; y++){
+      const o=document.createElement('option'); o.value=y; o.textContent=y; if(y===YEAR) o.selected=true; tahunSel.appendChild(o);
+    }
+    document.getElementById('capYear').textContent = YEAR;
+    document.getElementById('btnFilter').onclick = ()=>{
+      YEAR = +tahunSel.value;
+      document.getElementById('capYear').textContent = YEAR;
+      history.replaceState(null,"",`?branch_code=${encodeURIComponent(BRANCH_CODE)}&branch_name=${encodeURIComponent(BRANCH_NAME)}&year=${YEAR}`);
+      load();
+    };
+
+    // ====== Data loader ======
+    async function fetchMonthlyFromSupabase(code, year){
+      // Kamu bisa ganti nama view/kolom sesuai yang kamu punya.
+      // View yang diasumsikan: v_dashboard_profit_bulanan (year, month, branch_code, admin_bank, operasional, profit, pengeluaran, profit_bersih, omset)
+      const { data, error } = await sb
+        .from('v_dashboard_profit_bulanan')
+        .select('month, admin_bank, operasional, profit, pengeluaran, profit_bersih, omset')
+        .eq('branch_code', code).eq('year', year).order('month', { ascending:true });
+
+      if (error) throw error;
+      return data;
+    }
+
+    function emptyYear(){
+      const arr = [];
+      for(let m=1;m<=12;m++) arr.push({month:m, admin_bank:0, operasional:0, profit:0, pengeluaran:0, profit_bersih:0, omset:0});
+      return arr;
+    }
+
+    // MOCK fallback (biar halaman langsung tampil)
+    function mockMonthly(code, year){
+      // contoh angka sederhana (bisa kamu buang ketika view sudah siap)
+      const base=[0,0,8945429,19186120,20952827,23731460,23653353,13602948,18655072,0,0,0];
+      const res = emptyYear();
+      res.forEach((r,i)=>{
+        r.admin_bank = (i>=2 && i<=8)? (1500000 + i*123000) : 0;
+        r.operasional = (i===8)? 5000 : (i===9? 4000:0);
+        r.profit = base[i]||0;
+        r.pengeluaran = (i===8)? 10500000 : 0;
+        r.profit_bersih = Math.max(0, r.profit - r.pengeluaran); // contoh kasar
+        r.omset = r.profit_bersih + 15000000 + i*500000; // hanya untuk grafik contoh
+      });
+      return res;
+    }
+
+    // ====== Render ======
+    function renderTable(rows){
+      const tb = document.getElementById('tbody'); tb.innerHTML="";
+      let sAdmin=0,sOp=0,sProf=0,sOut=0,sNet=0;
+
+      rows.forEach(r=>{
+        sAdmin += +r.admin_bank||0;
+        sOp    += +r.operasional||0;
+        sProf  += +r.profit||0;
+        sOut   += +r.pengeluaran||0;
+        sNet   += +r.profit_bersih||0;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${bulanNama[r.month-1]}</td>
+          <td class="t-right">${rupiah(r.admin_bank)}</td>
+          <td class="t-right">${rupiah(r.operasional)}</td>
+          <td class="t-right t-green">${rupiah(r.profit)}</td>
+          <td class="t-right t-red">${rupiah(r.pengeluaran)}</td>
+          <td class="t-right t-green">${rupiah(r.profit_bersih)}</td>
+        `;
+        tb.appendChild(tr);
+      });
+
+      document.getElementById('t_admin').textContent = rupiah(sAdmin);
+      document.getElementById('t_operasional').textContent = rupiah(sOp);
+      document.getElementById('t_profit').textContent = rupiah(sProf);
+      document.getElementById('t_pengeluaran').textContent = rupiah(sOut);
+      document.getElementById('t_bersih').textContent = rupiah(sNet);
+    }
+
+    let chart;
+    function renderChart(rows){
+      const ctx = document.getElementById('chart').getContext('2d');
+      const labels = rows.map(r=>bulanNama[r.month-1]);
+      const omset = rows.map(r=>r.omset||0);
+      const admin = rows.map(r=>r.admin_bank||0);
+      const profit= rows.map(r=>r.profit||0);
+      const bersih= rows.map(r=>r.profit_bersih||0);
+
+      if(chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label:'Omset', data: omset, fill:true, tension:.3 },
+            { label:'Admin Bank', data: admin, fill:false, tension:.3 },
+            { label:'Profit', data: profit, fill:false, tension:.3 },
+            { label:'Profit Bersih', data: bersih, fill:true, tension:.3 }
+          ]
+        },
+        options: {
+          responsive:true,
+          plugins:{ legend:{ position:'bottom' } },
+          scales:{ y:{ ticks:{ callback:v=>'Rp '+Number(v).toLocaleString('id-ID') } } }
+        }
+      });
+    }
+
+    async function load(){
+      try{
+        let rows;
+        try{
+          rows = await fetchMonthlyFromSupabase(BRANCH_CODE, YEAR);
+          if(!rows || rows.length===0) throw new Error('empty');
+          toast('✅ Supabase aktif', 1500);
+        }catch(e){
+          rows = mockMonthly(BRANCH_CODE, YEAR);
+          toast('⚠️ Pakai data mock (view belum tersedia)');
+        }
+        // pastikan 12 bulan
+        const map = new Map(rows.map(r=>[+r.month, r]));
+        const all = emptyYear().map((x,i)=> map.get(i+1) ? {...x, ...map.get(i+1)} : x);
+
+        renderTable(all);
+        renderChart(all);
+      }catch(err){
+        toast('Gagal memuat laporan: '+(err?.message||err));
+        console.error(err);
+      }
+    }
+
+    // boot
+    load();
+  </script>
+</body>
+</html>

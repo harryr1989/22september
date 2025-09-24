@@ -68,7 +68,7 @@
     .kpi.green .val{color:var(--green-600)} .kpi.red .val{color:var(--red-600)}
     .kpi.orange .val{color:var(--orange-600)} .kpi.blue .val{color:#145a90}
     .footer-actions{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--gray-200);background:#fafafa}
-    .btn-sm{height:34px;padding:0 10px;border-radius:8px;border:1px solid var(--ring);background:#fff;cursor:pointer;font-size:13px}
+    .btn-sm{height:34px;padding:0 10px;border-radius:8px;border:1px solid var(--ring);background:#fff;cursor:pointer;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
     .btn-sm.primary{background:linear-gradient(180deg,#1f7cc5,#1769aa);color:#fff;border:none}
 
     .toast{position:fixed;right:16px;bottom:16px;background:#111827;color:#fff;padding:12px 14px;border-radius:10px;box-shadow:0 10px 24px rgba(0,0,0,.2);font-size:14px;display:none;z-index:50}
@@ -86,7 +86,7 @@
     <nav class="nav">
       <a href="./dashboard.html" class="active"><span class="ico">📊</span>Dashboard</a>
       <a href="./saldo-real.html"><span class="ico">📑</span>Saldo Real</a>
-      <a href="./master-saldo-akun.html"><span class="ico">💰</span>Master Saldo Akun</a>
+      <a href="./master-saldo.html"><span class="ico">💰</span>Master Saldo</a>
       <a href="./mutasi-saldo.html"><span class="ico">🔄</span>Mutasi Saldo</a>
       <a href="./transaksi-mini-atm.html"><span class="ico">🧮</span>Transaksi Mini ATM</a>
       <a href="./laporan.html"><span class="ico">📈</span>Laporan</a>
@@ -147,37 +147,68 @@
 
   <div id="toast" class="toast"></div>
 
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
-    // ========== Sidebar Toggle ==========
+    /* ========= Sidebar ========= */
     const sidebar = document.getElementById('sidebar');
     document.getElementById('toggleSidebar').addEventListener('click', ()=>{ sidebar.classList.toggle('open'); });
 
-    // ========== Utils ==========
+    /* ========= Utils ========= */
     const rupiah = (n)=> (n==null||isNaN(n)) ? "—" : (n<0? "- Rp ":"Rp ")+Math.abs(+n).toLocaleString("id-ID");
     const setText = (id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
-    const showToast=(m,ms=3000)=>{const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none',ms);};
+    const toastEl = document.getElementById('toast');
+    const showToast=(m,ms=2500)=>{toastEl.textContent=m; toastEl.style.display='block'; setTimeout(()=>toastEl.style.display='none',ms);};
+    const getDisplayName = (b)=> (b.display_name?.trim() || b.name?.trim() || b.code);
 
-    // ========== MOCK (fallback jika Supabase belum aktif) ==========
+    /* ========= Supabase Config (punyamu) ========= */
+    const SUPABASE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    /* ========= MOCK (fallback jika Supabase gagal) ========= */
     const MOCK_BRANCHES = [
-      { code:"AMKO25", name:"AMKO CELL 25" },
-      { code:"AMKO18", name:"AMKO CELL 18" }
+      { code:"AMKO1", display_name:"AMKO111", name:"AMKO111", active:true },
+      { code:"AMKO2", display_name:"AMKO2", name:"AMKO2", active:true }
     ];
     const MOCK_METRICS = {
       global:{asset_cash:43714900,asset_saldo:13031798,total_asset:56746698,profit:23773696,pengeluaran:0,profit_bersih:23773696,trends:{profit:0.06,pengeluaran:0,total_asset:0.04}},
       perBranch:{
-        AMKO25:{period:"September 2025", total_transaksi:3184, omset:3969924772, pot_bank_operasional:1506500, pengeluaran:0, profit:18652572, profit_bersih:18652572, asset_cash:9159900, asset_saldo:12370631, total_asset:21530531, trends:{omset:0.08,profit_bersih:-0.02}},
-        AMKO18:{period:"September 2025", total_transaksi:844, omset:1230791373, pot_bank_operasional:959500, pengeluaran:0, profit:5121124, profit_bersih:5121124, asset_cash:34555000, asset_saldo:661167, total_asset:35216167, trends:{omset:-0.03,profit_bersih:0.05}}
+        AMKO1:{period:"September 2025", total_transaksi:3184, omset:3969924772, pot_bank_operasional:1506500, pengeluaran:0, profit:18652572, profit_bersih:18652572, asset_cash:9159900, asset_saldo:12370631, total_asset:21530531, trends:{omset:0.08,profit_bersih:-0.02}},
+        AMKO2:{period:"September 2025", total_transaksi:844, omset:1230791373, pot_bank_operasional:959500, pengeluaran:0, profit:5121124, profit_bersih:5121124, asset_cash:34555000, asset_saldo:661167, total_asset:35216167, trends:{omset:-0.03,profit_bersih:0.05}}
       }
     };
 
-    // ========== Filter ==========
+    /* ========= Filter ========= */
     const now=new Date(); const tahunEl=document.getElementById('tahun');
     for(let y=now.getFullYear()-2;y<=now.getFullYear()+1;y++){const o=document.createElement('option');o.value=y;o.textContent=y;if(y===now.getFullYear())o.selected=true;tahunEl.appendChild(o);}
     document.getElementById('bulan').value = (now.getMonth()+1);
     document.getElementById('btnFilter').addEventListener('click', ()=>{ const p=getFilterParams(); document.getElementById('filterNote').textContent=`Periode: ${p.bulanName} ${p.tahun} • Rentang: ${p.rentangLabel}`; document.getElementById('topInfo').textContent=`Filter aktif: ${p.bulanName} ${p.tahun}`; loadAll(p); });
     function getFilterParams(){ const tahun=+document.getElementById('tahun').value; const bulan=+document.getElementById('bulan').value; const rentang=document.getElementById('rentang').value; const bulanName=document.getElementById('bulan').selectedOptions[0].textContent; const rentangLabel=document.getElementById('rentang').selectedOptions[0].textContent; return {tahun,bulan,rentang,bulanName,rentangLabel}; }
 
-    // ========== Rendering ==========
+    /* ========= Helpers URL ========= */
+    function buildTransaksiUrl(branchRow){
+      const code  = branchRow.code;
+      const name  = getDisplayName(branchRow);
+      const qs = new URLSearchParams({ branch: code, branch_code: code, branch_name: name });
+      return `./transaksi-mini-atm.html?${qs.toString()}`;
+    }
+    function buildLapTahunanUrl(branchRow, year){
+      const code  = branchRow.code;
+      const name  = getDisplayName(branchRow);
+      const qs = new URLSearchParams({ branch_code: code, branch_name: name, year: String(year || new Date().getFullYear()) });
+      return `./lap-tahunan.html?${qs.toString()}`;
+    }
+    function buildLapBulananUrl(branchRow, year, month){
+      const code  = branchRow.code;
+      const name  = getDisplayName(branchRow);
+      const qs = new URLSearchParams({ branch_code: code, branch_name: name, year: String(year||new Date().getFullYear()), month: String(month|| (new Date().getMonth()+1)) });
+      return `./lap-bulanan.html?${qs.toString()}`;
+    }
+
+    /* ========= Rendering ========= */
     function renderGlobalRibbon(data){
       setText('g_asset_cash',rupiah(data.asset_cash));
       setText('g_asset_saldo',rupiah(data.asset_saldo));
@@ -186,16 +217,19 @@
       setText('g_pengeluaran',rupiah(data.pengeluaran));
       setText('g_profit_bersih',rupiah(data.profit_bersih));
     }
+
     function renderBranchCards(branches, metricsMap){
       const host=document.getElementById('cards'); host.innerHTML="";
       if(!branches||branches.length===0){document.getElementById('emptyState').style.display='block';return;}
       document.getElementById('emptyState').style.display='none';
+
       branches.forEach(b=>{
         const m = metricsMap[b.code] || {};
+        const name = getDisplayName(b);
         const card=document.createElement('div'); card.className='card';
         card.innerHTML=`
           <div class="card-h">
-            <h3>${b.name}</h3>
+            <h3>${name}</h3>
             <div class="sub">
               <span>${m.period||'-'}</span>
               <span class="chip-trend">${(m.trends?.omset??0)>=0?'▲':'▼'} Omset</span>
@@ -225,83 +259,61 @@
             </div>
           </div>
           <div class="footer-actions">
-            <button class="btn-sm" onclick="openReport('${b.code}','year')">📄 Lap. Tahunan</button>
-            <button class="btn-sm" onclick="openReport('${b.code}','month')">🗓️ Lap. Bulanan</button>
-            <button class="btn-sm primary" onclick="goTransaksi('${b.code}')">🧮 Mode Transaksi</button>
+            <a class="btn-sm" href="${buildLapTahunanUrl(b, window.currentFilter?.tahun)}">📄 Lap. Tahunan</a>
+            <a class="btn-sm" href="${buildLapBulananUrl(b, window.currentFilter?.tahun, window.currentFilter?.bulan)}">🗓️ Lap. Bulanan</a>
+            <a class="btn-sm primary" href="${buildTransaksiUrl(b)}">🧮 Mode Transaksi</a>
           </div>`;
         host.appendChild(card);
       });
     }
 
-    // ========== Navigasi yang diminta ==========
-    function openReport(branch,type){
-      // arahkan ke halaman laporan (kalau sudah ada)
-      window.location.href = `./laporan.html?branch=${encodeURIComponent(branch)}&type=${encodeURIComponent(type)}`;
-    }
-    function goTransaksi(branch){
-      // ✅ FIX: benar-benar pindah ke halaman transaksi mini ATM
-      window.location.href = `./transaksi-mini-atm.html?branch=${encodeURIComponent(branch)}`;
+    /* ========= Loader utama ========= */
+    async function trySupabaseOrMock(params){
+      let active=false, reason='unknown';
+      try{
+        // ping ringan
+        const { error: ep } = await sb.from('branches').select('code').limit(1);
+        if (ep) { reason = ep.message || 'policy/izin'; throw ep; }
+
+        // ambil cabang aktif dari Manajemen Pengguna
+        const { data: b, error: eb } = await sb
+          .from('branches')
+          .select('code, display_name, name, active')
+          .eq('active', true)
+          .order('code', { ascending: true });
+        if (eb) { reason = eb.message; throw eb; }
+
+        // metrik: sementara mock; nanti sambungkan ke view kamu
+        const perBranch = {};
+        b.forEach(row => { perBranch[row.code] = MOCK_METRICS.perBranch[row.code] || {}; });
+
+        active = true;
+        return { active, branches: b, global: MOCK_METRICS.global, perBranch, reason: null };
+      } catch (e) {
+        return { active, reason, branches: MOCK_BRANCHES, global: MOCK_METRICS.global, perBranch: MOCK_METRICS.perBranch };
+      }
     }
 
-    // ========== Data Loader ==========
     async function loadAll(params){
       try{
-        // coba ambil branches dari Supabase, fallback ke mock
-        const { branches, global, perBranch } = await loadDataFromSupabaseOrMock(params);
+        window.currentFilter = params; // simpan filter aktif
+        const { active, branches, global, perBranch, reason } = await trySupabaseOrMock(params);
         renderGlobalRibbon(global);
         renderBranchCards(branches, perBranch);
+        if (!active) showToast(`⚠ Supabase tidak aktif, pakai data mock (${reason||'unknown'})`);
+        else showToast('✅ Supabase aktif', 1600);
       }catch(err){
         console.error(err); showToast("Gagal memuat data dashboard.");
       }
     }
 
-    // ========== Supabase / Mock ==========
-    async function loadDataFromSupabaseOrMock(params){
-      // jika library supabase-js tersedia & client bisa dibuat, tarik dari tabel 'branches'
-      if (window.supabase && window.SUPABASE_URL && window.SUPABASE_KEY){
-        try{
-          const { createClient } = window.supabase;
-          const sb = createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
-
-          // 1) ambil daftar cabang → nama header card mengikuti DB
-          const { data: b, error: eb } = await sb.from('branches')
-            .select('code,name,active').eq('active', true).order('code', { ascending: true });
-          if (eb) throw eb;
-
-          // 2) ambil ringkasan global & per cabang (SESUAIKAN nama view/rpc milikmu)
-          // Contoh pukul rata pakai mock metrik dulu:
-          const perBranch = {};
-          b.forEach(row=>{
-            perBranch[row.code] = MOCK_METRICS.perBranch[row.code] || {};
-          });
-
-          return { branches: b, global: MOCK_METRICS.global, perBranch };
-        }catch(e){
-          console.warn('Supabase fallback to mock:', e);
-        }
-      }
-      // Fallback penuh ke mock (terjamin tampil)
-      const branches = MOCK_BRANCHES;
-      const perBranch = MOCK_METRICS.perBranch;
-      const global = MOCK_METRICS.global;
-      return { branches, perBranch, global };
-    }
-
-    // ========== Boot ==========
+    /* ========= Boot ========= */
     (function boot(){
-      // Opsi: isi kredensial Supabase via window.* (atau biarkan kosong untuk mock)
-      // window.SUPABASE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
-      // window.SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9....";
-
-      // init filter
       const p=getFilterParams();
       document.getElementById('filterNote').textContent=`Periode: ${p.bulanName} ${p.tahun} • Rentang: ${p.rentangLabel}`;
       document.getElementById('topInfo').textContent=`Filter aktif: ${p.bulanName} ${p.tahun}`;
       loadAll(p);
     })();
   </script>
-
-  <!-- (Opsional) aktifkan jika ingin tarik dari Supabase langsung) -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> -->
 </body>
 </html>
