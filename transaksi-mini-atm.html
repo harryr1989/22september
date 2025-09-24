@@ -46,7 +46,6 @@
     .card{background:var(--card);border:1px solid var(--bd);border-radius:22px;box-shadow:var(--shadow);padding:16px}
     .card h3{margin:0 0 6px 0}
 
-    /* TABLE with full borders */
     table{width:100%;border-collapse:collapse;background:#fff}
     th,td{padding:10px;border:1px solid var(--bd);font-size:14px;text-align:left;vertical-align:top}
     th{background:#f8fafc}
@@ -83,8 +82,6 @@
     .kpi-title{font-size:12px;color:#475569}
     .kpi-value{font-size:18px;font-weight:800}
     .kpi-sub{font-size:11px;color:#6b7280}
-
-    /* Accents */
     .kpi-card.kpi-omset  { border-left:4px solid #2563eb; background:linear-gradient(180deg,var(--blueA), #ffffff 58%); }
     .kpi-card.kpi-profit { border-left:4px solid #16a34a; background:linear-gradient(180deg,var(--greenA), #ffffff 58%); }
     .kpi-card.kpi-asset  { border-left:4px solid #f59e0b; background:linear-gradient(180deg,var(--orangeA), #ffffff 58%); }
@@ -122,7 +119,6 @@
     </header>
 
     <div class="topbar">
-      <!-- Dropdown cabang (owner only) -->
       <div id="branchRow" style="display:none; margin-bottom:10px; gap:8px; align-items:center; flex-wrap:wrap">
         <span style="font-size:12px;color:#475569;">Cabang</span>
         <select id="branchSelect" class="input" style="width:260px;max-width:100%">
@@ -131,7 +127,6 @@
         <button id="btnTambah" class="btn btn-primary">+ Tambah Transaksi</button>
       </div>
 
-      <!-- Filter Jenis -->
       <div class="chips">
         <div class="chip active" data-j="all">Semua</div>
         <div class="chip" data-j="tarik">Tarik Tunai</div>
@@ -141,7 +136,6 @@
       </div>
     </div>
 
-    <!-- FILTER TANGGAL + EXPORT -->
     <div class="filters">
       <button class="btn-sm btn-ghost" id="presetToday">Hari ini</button>
       <button class="btn-sm btn-ghost" id="preset7">7H</button>
@@ -157,7 +151,6 @@
     </div>
 
     <div class="grid">
-      <!-- KPI Transaksi -->
       <div class="card">
         <h3 style="margin-bottom:10px">KPI Transaksi <span id="kpiTglLabel" class="pill" style="margin-left:8px">Hari ini</span></h3>
         <div class="kpi-grid">
@@ -189,13 +182,11 @@
         </div>
       </div>
 
-      <!-- KPI Master Saldo Akun (DINAMIS) -->
       <div class="card">
         <h3 style="margin-bottom:10px">KPI Master Saldo Akun</h3>
         <div id="kpiSaldoWrap" class="kpi-grid"></div>
       </div>
 
-      <!-- Riwayat -->
       <div class="card">
         <h3>Riwayat Transaksi</h3>
         <table>
@@ -244,7 +235,7 @@
   </div>
 </div>
 
-<!-- MODAL FORM TRANSAKSI -->
+<!-- MODAL FORM -->
 <div class="modal" id="modalForm">
   <div class="dialog">
     <div class="dlg-hd">
@@ -284,7 +275,6 @@
         </div>
       </div>
 
-      <!-- ROW NOMINAL -->
       <div class="row" id="rowNominal">
         <div>
           <label id="labelNominal">Nominal (Rp)</label>
@@ -294,7 +284,6 @@
         </div>
       </div>
 
-      <!-- ROW ADMIN DALAM & LUAR (dua kolom) -->
       <div class="row" id="rowAdminDua">
         <div>
           <label>Admin Dalam</label>
@@ -310,7 +299,6 @@
         </div>
       </div>
 
-      <!-- ROW ADMIN LUAR SAJA -->
       <div class="row" id="rowAdminLuarOnly" style="display:none">
         <div>
           <label>Admin Luar</label>
@@ -320,7 +308,6 @@
         </div>
       </div>
 
-      <!-- ROW FEE BANK -->
       <div class="row" id="rowFeeBank" style="display:none">
         <div>
           <label>Fee Bank (Transfer)</label>
@@ -330,7 +317,6 @@
         </div>
       </div>
 
-      <!-- ROW PULSA (MODAL & JUAL) -->
       <div class="row" id="rowPulsa" style="display:none">
         <div>
           <label>Modal (harga modal)</label>
@@ -368,7 +354,7 @@
 
   const $ = (id)=>document.getElementById(id)
   const fmtRp = n => "Rp " + new Intl.NumberFormat('id-ID').format(Number(n||0))
-  const fmtNum = n => new Intl.NumberFormat('id-ID').format(Number(n||0)) // tanpa "Rp "
+  const fmtNum = n => new Intl.NumberFormat('id-ID').format(Number(n||0))
   const parseNum = v => Number(String(v||'').replace(/[^0-9]/g,''))||0
 
   let gRole=null, gBranch=null, viewBranch=null
@@ -376,10 +362,8 @@
   let filterJenis='all'
   let lastRiwayatRows = []
   const isOwner = ()=> gRole==='owner'
-
   function toastErr(t){ const m=$('msgErr'); m.textContent=t; m.style.display='block'; setTimeout(()=>m.style.display='none',3000) }
 
-  // helpers tanggal
   const fmtHuman = (d)=> d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric', hour:'2-digit', minute:'2-digit'})
   const fmtHumanDateOnly = (d)=> d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
   const toISODate = (d)=> d.toISOString().slice(0,10)
@@ -409,7 +393,7 @@
     $('kpiTglLabel').textContent = same? 'Hari ini' : `${f} – ${t}`
   }
 
-  ;(()=>{ // input numeric formatters
+  ;(()=>{ // mask input numeric
     const ids=['f_nom','f_admin_dalam','f_admin_luar','f_fee_bank','f_admin_luar_only','f_modal','f_jual']
     ids.forEach(id=>{
       const el=$(id); if(!el) return
@@ -421,9 +405,7 @@
   })()
 
   async function boot(){
-    // default preset: Hari ini
     setPreset(1)
-
     const { data:{ session } } = await supabase.auth.getSession()
     if(!session){ location.href='login.html'; return }
     const { data: prof, error } = await supabase.from('profiles').select('role,branch_code,full_name,email').eq('id', session.user.id).single()
@@ -453,14 +435,13 @@
   }
 
   async function refreshByRange(){
-    await loadKPITransaksi()
     await loadKPISaldo()
+    await loadKPITransaksi()
     await loadRiwayat()
   }
 
   async function loadBranches(){
-    const sel=$('branchSelect')
-    sel.innerHTML='<option value="">Memuat cabang…</option>'
+    const sel=$('branchSelect'); sel.innerHTML='<option value="">Memuat cabang…</option>'
     let list=[]
     const { data: br, error: ebr } = await supabase.from('branches').select('code,name').order('name')
     if(!ebr && br && br.length){
@@ -495,11 +476,10 @@
     ;(data||[]).forEach(a=>{ if(cacheAcc[a.account_type]) cacheAcc[a.account_type].push(a) })
   }
 
-  // ====== KPI TRANSAKSI (respect range) ======
+  // KPI Transaksi
   async function loadKPITransaksi(){
     const cab = viewBranch || gBranch
     const { tmin, tmax } = getRangeISO()
-
     const { data, error } = await supabase
       .from('transactions')
       .select('jenis, nominal, admin_dalam, admin_luar, fee_bank, branch_code, created_at')
@@ -522,7 +502,7 @@
     if(gRole==='owner') $('kpi_profit').textContent = fmtRp(profit)
   }
 
-  // ====== KPI MASTER SALDO (DINAMIS) ======
+  // KPI Master Saldo Akun
   function renderKPISaldoCards(accounts){
     const wrap = $('kpiSaldoWrap')
     const list = Array.isArray(accounts) ? accounts : []
@@ -533,7 +513,7 @@
     const srv  = list.filter(a=> a.account_type==='server_pulsa').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
 
     let html = `
-      <div class="kpi-card kpi-asset">
+      <div class="kpi-card kpi-asset" title="Σ semua akun (cash + rekening + server)">
         <div class="kpi-title">Total Asset</div>
         <div class="kpi-value">${fmtRp(totalAsset)}</div>
         <div class="kpi-sub">Σ semua akun (cash + rekening + server)</div>
@@ -541,7 +521,7 @@
     `
     const pushCard = (a)=> {
       html += `
-        <div class="kpi-card">
+        <div class="kpi-card" title="ID: ${a.id}">
           <div class="kpi-title">${a.name || (a.account_type||'').toUpperCase()}</div>
           <div class="kpi-value">${fmtRp(a.saldo||0)}</div>
           <div class="kpi-sub">${a.account_type}</div>
@@ -561,7 +541,6 @@
     }
     wrap.innerHTML = html
   }
-
   async function loadKPISaldo(){
     const cab = viewBranch || gBranch
     const { data, error } = await supabase
@@ -573,17 +552,12 @@
     renderKPISaldoCards(data||[])
   }
 
-  // ====== RIWAYAT (respect range) ======
-  // helper: tampilkan dua baris saldo dengan NAMA AKUN
+  // Riwayat
   const saldoBlock = (srcName, srcVal, dstName, dstVal) => {
     const fmt = v => (v ?? null) !== null ? fmtNum(v) : '-'
     let html = ''
-    if (srcName || srcVal !== undefined) {
-      html += `<div>${(srcName || 'SRC')}: <b>${fmt(srcVal)}</b></div>`
-    }
-    if (dstName || dstVal !== undefined) {
-      html += `<div>${(dstName || 'DST')}: <b>${fmt(dstVal)}</b></div>`
-    }
+    if (srcName || srcVal !== undefined) html += `<div>${(srcName || 'SRC')}: <b>${fmt(srcVal)}</b></div>`
+    if (dstName || dstVal !== undefined) html += `<div>${(dstName || 'DST')}: <b>${fmt(dstVal)}</b></div>`
     return html || '-'
   }
 
@@ -597,7 +571,9 @@
         id,
         id_trx,
         jenis,
+        src_account_id,
         src_account_name,
+        dst_account_id,
         dst_account_name,
         nominal,
         admin_dalam,
@@ -639,7 +615,9 @@
       const tgl = fmtHuman(new Date(r.created_at))
       const src = r.src_account_name || '-'
       const dst = r.dst_account_name || ''
-      const sumberDana = dst ? `${src} → ${dst}` : `${src}`
+      const sumberDana = dst
+        ? `<span title="${src} • ${r.src_account_id}">${src}</span> → <span title="${dst} • ${r.dst_account_id}">${dst}</span>`
+        : `<span title="${src} • ${r.src_account_id}">${src}</span>`
       const userTanggal = `(<span style="color:#1d4ed8">${user}</span>, ${tgl})`
 
       const saldoAwalCell  = saldoBlock(r.src_account_name, r.src_saldo_awal,  r.dst_account_name, r.dst_saldo_awal)
@@ -666,7 +644,7 @@
     }).join('')
   }
 
-  // ====== Export CSV ======
+  // CSV export (tetap)
   function csvEscape(value){
     if(value==null) return ''
     const s = String(value).replace(/\r?\n/g,' ').replace(/\s+/g,' ').trim()
@@ -683,7 +661,6 @@
       'Keterangan'
     ]
     const lines = [header.join(',')]
-
     let i=1
     for(const r of rows){
       const user = r.created_by_name || ''
@@ -691,73 +668,49 @@
       const sumber = `${r.src_account_name || ''}${r.dst_account_name ? ' → '+r.dst_account_name : ''}`
 
       const rec = [
-        i++,
-        user,
-        tgl,
-        (r.id_trx || r.id),
-        sumber,
-        r.jenis || '',
-        (r.src_saldo_awal ?? ''),
-        (r.dst_saldo_awal ?? ''),
-        (r.nominal ?? 0),
-        (r.admin_dalam ?? 0),
-        (r.admin_luar ?? 0),
-        (r.fee_bank ?? 0),
-        (r.src_saldo_akhir ?? ''),
-        (r.dst_saldo_akhir ?? ''),
-        r.note || ''
+        i++, user, tgl, (r.id_trx || r.id), sumber, r.jenis || '',
+        (r.src_saldo_awal ?? ''), (r.dst_saldo_awal ?? ''), (r.nominal ?? 0),
+        (r.admin_dalam ?? 0), (r.admin_luar ?? 0), (r.fee_bank ?? 0),
+        (r.src_saldo_akhir ?? ''), (r.dst_saldo_akhir ?? ''), r.note || ''
       ].map(csvEscape)
       lines.push(rec.join(','))
     }
-
     const csv = lines.join('\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     const f = range.from || toISODate(new Date())
     const t = range.to   || toISODate(new Date())
     const same = f===t
     const fname = same ? `riwayat_${f}.csv` : `riwayat_${f}_sampai_${t}.csv`
-
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
-    link.setAttribute('href', url)
-    link.setAttribute('download', fname)
-    link.style.display='none'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
+    link.href = url; link.download = fname; link.style.display='none'
+    document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url)
   }
 
-  // Delegasi klik untuk Aksi Edit/Hapus
+  // Delegasi klik aksi
   document.addEventListener('click', async (e)=>{
-    const btn = e.target.closest('button[data-act]')
-    if(!btn) return
-    const tr = btn.closest('tr[data-id]')
-    if(!tr) return
-    const id = tr.getAttribute('data-id')
-    const act = btn.getAttribute('data-act')
-
+    const btn = e.target.closest('button[data-act]'); if(!btn) return
+    const tr = btn.closest('tr[data-id]'); if(!tr) return
+    const id = tr.getAttribute('data-id'); const act = btn.getAttribute('data-act')
     if(act==='del'){
       if(!confirm('Hapus transaksi ini?')) return
       const { error } = await supabase.from('transactions').delete().eq('id', id)
       if(error){ alert('Gagal hapus: '+error.message); return }
       await refreshByRange()
     } else if(act==='edit'){
-      alert('Edit: akan diaktifkan. (Form edit memuat data transaksi & update baris.)')
+      alert('Edit: akan diaktifkan.')
     }
   })
 
-  // ====== UI: filter chips ======
+  // Chips
   document.querySelectorAll('.chip').forEach(ch=>{
     ch.addEventListener('click', ()=>{
       document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'))
-      ch.classList.add('active')
-      filterJenis = ch.dataset.j
-      loadRiwayat()
+      ch.classList.add('active'); filterJenis = ch.dataset.j; loadRiwayat()
     })
   })
 
-  // ====== Date preset & apply ======
+  // Range events
   $('presetToday').onclick = async ()=>{ setPreset(1); await refreshByRange() }
   $('preset7').onclick     = async ()=>{ setPreset(7); await refreshByRange() }
   $('preset30').onclick    = async ()=>{ setPreset(30); await refreshByRange() }
@@ -769,10 +722,10 @@
     await refreshByRange()
   }
 
-  // ====== Export button ======
+  // Export
   $('btnExport').onclick = ()=> exportCSV()
 
-  // ====== Tambah transaksi (popup jenis -> form) ======
+  // Modal logic
   function openJenis(){ $('modalJenis').classList.add('show') }
   function closeJenis(){ $('modalJenis').classList.remove('show') }
   function openForm(){ $('modalForm').classList.add('show') }
@@ -783,24 +736,19 @@
   $('xJenis').onclick = $('batalJenis').onclick = closeJenis
   $('xForm').onclick = $('batalForm').onclick = ()=>{ closeForm(); }
 
-  // pilih jenis
-  document.querySelectorAll('#modalJenis [data-pilih]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const jenis = btn.getAttribute('data-pilih')
-      closeJenis()
-      setupForm(jenis)
-      openForm()
-    })
-  })
-
   function fillSelect(sel, items){
     sel.innerHTML = (items||[]).map(i=>`<option value="${i.id}">${i.name}</option>`).join('')
     if(!items || !items.length){ sel.innerHTML = '<option value="">(Tidak ada opsi)</option>' }
   }
   function findLaci(){ return (cacheAcc.cash||[]).find(a=>/laci/i.test(a.name||'')) || null }
 
+  document.querySelectorAll('#modalJenis [data-pilih]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const jenis = btn.getAttribute('data-pilih'); closeJenis(); setupForm(jenis); openForm()
+    })
+  })
+
   function setupForm(jenis){
-    // reset
     $('dlgTitle').textContent = `Form ${jenis.toUpperCase()}`
     $('f_jenis').value = jenis
     $('f_branch').value = viewBranch || gBranch
@@ -810,7 +758,6 @@
     const sumber=$('f_sumber'), terima=$('f_terima')
     const laci = findLaci()
 
-    // default hide
     $('rowNominal').style.display='none'
     $('rowAdminDua').style.display='none'
     $('rowAdminLuarOnly').style.display='none'
@@ -820,47 +767,35 @@
     $('labelNominal').textContent = 'Nominal (Rp)'
 
     if(jenis==='tarik'){
-      // sumber: Laci (locked), terima: Rekening
       fillSelect(sumber, laci? [laci] : []); sumber.disabled=true
       fillSelect(terima, cacheAcc.rekening||[]); terima.disabled=false
-
       $('rowNominal').style.display='grid'
       $('rowAdminDua').style.display='grid'
     }
     else if(jenis==='transfer'){
-      // sumber: Rekening & Server; terima: Laci (locked)
       const sumberList = [...(cacheAcc.rekening||[]), ...(cacheAcc.server_pulsa||[])]
       fillSelect(sumber, sumberList); sumber.disabled=false
       fillSelect(terima, laci? [laci] : []); terima.disabled=true
-
       $('rowNominal').style.display='grid'
       $('rowAdminLuarOnly').style.display='grid'
       $('rowFeeBank').style.display='grid'
     }
     else if(jenis==='pulsa'){
-      // sumber: Rekening & Server; terima: Laci (locked)
       const sumberList = [...(cacheAcc.rekening||[]), ...(cacheAcc.server_pulsa||[])]
       fillSelect(sumber, sumberList); sumber.disabled=false
       fillSelect(terima, laci? [laci] : []); terima.disabled=true
-
       $('rowPulsa').style.display='grid'
     }
     else if(jenis==='jasa'){
-      // sembunyikan sumber/terima di UI, tetap set terima = Laci
       $('rowSumber').style.display='none'
       if(laci){ terima.innerHTML = `<option value="${laci.id}">${laci.name}</option>`; }
       $('rowAdminLuarOnly').style.display='grid'
-      // nominal disembunyikan; akan = admin luar saat simpan
     }
   }
 
-  // enforce TARIK: hanya salah satu admin terisi
-  $('f_admin_dalam').addEventListener('input', ()=>{
-    if(parseNum($('f_admin_dalam').value)>0){ $('f_admin_luar').value='' }
-  })
-  $('f_admin_luar').addEventListener('input', ()=>{
-    if(parseNum($('f_admin_luar').value)>0){ $('f_admin_dalam').value='' }
-  })
+  // enforce TARIK: hanya salah satu admin
+  $('f_admin_dalam').addEventListener('input', ()=>{ if(parseNum($('f_admin_dalam').value)>0){ $('f_admin_luar').value='' } })
+  $('f_admin_luar').addEventListener('input',  ()=>{ if(parseNum($('f_admin_luar').value)>0){ $('f_admin_dalam').value='' } })
 
   $('simpanForm').onclick = async ()=>{
     const jenis = $('f_jenis').value
@@ -870,7 +805,6 @@
     const note = $('f_ket').value.trim()
 
     try{
-      // KETERANGAN WAJIB
       if(!note) throw new Error('Keterangan wajib diisi (mis. No HP / No Ref).')
 
       let row = { branch_code: branch, jenis, src_account_id: sumber, dst_account_id: terima, nominal: 0, admin_dalam: 0, admin_luar: 0, fee_bank: 0, note }
@@ -879,7 +813,6 @@
         if(!terima) throw new Error('Terima Dana (rekening) wajib diisi.')
         const laci = findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai di cabang ini.')
         row.src_account_id = laci.id
-
         const nominal = parseNum($('f_nom').value)
         const ad = parseNum($('f_admin_dalam').value)
         const al = parseNum($('f_admin_luar').value)
@@ -894,7 +827,6 @@
         if(!sumber) throw new Error('Sumber Dana (rekening/server) wajib diisi.')
         const laci = findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai di cabang ini.')
         row.dst_account_id = laci.id
-
         const nominal = parseNum($('f_nom').value)
         const al = parseNum($('f_admin_luar_only').value)
         const fb = parseNum($('f_fee_bank').value)
@@ -908,7 +840,6 @@
         if(!sumber) throw new Error('Sumber Dana (rekening/server) wajib diisi.')
         const laci = findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai di cabang ini.')
         row.dst_account_id = laci.id
-
         const modal = parseNum($('f_modal').value)
         const jual  = parseNum($('f_jual').value)
         if(modal<=0) throw new Error('Modal harus > 0.')
@@ -924,7 +855,6 @@
         const laci = findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai di cabang ini.')
         row.src_account_id = null
         row.dst_account_id = laci.id
-
         const al = parseNum($('f_admin_luar_only').value)
         if(al<=0) throw new Error('Fee Admin (Admin Luar) harus > 0.')
         row.nominal    = al
@@ -937,16 +867,19 @@
       if(error) throw error
 
       $('modalForm').classList.remove('show')
-      await refreshByRange()
+
+      // *** REFRESH BERURUT + JEDA MINI (agar KPI pasti terbaru) ***
+      await new Promise(r => setTimeout(r, 150))
+      await loadKPISaldo()
+      await loadKPITransaksi()
+      await loadRiwayat()
     }catch(e){ toastErr('Gagal simpan: '+(e.message||e)) }
   }
 
   $('lnk-logout').addEventListener('click', async ()=>{ await supabase.auth.signOut(); location.href='login.html' })
 
-  // Export button
   document.getElementById('btnExport').onclick = ()=> exportCSV()
 
-  // start
   boot()
 </script>
 </body>
