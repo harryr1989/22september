@@ -203,7 +203,7 @@
             <tr>
               <th>No urut</th>
               <th>User & Tanggal</th>
-              <th>id trx</th>
+              <th>ID Trx</th>
               <th>Sumber Dana</th>
               <th>Jenis</th>
               <th>Saldo Awal</th>
@@ -374,13 +374,9 @@
   let gRole=null, gBranch=null, viewBranch=null
   let cacheAcc={ cash:[], rekening:[], server_pulsa:[] }
   let filterJenis='all'
-
-  // ====== DATE RANGE STATE ======
-  let range = { from: null, to: null } // 'YYYY-MM-DD'
-  // ====== EXPORT STATE ======
   let lastRiwayatRows = []
-
   const isOwner = ()=> gRole==='owner'
+
   function toastErr(t){ const m=$('msgErr'); m.textContent=t; m.style.display='block'; setTimeout(()=>m.style.display='none',3000) }
 
   // helpers tanggal
@@ -397,6 +393,7 @@
     $('dateTo').value = range.to
     updateRangeLabel()
   }
+  let range = { from: null, to: null }
   function getRangeISO(){
     if(!range.from || !range.to){
       const t=new Date(); const s=new Date(); s.setHours(0,0,0,0)
@@ -577,6 +574,12 @@
   }
 
   // ====== RIWAYAT (respect range) ======
+  const twoLinesSaldo = (labelA, valA, labelB, valB) => {
+    const a = (valA ?? null) !== null ? fmtNum(valA) : '-'
+    const b = (valB ?? null) !== null ? fmtNum(valB) : '-'
+    return `<div>${labelA}: <b>${a}</b></div><div>${labelB}: <b>${b}</b></div>`
+  }
+
   async function loadRiwayat(){
     const cab = viewBranch || gBranch
     const { tmin, tmax } = getRangeISO()
@@ -595,6 +598,10 @@
         fee_bank,
         saldo_awal,
         saldo_akhir,
+        src_saldo_awal,
+        src_saldo_akhir,
+        dst_saldo_awal,
+        dst_saldo_akhir,
         note,
         created_by_name,
         created_at,
@@ -628,18 +635,21 @@
       const sumberDana = dst ? `${src} → ${dst}` : `${src}`
       const userTanggal = `(<span style="color:#1d4ed8">${user}</span>, ${tgl})`
 
+      const saldoAwalCell  = twoLinesSaldo('SRC', r.src_saldo_awal,  'DST', r.dst_saldo_awal)
+      const saldoAkhirCell = twoLinesSaldo('SRC', r.src_saldo_akhir, 'DST', r.dst_saldo_akhir)
+
       return `<tr data-id="${r.id}">
         <td>${i++}</td>
         <td>${userTanggal}</td>
-        <td><code>${r.id_trx}</code></td>
+        <td><code>${r.id_trx || r.id}</code></td>
         <td>${sumberDana}</td>
         <td style="text-transform:capitalize">${r.jenis}</td>
-        <td>${fmtNum(r.saldo_awal || 0)}</td>
+        <td>${saldoAwalCell}</td>
         <td>${fmtNum(r.nominal || 0)}</td>
         <td>${r.admin_dalam ? fmtNum(r.admin_dalam) : '-'}</td>
         <td>${r.admin_luar ? fmtNum(r.admin_luar) : '-'}</td>
         <td>${r.fee_bank ? fmtNum(r.fee_bank) : '-'}</td>
-        <td>${fmtNum(r.saldo_akhir || 0)}</td>
+        <td>${saldoAkhirCell}</td>
         <td>${r.note || '-'}</td>
         <td>
           <button class="btn btn-ghost" data-act="edit" title="Edit" style="height:32px;padding:4px 8px">✏️</button>
@@ -649,7 +659,7 @@
     }).join('')
   }
 
-  // ====== Export Excel (CSV) ======
+  // ====== Export CSV ======
   function csvEscape(value){
     if(value==null) return ''
     const s = String(value).replace(/\r?\n/g,' ').replace(/\s+/g,' ').trim()
@@ -660,7 +670,10 @@
     const rows = lastRiwayatRows || []
     const header = [
       'No urut','User','Tanggal','ID Trx','Sumber Dana','Jenis',
-      'Saldo Awal','Nominal','Admin Dalam','Admin Luar','Fee Bank','Saldo Akhir','Keterangan'
+      'SRC Saldo Awal','DST Saldo Awal',
+      'Nominal','Admin Dalam','Admin Luar','Fee Bank',
+      'SRC Saldo Akhir','DST Saldo Akhir',
+      'Keterangan'
     ]
     const lines = [header.join(',')]
 
@@ -674,15 +687,17 @@
         i++,
         user,
         tgl,
-        r.id_trx || '',
+        (r.id_trx || r.id),
         sumber,
         r.jenis || '',
-        (r.saldo_awal ?? 0),
+        (r.src_saldo_awal ?? ''),
+        (r.dst_saldo_awal ?? ''),
         (r.nominal ?? 0),
         (r.admin_dalam ?? 0),
         (r.admin_luar ?? 0),
         (r.fee_bank ?? 0),
-        (r.saldo_akhir ?? 0),
+        (r.src_saldo_akhir ?? ''),
+        (r.dst_saldo_akhir ?? ''),
         r.note || ''
       ].map(csvEscape)
       lines.push(rec.join(','))
@@ -690,7 +705,6 @@
 
     const csv = lines.join('\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-
     const f = range.from || toISODate(new Date())
     const t = range.to   || toISODate(new Date())
     const same = f===t
@@ -825,12 +839,11 @@
       $('rowPulsa').style.display='grid'
     }
     else if(jenis==='jasa'){
-      // Sembunyikan baris sumber/terima di UI, tapi tetap set terima = Laci agar kas bertambah
+      // sembunyikan sumber/terima di UI, tetap set terima = Laci
       $('rowSumber').style.display='none'
       if(laci){ terima.innerHTML = `<option value="${laci.id}">${laci.name}</option>`; }
-
       $('rowAdminLuarOnly').style.display='grid'
-      // nominal disembunyikan; diisi otomatis saat simpan = admin luar
+      // nominal disembunyikan; akan = admin luar saat simpan
     }
   }
 
@@ -898,7 +911,7 @@
         row.admin_dalam = 0
         row.admin_luar  = margin
         row.fee_bank    = 0
-        row.note = note  // keterangan dari user
+        row.note = note
       }
       else if(jenis==='jasa'){
         const laci = findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai di cabang ini.')
@@ -923,7 +936,7 @@
 
   $('lnk-logout').addEventListener('click', async ()=>{ await supabase.auth.signOut(); location.href='login.html' })
 
-  // ====== Export button ======
+  // Export button
   document.getElementById('btnExport').onclick = ()=> exportCSV()
 
   // start
