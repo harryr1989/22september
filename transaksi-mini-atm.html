@@ -7,9 +7,10 @@
   <style>
     :root{
       --bg:#f6f8fb; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#0b63f3;
-      --card:#fff; --bd:#e5e7eb; --muted:#64748b; --txt:#0f172a;
+      --card:#fff; --bd:#e2e8f0; --muted:#64748b; --txt:#0f172a;
       --shadow:0 6px 18px rgba(15,23,42,.08);
       --touch:48px; --radius:16px; --safe-bottom: env(safe-area-inset-bottom, 0);
+      --blueA:#dbeafe; --greenA:#f0fdf4; --orangeA:#fff7ed;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -45,8 +46,9 @@
     .card{background:var(--card);border:1px solid var(--bd);border-radius:22px;box-shadow:var(--shadow);padding:16px}
     .card h3{margin:0 0 6px 0}
 
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:10px;border-bottom:1px solid var(--bd);font-size:14px;text-align:left;vertical-align:top}
+    /* TABLE with full borders */
+    table{width:100%;border-collapse:collapse;background:#fff}
+    th,td{padding:10px;border:1px solid var(--bd);font-size:14px;text-align:left;vertical-align:top}
     th{background:#f8fafc}
 
     .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:50}
@@ -66,7 +68,6 @@
       .sidebar{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:11}
       .brand{margin:0}
       .topbar{top:56px;padding:10px 12px}
-      header{padding:10px}
       .dialog{width:100%;height:100%;max-height:none;border-radius:0}
       .dlg-bd{padding:12px;gap:10px}
       .row{grid-template-columns:1fr}
@@ -83,14 +84,13 @@
     .kpi-value{font-size:18px;font-weight:800}
     .kpi-sub{font-size:11px;color:#6b7280}
 
-    /* Highlight KPI Omset & Profit */
-    .kpi-card.kpi-omset  { border-left:4px solid #6366f1; }
-    .kpi-card.kpi-omset .kpi-value{ font-size:20px; }
-    .kpi-card.kpi-profit { border-left:4px solid #16a34a; background:linear-gradient(180deg,#f0fdf4, #ffffff 55%); }
+    /* Accents */
+    .kpi-card.kpi-omset  { border-left:4px solid #2563eb; background:linear-gradient(180deg,var(--blueA), #ffffff 58%); }
+    .kpi-card.kpi-profit { border-left:4px solid #16a34a; background:linear-gradient(180deg,var(--greenA), #ffffff 58%); }
+    .kpi-card.kpi-asset  { border-left:4px solid #f59e0b; background:linear-gradient(180deg,var(--orangeA), #ffffff 58%); }
     .kpi-card.kpi-profit .kpi-title{ color:#166534; }
     .kpi-card.kpi-profit .kpi-value{ font-size:22px; }
 
-    /* filter bar */
     .filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 16px 0 16px}
     .date{height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:#fff}
     .sep{color:#94a3b8}
@@ -347,9 +347,9 @@
       </div>
 
       <div>
-        <label>Keterangan</label>
+        <label>Keterangan (wajib diisi, mis. No HP / No Ref)</label>
         <div class="icon-input">
-          <textarea id="f_ket" rows="3" placeholder="Catatan jika perlu..."></textarea>
+          <input id="f_ket" type="text" maxlength="50" placeholder="contoh: 081234567890" required />
         </div>
       </div>
     </div>
@@ -368,6 +368,7 @@
 
   const $ = (id)=>document.getElementById(id)
   const fmtRp = n => "Rp " + new Intl.NumberFormat('id-ID').format(Number(n||0))
+  const fmtNum = n => new Intl.NumberFormat('id-ID').format(Number(n||0)) // tanpa "Rp "
   const parseNum = v => Number(String(v||'').replace(/[^0-9]/g,''))||0
 
   let gRole=null, gBranch=null, viewBranch=null
@@ -535,7 +536,7 @@
     const srv  = list.filter(a=> a.account_type==='server_pulsa').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
 
     let html = `
-      <div class="kpi-card">
+      <div class="kpi-card kpi-asset">
         <div class="kpi-title">Total Asset</div>
         <div class="kpi-value">${fmtRp(totalAsset)}</div>
         <div class="kpi-sub">Σ semua akun (cash + rekening + server)</div>
@@ -554,7 +555,7 @@
 
     if(list.length===0){
       html = `
-        <div class="kpi-card">
+        <div class="kpi-card kpi-asset">
           <div class="kpi-title">Total Asset</div>
           <div class="kpi-value">Rp 0</div>
           <div class="kpi-sub">Belum ada akun</div>
@@ -622,7 +623,9 @@
     $('tb').innerHTML = rows.map(r=>{
       const user = r.created_by_name || '-'
       const tgl = fmtHuman(new Date(r.created_at))
-      const sumberDana = `${r.src_account_name || '-'}${r.dst_account_name ? ' → '+r.dst_account_name : ''}`
+      const src = r.src_account_name || '-'
+      const dst = r.dst_account_name || ''
+      const sumberDana = dst ? `${src} → ${dst}` : `${src}`
       const userTanggal = `(<span style="color:#1d4ed8">${user}</span>, ${tgl})`
 
       return `<tr data-id="${r.id}">
@@ -631,12 +634,12 @@
         <td><code>${r.id_trx}</code></td>
         <td>${sumberDana}</td>
         <td style="text-transform:capitalize">${r.jenis}</td>
-        <td>${fmtRp(r.saldo_awal || 0)}</td>
-        <td>${fmtRp(r.nominal || 0)}</td>
-        <td>${r.admin_dalam ? fmtRp(r.admin_dalam) : '-'}</td>
-        <td>${r.admin_luar ? fmtRp(r.admin_luar) : '-'}</td>
-        <td>${r.fee_bank ? fmtRp(r.fee_bank) : '-'}</td>
-        <td>${fmtRp(r.saldo_akhir || 0)}</td>
+        <td>${fmtNum(r.saldo_awal || 0)}</td>
+        <td>${fmtNum(r.nominal || 0)}</td>
+        <td>${r.admin_dalam ? fmtNum(r.admin_dalam) : '-'}</td>
+        <td>${r.admin_luar ? fmtNum(r.admin_luar) : '-'}</td>
+        <td>${r.fee_bank ? fmtNum(r.fee_bank) : '-'}</td>
+        <td>${fmtNum(r.saldo_akhir || 0)}</td>
         <td>${r.note || '-'}</td>
         <td>
           <button class="btn btn-ghost" data-act="edit" title="Edit" style="height:32px;padding:4px 8px">✏️</button>
@@ -801,7 +804,7 @@
       fillSelect(terima, cacheAcc.rekening||[]); terima.disabled=false
 
       $('rowNominal').style.display='grid'
-      $('rowAdminDua').style.display='grid'      // admin dalam & admin luar
+      $('rowAdminDua').style.display='grid'
     }
     else if(jenis==='transfer'){
       // sumber: Rekening & Server; terima: Laci (locked)
@@ -810,7 +813,7 @@
       fillSelect(terima, laci? [laci] : []); terima.disabled=true
 
       $('rowNominal').style.display='grid'
-      $('rowAdminLuarOnly').style.display='grid' // hanya admin luar
+      $('rowAdminLuarOnly').style.display='grid'
       $('rowFeeBank').style.display='grid'
     }
     else if(jenis==='pulsa'){
@@ -819,14 +822,14 @@
       fillSelect(sumber, sumberList); sumber.disabled=false
       fillSelect(terima, laci? [laci] : []); terima.disabled=true
 
-      $('rowPulsa').style.display='grid'         // modal & jual
+      $('rowPulsa').style.display='grid'
     }
     else if(jenis==='jasa'){
       // Sembunyikan baris sumber/terima di UI, tapi tetap set terima = Laci agar kas bertambah
       $('rowSumber').style.display='none'
       if(laci){ terima.innerHTML = `<option value="${laci.id}">${laci.name}</option>`; }
 
-      $('rowAdminLuarOnly').style.display='grid' // hanya admin luar
+      $('rowAdminLuarOnly').style.display='grid'
       // nominal disembunyikan; diisi otomatis saat simpan = admin luar
     }
   }
@@ -847,6 +850,9 @@
     const note = $('f_ket').value.trim()
 
     try{
+      // KETERANGAN WAJIB
+      if(!note) throw new Error('Keterangan wajib diisi (mis. No HP / No Ref).')
+
       let row = { branch_code: branch, jenis, src_account_id: sumber, dst_account_id: terima, nominal: 0, admin_dalam: 0, admin_luar: 0, fee_bank: 0, note }
 
       if(jenis==='tarik'){
@@ -892,7 +898,7 @@
         row.admin_dalam = 0
         row.admin_luar  = margin
         row.fee_bank    = 0
-        row.note = note ? note : `Pulsa: modal ${fmtRp(modal)}, jual ${fmtRp(jual)}, margin ${fmtRp(margin)}`
+        row.note = note  // keterangan dari user
       }
       else if(jenis==='jasa'){
         const laci = findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai di cabang ini.')
@@ -901,7 +907,7 @@
 
         const al = parseNum($('f_admin_luar_only').value)
         if(al<=0) throw new Error('Fee Admin (Admin Luar) harus > 0.')
-        row.nominal    = al     // nominal = admin luar (otomatis)
+        row.nominal    = al
         row.admin_luar = al
         row.admin_dalam = 0
         row.fee_bank = 0
