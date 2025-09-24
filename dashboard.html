@@ -7,216 +7,97 @@
   <style>
     :root{
       --sidebar-w: 260px;
-      --primary:#1769aa;
-      --primary-700:#145a90;
-      --primary-900:#0f4c81;
-      --blue-700:#1769aa;
-      --blue-100:#e8f1fb;
-      --green-600:#1ca85c;
-      --red-600:#e74c3c;
-      --orange-600:#ff8f00;
-      --gray-900:#111827;
-      --gray-700:#374151;
-      --gray-500:#6b7280;
-      --gray-300:#d1d5db;
-      --gray-200:#e5e7eb;
-      --gray-100:#f3f4f6;
-      --card:#ffffff;
-      --ring:#cbd5e1;
+      --primary:#1769aa; --primary-700:#145a90; --primary-900:#0f4c81;
+      --green-600:#1ca85c; --red-600:#e74c3c; --orange-600:#ff8f00;
+      --gray-900:#111827; --gray-700:#374151; --gray-500:#6b7280;
+      --gray-300:#d1d5db; --gray-200:#e5e7eb; --card:#fff; --ring:#cbd5e1;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",sans-serif;
-      background:#f6f9fb; color:#0f172a; display:flex;
-    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",sans-serif;background:#f6f9fb;color:#0f172a;display:flex}
 
     /* SIDEBAR */
-    .sidebar{
-      width:var(--sidebar-w);
-      background:#0f172a; color:#e5e7eb;
-      border-right:1px solid #0b1222;
-      position:fixed; inset:0 auto 0 0; z-index:30;
-      display:flex; flex-direction:column;
-    }
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.06);
-      background:linear-gradient(180deg,#0f4c81,#0b3a66); color:#fff;
-    }
-    .brand .logo{
-      width:36px; height:36px; border-radius:10px; display:grid; place-items:center;
-      background:#ffffff22; border:1px solid #ffffff33; font-weight:800;
-    }
-    .brand .title{font-weight:800; letter-spacing:.3px}
-
+    .sidebar{width:var(--sidebar-w);background:#0f172a;color:#e5e7eb;border-right:1px solid #0b1222;position:fixed;inset:0 auto 0 0;z-index:30;display:flex;flex-direction:column}
+    .brand{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,#0f4c81,#0b3a66);color:#fff}
+    .brand .logo{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:#ffffff22;border:1px solid #ffffff33;font-weight:800}
+    .brand .title{font-weight:800;letter-spacing:.3px}
     .nav{padding:10px}
-    .nav a{
-      display:flex; align-items:center; gap:10px; text-decoration:none; color:#e5e7eb;
-      padding:10px 12px; border-radius:10px; font-size:14px;
-    }
-    .nav a .ico{width:22px; text-align:center}
+    .nav a{display:flex;align-items:center;gap:10px;text-decoration:none;color:#e5e7eb;padding:10px 12px;border-radius:10px;font-size:14px}
+    .nav a .ico{width:22px;text-align:center}
     .nav a:hover{background:#1f2937}
-    .nav a.active{background:#0b3a66; border:1px solid #1f4f83}
-
-    .nav .group-title{
-      margin:12px 10px 6px; font-size:12px; color:#9ca3af; text-transform:uppercase; letter-spacing:.5px;
-    }
-    .submenu{margin-left:36px; display:flex; flex-direction:column; gap:4px; margin-top:6px}
-    .submenu a{font-size:13px; padding:8px 10px}
-    .nav .caret{margin-left:auto; opacity:.6}
-
-    .sidebar-footer{
-      margin-top:auto; padding:10px; border-top:1px solid rgba(255,255,255,.06); font-size:12px; color:#93a3b8;
-    }
+    .nav a.active{background:#0b3a66;border:1px solid #1f4f83}
+    .group-title{margin:12px 10px 6px;font-size:12px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px}
+    .submenu{margin-left:36px;display:flex;flex-direction:column;gap:4px;margin-top:6px}
+    .submenu a{font-size:13px;padding:8px 10px}
+    .sidebar-footer{margin-top:auto;padding:10px;border-top:1px solid rgba(255,255,255,.06);font-size:12px;color:#93a3b8}
 
     /* MAIN */
-    .main{
-      margin-left:var(--sidebar-w);
-      flex:1; min-width:0;
-      display:flex; flex-direction:column;
-    }
-    .topbar{
-      height:56px; display:flex; align-items:center; gap:10px; padding:0 16px;
-      background:#fff; border-bottom:1px solid var(--gray-200); position:sticky; top:0; z-index:20;
-    }
-    .toggleBtn{
-      display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px;
-      border:1px solid var(--ring); border-radius:8px; background:#fff; cursor:pointer;
-    }
-
-    .container{max-width:1200px; margin:20px auto; padding:0 16px}
+    .main{margin-left:var(--sidebar-w);flex:1;min-width:0;display:flex;flex-direction:column}
+    .topbar{height:56px;display:flex;align-items:center;gap:10px;padding:0 16px;background:#fff;border-bottom:1px solid var(--gray-200);position:sticky;top:0;z-index:20}
+    .toggleBtn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid var(--ring);border-radius:8px;background:#fff;cursor:pointer}
+    .container{max-width:1200px;margin:20px auto;padding:0 16px}
 
     /* Toolbar Filter */
-    .toolbar{
-      display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:16px;
-    }
-    .select, .btn{
-      height:38px; padding:0 12px; border:1px solid var(--ring); border-radius:8px; background:#fff; color:#111;
-      font-size:14px;
-    }
-    .btn{background:linear-gradient(180deg,#1f7cc5,#1769aa); color:#fff; border:none; cursor:pointer}
+    .toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+    .select,.btn{height:38px;padding:0 12px;border:1px solid var(--ring);border-radius:8px;background:#fff;color:#111;font-size:14px}
+    .btn{background:linear-gradient(180deg,#1f7cc5,#1769aa);color:#fff;border:none;cursor:pointer}
     .btn:active{transform:translateY(1px)}
-    .chip-title{
-      font-size:13px; font-weight:700; letter-spacing:.4px; color:#fff; background:#0f4c81;
-      display:inline-block; padding:6px 10px; border-radius:10px; margin-bottom:8px
-    }
+    .chip-title{font-size:13px;font-weight:700;letter-spacing:.4px;color:#fff;background:#0f4c81;display:inline-block;padding:6px 10px;border-radius:10px;margin-bottom:8px}
 
     /* Ribbon Summary */
-    .ribbon{
-      background:linear-gradient(180deg,#0e4980,#0b3a66);
-      color:#fff; border-radius:12px; padding:14px; box-shadow:0 6px 18px rgba(15,76,129,.18);
-      display:grid; grid-template-columns:1.3fr repeat(6, 1fr); gap:10px; align-items:stretch;
-      overflow:auto;
-    }
-    .ribbon .box{
-      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.15);
-      border-radius:10px; padding:10px 12px; min-width:140px;
-    }
-    .ribbon .box .label{font-size:11px; text-transform:uppercase; opacity:.9; letter-spacing:.5px}
-    .ribbon .box .val{font-weight:800; margin-top:6px; font-variant-numeric:tabular-nums; white-space:nowrap}
-    .v-blue{color:#cfe8ff}
-    .v-green{color:#b9f7d0}
-    .v-red{color:#ffd0cc}
-    .v-orange{color:#ffe2bf}
+    .ribbon{background:linear-gradient(180deg,#0e4980,#0b3a66);color:#fff;border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(15,76,129,.18);display:grid;grid-template-columns:1.3fr repeat(6,1fr);gap:10px;align-items:stretch;overflow:auto}
+    .ribbon .box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px 12px;min-width:140px}
+    .ribbon .box .label{font-size:11px;text-transform:uppercase;opacity:.9;letter-spacing:.5px}
+    .ribbon .box .val{font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums;white-space:nowrap}
+    .v-blue{color:#cfe8ff}.v-green{color:#b9f7d0}.v-red{color:#ffd0cc}.v-orange{color:#ffe2bf}
 
     /* Grid Cards */
-    .grid{
-      display:grid; gap:16px; margin-top:16px;
-      grid-template-columns:repeat(1,minmax(0,1fr));
-    }
-    @media(min-width:700px){ .grid{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
-    @media(min-width:1100px){ .grid{ grid-template-columns:repeat(3,minmax(0,1fr)); } }
+    .grid{display:grid;gap:16px;margin-top:16px;grid-template-columns:repeat(1,minmax(0,1fr))}
+    @media(min-width:700px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(min-width:1100px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
-    .card{
-      background:var(--card); border:1px solid var(--gray-200); border-radius:14px; overflow:hidden;
-      box-shadow:0 10px 24px rgba(16,24,40,.06);
-    }
-    .card-h{
-      background:#1769aa; color:#fff; padding:14px 16px; position:relative;
-    }
-    .card-h h3{margin:0; font-size:18px}
-    .card-h .sub{font-size:12px; opacity:.9}
+    .card{background:var(--card);border:1px solid var(--gray-200);border-radius:16px;overflow:hidden;box-shadow:0 10px 24px rgba(16,24,40,.06)}
+    .card-h{background:#1769aa;color:#fff;padding:14px 16px;position:relative;border-top-left-radius:16px;border-top-right-radius:16px}
+    .card-h h3{margin:0;font-size:18px}
+    .card-h .sub{font-size:12px;opacity:.9;display:flex;gap:8px;align-items:center}
+    .chip-trend{font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid #a7c2de;background:rgba(255,255,255,.15)}
     .card-b{padding:14px 16px}
-    .row{
-      display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:8px;
-    }
-    .kpi{
-      background:#fff; border:1px dashed var(--gray-300); border-radius:10px; padding:10px 12px;
-    }
-    .kpi .label{font-size:12px; color:var(--gray-700)}
-    .kpi .val{font-weight:800; margin-top:4px; font-variant-numeric:tabular-nums}
-    .kpi.green .val{color:var(--green-600)}
-    .kpi.red .val{color:var(--red-600)}
-    .kpi.orange .val{color:var(--orange-600)}
-    .kpi.blue .val{color:#145a90}
+    .row{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px}
+    .kpi{background:#fff;border:1px dashed var(--gray-300);border-radius:10px;padding:10px 12px}
+    .kpi .label{font-size:12px;color:#374151}
+    .kpi .val{font-weight:800;margin-top:4px;font-variant-numeric:tabular-nums}
+    .kpi.green .val{color:var(--green-600)} .kpi.red .val{color:var(--red-600)}
+    .kpi.orange .val{color:var(--orange-600)} .kpi.blue .val{color:#145a90}
+    .footer-actions{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--gray-200);background:#fafafa}
+    .btn-sm{height:34px;padding:0 10px;border-radius:8px;border:1px solid var(--ring);background:#fff;cursor:pointer;font-size:13px}
+    .btn-sm.primary{background:linear-gradient(180deg,#1f7cc5,#1769aa);color:#fff;border:none}
 
-    .footer-actions{display:flex; gap:8px; padding:12px 16px; border-top:1px solid var(--gray-200); background:#fafafa}
-    .btn-sm{
-      height:34px; padding:0 10px; border-radius:8px; border:1px solid var(--ring); background:#fff; cursor:pointer; font-size:13px
-    }
-    .btn-sm.primary{background:linear-gradient(180deg,#1f7cc5,#1769aa); color:#fff; border:none}
-    .trend{
-      font-size:11px; font-weight:700; padding:2px 6px; border-radius:999px; margin-left:8px;
-      background:rgba(255,255,255,.15); color:#fff; border:1px solid rgba(255,255,255,.25)
-    }
-
-    /* Skeletons */
-    .skeleton{position:relative; overflow:hidden; background:#e5edf6; border-radius:8px; min-height:20px}
-    .skeleton::after{
-      content:""; position:absolute; inset:0; transform:translateX(-100%);
-      background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);
-      animation:shimmer 1.4s infinite;
-    }
-    @keyframes shimmer{100%{transform:translateX(100%)}}
-
-    /* Toast */
-    .toast{
-      position:fixed; right:16px; bottom:16px; background:#111827; color:#fff; padding:12px 14px; border-radius:10px;
-      box-shadow:0 10px 24px rgba(0,0,0,.2); font-size:14px; display:none; z-index:50;
-    }
-
-    .empty{
-      margin:28px 0; padding:18px; border:1px dashed var(--gray-300); border-radius:12px; background:#fff; color:#4b5563;
-      text-align:center;
-    }
-    .muted{color:#6b7280; font-size:12px}
-
-    /* Responsive sidebar */
-    @media (max-width: 980px){
-      .sidebar{transform:translateX(-100%); transition:transform .25s ease}
-      .sidebar.open{transform:translateX(0)}
-      .main{margin-left:0}
-    }
+    .toast{position:fixed;right:16px;bottom:16px;background:#111827;color:#fff;padding:12px 14px;border-radius:10px;box-shadow:0 10px 24px rgba(0,0,0,.2);font-size:14px;display:none;z-index:50}
+    .empty{margin:28px 0;padding:18px;border:1px dashed var(--gray-300);border-radius:12px;background:#fff;color:#4b5563;text-align:center}
+    .muted{color:#6b7280;font-size:12px}
+    @media (max-width: 980px){.sidebar{transform:translateX(-100%);transition:transform .25s ease}.sidebar.open{transform:translateX(0)}.main{margin-left:0}}
   </style>
 </head>
 <body>
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <div class="logo">AM</div>
-      <div class="title">AMKO Celluler</div>
+      <div class="logo">AM</div><div class="title">AMKO Celluler</div>
     </div>
-
     <nav class="nav">
       <a href="./dashboard.html" class="active"><span class="ico">📊</span>Dashboard</a>
       <a href="./saldo-real.html"><span class="ico">📑</span>Saldo Real</a>
-      <a href="./master-saldo.html"><span class="ico">💰</span>Master Saldo</a>
+      <a href="./master-saldo-akun.html"><span class="ico">💰</span>Master Saldo Akun</a>
       <a href="./mutasi-saldo.html"><span class="ico">🔄</span>Mutasi Saldo</a>
       <a href="./transaksi-mini-atm.html"><span class="ico">🧮</span>Transaksi Mini ATM</a>
       <a href="./laporan.html"><span class="ico">📈</span>Laporan</a>
-
       <div class="group-title">Pengaturan</div>
-      <a href="./pengaturan.html"><span class="ico">⚙️</span>Pengaturan<span class="caret">›</span></a>
+      <a href="./pengaturan.html"><span class="ico">⚙️</span>Pengaturan</a>
       <div class="submenu">
         <a href="./manajemen-pengguna.html">👥 Manajemen Pengguna</a>
         <a href="./hak-akses.html">🔑 Hak Akses</a>
       </div>
     </nav>
-
-    <div class="sidebar-footer">
-      © AMKO • Dashboard v1
-    </div>
+    <div class="sidebar-footer">© AMKO • Dashboard v1</div>
   </aside>
 
   <!-- MAIN -->
@@ -250,31 +131,12 @@
       <!-- Ribbon Summary Global -->
       <div id="ribbon" class="ribbon" role="region" aria-label="Ringkasan keseluruhan">
         <div><span class="chip-title">TOTAL KESELURUHAN</span></div>
-
-        <div class="box">
-          <div class="label">ASET CASH</div>
-          <div class="val v-blue" id="g_asset_cash">—</div>
-        </div>
-        <div class="box">
-          <div class="label">ASET SALDO</div>
-          <div class="val v-blue" id="g_asset_saldo">—</div>
-        </div>
-        <div class="box">
-          <div class="label">TOTAL ASET</div>
-          <div class="val v-blue" id="g_total_asset">—</div>
-        </div>
-        <div class="box">
-          <div class="label">PROFIT</div>
-          <div class="val v-green" id="g_profit">—</div>
-        </div>
-        <div class="box">
-          <div class="label">PENGELUARAN</div>
-          <div class="val v-red" id="g_pengeluaran">—</div>
-        </div>
-        <div class="box">
-          <div class="label">PROFIT BERSIH</div>
-          <div class="val v-green" id="g_profit_bersih">—</div>
-        </div>
+        <div class="box"><div class="label">ASET CASH</div><div class="val v-blue" id="g_asset_cash">—</div></div>
+        <div class="box"><div class="label">ASET SALDO</div><div class="val v-blue" id="g_asset_saldo">—</div></div>
+        <div class="box"><div class="label">TOTAL ASET</div><div class="val v-blue" id="g_total_asset">—</div></div>
+        <div class="box"><div class="label">PROFIT</div><div class="val v-green" id="g_profit">—</div></div>
+        <div class="box"><div class="label">PENGELUARAN</div><div class="val v-red" id="g_pengeluaran">—</div></div>
+        <div class="box"><div class="label">PROFIT BERSIH</div><div class="val v-green" id="g_profit_bersih">—</div></div>
       </div>
 
       <!-- Grid Cabang -->
@@ -288,230 +150,158 @@
   <script>
     // ========== Sidebar Toggle ==========
     const sidebar = document.getElementById('sidebar');
-    document.getElementById('toggleSidebar').addEventListener('click', ()=>{
-      sidebar.classList.toggle('open');
-    });
+    document.getElementById('toggleSidebar').addEventListener('click', ()=>{ sidebar.classList.toggle('open'); });
 
-    // ========== Utility ==========
-    const rupiah = (n) => {
-      if(n === null || n === undefined || isNaN(n)) return "—";
-      const abs = Math.abs(Number(n));
-      const s = abs.toLocaleString("id-ID");
-      return (n < 0 ? "- Rp " : "Rp ") + s;
-    };
-    const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-    const showToast = (msg, ms=3000) => {
-      const t = document.getElementById('toast');
-      t.textContent = msg; t.style.display='block';
-      setTimeout(()=> t.style.display='none', ms);
-    };
+    // ========== Utils ==========
+    const rupiah = (n)=> (n==null||isNaN(n)) ? "—" : (n<0? "- Rp ":"Rp ")+Math.abs(+n).toLocaleString("id-ID");
+    const setText = (id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+    const showToast=(m,ms=3000)=>{const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none',ms);};
 
-    // ========== Mock Data (sementara agar UI langsung tampil) ==========
-    const MOCK_DATA = {
-      global: {
-        asset_cash: 43714900,
-        asset_saldo: 13031798,
-        total_asset: 56746698,
-        profit: 23773696,
-        pengeluaran: 0,
-        profit_bersih: 23773696,
-        trends: { profit: 0.06, pengeluaran: 0, total_asset: 0.04 }
-      },
-      branches: [
-        {
-          code: "AMKO25", name: "AMKO CELL 25", period: "September 2025",
-          total_transaksi: 3184,
-          omset: 3969924772,
-          pot_bank_operasional: 1506500,
-          pengeluaran: 0,
-          profit: 18652572,
-          profit_bersih: 18652572,
-          asset_cash: 9159900,
-          asset_saldo: 12370631,
-          total_asset: 21530531,
-          trends: { omset: 0.08, profit_bersih: -0.02 }
-        },
-        {
-          code: "AMKO18", name: "AMKO CELL 18", period: "September 2025",
-          total_transaksi: 844,
-          omset: 1230791373,
-          pot_bank_operasional: 959500,
-          pengeluaran: 0,
-          profit: 5121124,
-          profit_bersih: 5121124,
-          asset_cash: 34555000,
-          asset_saldo: 661167,
-          total_asset: 35216167,
-          trends: { omset: -0.03, profit_bersih: 0.05 }
-        }
-        // Tambah cabang ketiga? tinggal push objek baru di sini.
-      ]
-    };
-
-    // ========== Init Filter ==========
-    const now = new Date();
-    const topInfo = document.getElementById('topInfo');
-    const tahunEl = document.getElementById('tahun');
-    for (let y = now.getFullYear()-2; y<= now.getFullYear()+1; y++){
-      const opt = document.createElement('option');
-      opt.value = y; opt.textContent = y;
-      if (y === now.getFullYear()) opt.selected = true;
-      tahunEl.appendChild(opt);
-    }
-    document.getElementById('bulan').value = (now.getMonth()+1);
-
-    document.getElementById('btnFilter').addEventListener('click', () => {
-      const params = getFilterParams();
-      document.getElementById('filterNote').textContent =
-        `Periode: ${params.bulanName} ${params.tahun} • Rentang: ${params.rentangLabel}`;
-      topInfo.textContent = `Filter aktif: ${params.bulanName} ${params.tahun}`;
-      loadAll(params);
-    });
-    function getFilterParams(){
-      const tahun = parseInt(document.getElementById('tahun').value,10);
-      const bulan = parseInt(document.getElementById('bulan').value,10);
-      const rentang = document.getElementById('rentang').value;
-      const bulanName = document.getElementById('bulan').selectedOptions[0].textContent;
-      const rentangLabel = document.getElementById('rentang').selectedOptions[0].textContent;
-      return { tahun, bulan, rentang, bulanName, rentangLabel };
-    }
-
-    // ========== Render Ribbon ==========
-    function renderGlobalRibbon(data){
-      setText('g_asset_cash', rupiah(data.asset_cash));
-      setText('g_asset_saldo', rupiah(data.asset_saldo));
-      setText('g_total_asset', rupiah(data.total_asset));
-      setText('g_profit', rupiah(data.profit) + trendBadge(data.trends?.profit));
-      setText('g_pengeluaran', rupiah(data.pengeluaran) + trendBadge(data.trends?.pengeluaran));
-      setText('g_profit_bersih', rupiah(data.profit_bersih));
-    }
-    function trendBadge(v){
-      if (v === undefined || v === null || isNaN(v)) return "";
-      const pct = (v*100).toFixed(1) + "%";
-      return `  ▲▼`.replace("▲▼", v>=0 ? ` ▲ ${pct}` : ` ▼ ${Math.abs(v*100).toFixed(1)}%`);
-    }
-
-    // ========== Render Cards ==========
-    function renderBranchCards(list){
-      const host = document.getElementById('cards');
-      host.innerHTML = "";
-      if (!list || list.length === 0){
-        document.getElementById('emptyState').style.display = 'block';
-        return;
+    // ========== MOCK (fallback jika Supabase belum aktif) ==========
+    const MOCK_BRANCHES = [
+      { code:"AMKO25", name:"AMKO CELL 25" },
+      { code:"AMKO18", name:"AMKO CELL 18" }
+    ];
+    const MOCK_METRICS = {
+      global:{asset_cash:43714900,asset_saldo:13031798,total_asset:56746698,profit:23773696,pengeluaran:0,profit_bersih:23773696,trends:{profit:0.06,pengeluaran:0,total_asset:0.04}},
+      perBranch:{
+        AMKO25:{period:"September 2025", total_transaksi:3184, omset:3969924772, pot_bank_operasional:1506500, pengeluaran:0, profit:18652572, profit_bersih:18652572, asset_cash:9159900, asset_saldo:12370631, total_asset:21530531, trends:{omset:0.08,profit_bersih:-0.02}},
+        AMKO18:{period:"September 2025", total_transaksi:844, omset:1230791373, pot_bank_operasional:959500, pengeluaran:0, profit:5121124, profit_bersih:5121124, asset_cash:34555000, asset_saldo:661167, total_asset:35216167, trends:{omset:-0.03,profit_bersih:0.05}}
       }
-      document.getElementById('emptyState').style.display = 'none';
+    };
 
-      list.forEach(item=>{
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
+    // ========== Filter ==========
+    const now=new Date(); const tahunEl=document.getElementById('tahun');
+    for(let y=now.getFullYear()-2;y<=now.getFullYear()+1;y++){const o=document.createElement('option');o.value=y;o.textContent=y;if(y===now.getFullYear())o.selected=true;tahunEl.appendChild(o);}
+    document.getElementById('bulan').value = (now.getMonth()+1);
+    document.getElementById('btnFilter').addEventListener('click', ()=>{ const p=getFilterParams(); document.getElementById('filterNote').textContent=`Periode: ${p.bulanName} ${p.tahun} • Rentang: ${p.rentangLabel}`; document.getElementById('topInfo').textContent=`Filter aktif: ${p.bulanName} ${p.tahun}`; loadAll(p); });
+    function getFilterParams(){ const tahun=+document.getElementById('tahun').value; const bulan=+document.getElementById('bulan').value; const rentang=document.getElementById('rentang').value; const bulanName=document.getElementById('bulan').selectedOptions[0].textContent; const rentangLabel=document.getElementById('rentang').selectedOptions[0].textContent; return {tahun,bulan,rentang,bulanName,rentangLabel}; }
+
+    // ========== Rendering ==========
+    function renderGlobalRibbon(data){
+      setText('g_asset_cash',rupiah(data.asset_cash));
+      setText('g_asset_saldo',rupiah(data.asset_saldo));
+      setText('g_total_asset',rupiah(data.total_asset));
+      setText('g_profit',rupiah(data.profit));
+      setText('g_pengeluaran',rupiah(data.pengeluaran));
+      setText('g_profit_bersih',rupiah(data.profit_bersih));
+    }
+    function renderBranchCards(branches, metricsMap){
+      const host=document.getElementById('cards'); host.innerHTML="";
+      if(!branches||branches.length===0){document.getElementById('emptyState').style.display='block';return;}
+      document.getElementById('emptyState').style.display='none';
+      branches.forEach(b=>{
+        const m = metricsMap[b.code] || {};
+        const card=document.createElement('div'); card.className='card';
+        card.innerHTML=`
           <div class="card-h">
-            <h3>${item.name}</h3>
-            <div class="sub">${item.period}
-              <span class="trend">${item.trends?.omset!==undefined ? (item.trends.omset>=0 ? "▲" : "▼") : ""} Omset</span>
+            <h3>${b.name}</h3>
+            <div class="sub">
+              <span>${m.period||'-'}</span>
+              <span class="chip-trend">${(m.trends?.omset??0)>=0?'▲':'▼'} Omset</span>
             </div>
           </div>
           <div class="card-b">
             <div class="row">
-              <div class="kpi"><div class="label">TOTAL TRANSAKSI</div><div class="val">${(item.total_transaksi||0).toLocaleString('id-ID')}</div></div>
-              <div class="kpi green"><div class="label">OMSET</div><div class="val">${rupiah(item.omset)}</div></div>
+              <div class="kpi"><div class="label">TOTAL TRANSAKSI</div><div class="val">${(m.total_transaksi||0).toLocaleString('id-ID')}</div></div>
+              <div class="kpi green"><div class="label">OMSET</div><div class="val">${rupiah(m.omset)}</div></div>
             </div>
             <div class="row">
-              <div class="kpi orange"><div class="label">POT BANK + OPERASIONAL</div><div class="val">${rupiah(item.pot_bank_operasional)}</div></div>
-              <div class="kpi red"><div class="label">PENGELUARAN</div><div class="val">${rupiah(item.pengeluaran)}</div></div>
+              <div class="kpi orange"><div class="label">POT BANK + OPERASIONAL</div><div class="val">${rupiah(m.pot_bank_operasional)}</div></div>
+              <div class="kpi red"><div class="label">PENGELUARAN</div><div class="val">${rupiah(m.pengeluaran)}</div></div>
             </div>
             <div class="row">
-              <div class="kpi green"><div class="label">PROFIT</div><div class="val">${rupiah(item.profit)}</div></div>
-              <div class="kpi green"><div class="label">PROFIT BERSIH</div><div class="val">${rupiah(item.profit_bersih)} ${trendMini(item.trends?.profit_bersih)}</div></div>
+              <div class="kpi green"><div class="label">PROFIT</div><div class="val">${rupiah(m.profit)}</div></div>
+              <div class="kpi green"><div class="label">PROFIT BERSIH</div><div class="val">${rupiah(m.profit_bersih)}</div></div>
             </div>
             <div class="row">
-              <div class="kpi blue"><div class="label">ASET CASH</div><div class="val">${rupiah(item.asset_cash)}</div></div>
-              <div class="kpi blue"><div class="label">ASET SALDO</div><div class="val">${rupiah(item.asset_saldo)}</div></div>
+              <div class="kpi blue"><div class="label">ASET CASH</div><div class="val">${rupiah(m.asset_cash)}</div></div>
+              <div class="kpi blue"><div class="label">ASET SALDO</div><div class="val">${rupiah(m.asset_saldo)}</div></div>
             </div>
             <div class="row">
               <div class="kpi blue" style="grid-column: span 2;">
-                <div class="label">TOTAL ASET</div><div class="val">${rupiah(item.total_asset)}</div>
+                <div class="label">TOTAL ASET</div><div class="val">${rupiah(m.total_asset)}</div>
               </div>
             </div>
           </div>
           <div class="footer-actions">
-            <button class="btn-sm" onclick="openReport('${item.code}','year')">📄 Lap. Tahunan</button>
-            <button class="btn-sm" onclick="openReport('${item.code}','month')">🗓️ Lap. Bulanan</button>
-            <button class="btn-sm primary" onclick="goTransaksi('${item.code}')">🧮 Mode Transaksi</button>
-          </div>
-        `;
+            <button class="btn-sm" onclick="openReport('${b.code}','year')">📄 Lap. Tahunan</button>
+            <button class="btn-sm" onclick="openReport('${b.code}','month')">🗓️ Lap. Bulanan</button>
+            <button class="btn-sm primary" onclick="goTransaksi('${b.code}')">🧮 Mode Transaksi</button>
+          </div>`;
         host.appendChild(card);
       });
     }
-    function trendMini(v){
-      if (v===undefined || v===null || isNaN(v)) return "";
-      return v>=0 ? "▲" : "▼";
-    }
-    function openReport(branch, type){
-      showToast(`Buka laporan ${type==='year'?'tahunan':'bulanan'} untuk ${branch}`);
-      // TODO: arahkan ke ./laporan.html?branch=...&type=...
+
+    // ========== Navigasi yang diminta ==========
+    function openReport(branch,type){
+      // arahkan ke halaman laporan (kalau sudah ada)
+      window.location.href = `./laporan.html?branch=${encodeURIComponent(branch)}&type=${encodeURIComponent(type)}`;
     }
     function goTransaksi(branch){
-      showToast(`Buka Mode Transaksi untuk ${branch}`);
-      // TODO: window.location.href = './transaksi-mini-atm.html?branch='+encodeURIComponent(branch);
+      // ✅ FIX: benar-benar pindah ke halaman transaksi mini ATM
+      window.location.href = `./transaksi-mini-atm.html?branch=${encodeURIComponent(branch)}`;
     }
 
-    // ========== Data Loader (Mock → Supabase-ready) ==========
+    // ========== Data Loader ==========
     async function loadAll(params){
       try{
-        setText('g_asset_cash',"…"); setText('g_asset_saldo',"…"); setText('g_total_asset',"…");
-        setText('g_profit',"…"); setText('g_pengeluaran',"…"); setText('g_profit_bersih',"…");
-        document.getElementById('cards').innerHTML =
-          `<div class="card"><div class="card-h"><h3>Memuat…</h3></div><div class="card-b"><div class="skeleton" style="height:120px"></div></div></div>`;
-
-        // ====== MOCK (langsung jalan)
-        const global = MOCK_DATA.global;
-        const branches = MOCK_DATA.branches;
-
+        // coba ambil branches dari Supabase, fallback ke mock
+        const { branches, global, perBranch } = await loadDataFromSupabaseOrMock(params);
         renderGlobalRibbon(global);
-        renderBranchCards(branches);
-
-        // ====== TODO: Supabase (aktifkan jika view siap)
-        // await connectSupabase();
-        // const {global, branches} = await fetchFromSupabase(params);
-        // renderGlobalRibbon(global);
-        // renderBranchCards(branches);
-
+        renderBranchCards(branches, perBranch);
       }catch(err){
-        console.error(err);
-        showToast("Gagal memuat data dashboard.");
+        console.error(err); showToast("Gagal memuat data dashboard.");
       }
     }
 
-    // ========== (Opsional) Supabase Hooks ==========
-    async function connectSupabase(){
-      // const { createClient } = window.supabase;
-      // window.sb = createClient("https://kfqcdcvcnyhisbmwftzb.supabase.co",
-      //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y");
-    }
-    async function fetchFromSupabase(params){
-      // Contoh pola query:
-      // const { data: g, error: eg } = await sb.rpc('fn_global_summary', { y: params.tahun, m: params.bulan });
-      // if (eg) throw eg;
-      // const { data: b, error: eb } = await sb.from('v_dashboard_branch')
-      //   .select('*').eq('tahun', params.tahun).eq('bulan', params.bulan);
-      // if (eb) throw eb;
-      // return { global: g[0], branches: b };
+    // ========== Supabase / Mock ==========
+    async function loadDataFromSupabaseOrMock(params){
+      // jika library supabase-js tersedia & client bisa dibuat, tarik dari tabel 'branches'
+      if (window.supabase && window.SUPABASE_URL && window.SUPABASE_KEY){
+        try{
+          const { createClient } = window.supabase;
+          const sb = createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
 
-      return { global: MOCK_DATA.global, branches: MOCK_DATA.branches };
+          // 1) ambil daftar cabang → nama header card mengikuti DB
+          const { data: b, error: eb } = await sb.from('branches')
+            .select('code,name,active').eq('active', true).order('code', { ascending: true });
+          if (eb) throw eb;
+
+          // 2) ambil ringkasan global & per cabang (SESUAIKAN nama view/rpc milikmu)
+          // Contoh pukul rata pakai mock metrik dulu:
+          const perBranch = {};
+          b.forEach(row=>{
+            perBranch[row.code] = MOCK_METRICS.perBranch[row.code] || {};
+          });
+
+          return { branches: b, global: MOCK_METRICS.global, perBranch };
+        }catch(e){
+          console.warn('Supabase fallback to mock:', e);
+        }
+      }
+      // Fallback penuh ke mock (terjamin tampil)
+      const branches = MOCK_BRANCHES;
+      const perBranch = MOCK_METRICS.perBranch;
+      const global = MOCK_METRICS.global;
+      return { branches, perBranch, global };
     }
 
     // ========== Boot ==========
     (function boot(){
-      const params = getFilterParams();
-      document.getElementById('filterNote').textContent =
-        `Periode: ${params.bulanName} ${params.tahun} • Rentang: ${params.rentangLabel}`;
-      document.getElementById('topInfo').textContent = `Filter aktif: ${params.bulanName} ${params.tahun}`;
-      loadAll(params);
+      // Opsi: isi kredensial Supabase via window.* (atau biarkan kosong untuk mock)
+      // window.SUPABASE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
+      // window.SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9....";
+
+      // init filter
+      const p=getFilterParams();
+      document.getElementById('filterNote').textContent=`Periode: ${p.bulanName} ${p.tahun} • Rentang: ${p.rentangLabel}`;
+      document.getElementById('topInfo').textContent=`Filter aktif: ${p.bulanName} ${p.tahun}`;
+      loadAll(p);
     })();
   </script>
 
-  <!-- (Opsional) Supabase js kalau mau langsung konek -->
+  <!-- (Opsional) aktifkan jika ingin tarik dari Supabase langsung) -->
   <!-- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> -->
 </body>
 </html>
