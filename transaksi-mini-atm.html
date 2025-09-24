@@ -14,9 +14,8 @@
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt);-webkit-tap-highlight-color: transparent}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt)}
     button,input,select,textarea{font-family:inherit}
-
     .layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
     .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px}
     .brand{color:#fff;font-weight:800;font-size:20px;margin-bottom:12px}
@@ -24,10 +23,8 @@
     .nav a{color:var(--sbfg);text-decoration:none;padding:10px 12px;border-radius:10px;line-height:1.2}
     .nav a:hover{background:rgba(255,255,255,.10)}
     .nav a.active{background:var(--pri);color:#fff}
-
     header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
     .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px}
-
     .topbar{position:sticky;top:54px;z-index:9;background:linear-gradient(#fff,#fff 75%,transparent);padding:12px 16px;border-bottom:1px solid var(--bd)}
     .input{border:1px solid var(--bd);background:#fff;border-radius:10px;padding:12px 12px;font-size:16px;height:var(--touch);outline:none}
     .btn{border:none;border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:700;height:var(--touch)}
@@ -37,19 +34,15 @@
     .btn-ghost{background:#f1f5f9}
     .btn-danger{background:#fee2e2;color:#991b1b}
     .btn-sm{height:36px;padding:6px 10px;border-radius:10px;font-weight:700}
-
     .chips{display:flex;gap:8px;flex-wrap:wrap}
     .chip{border:1px solid var(--bd);padding:8px 10px;border-radius:999px;background:#fff;font-size:12px;cursor:pointer}
     .chip.active{background:#0b63f3;color:#fff;border-color:#0b63f3}
-
     .grid{display:grid;grid-template-columns:1fr;gap:12px;margin:12px 16px}
     .card{background:var(--card);border:1px solid var(--bd);border-radius:22px;box-shadow:var(--shadow);padding:16px}
     .card h3{margin:0 0 6px 0}
-
     table{width:100%;border-collapse:collapse;background:#fff}
     th,td{padding:10px;border:1px solid var(--bd);font-size:14px;text-align:left;vertical-align:top}
     th{background:#f8fafc}
-
     .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:50}
     .modal.show{display:flex}
     .dialog{width:min(820px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:92vh}
@@ -61,7 +54,6 @@
     .icon-input input,.icon-input select,.icon-input textarea{border:none;outline:none;flex:1;font-size:16px;background:transparent}
     .icon-input textarea{min-height:96px;resize:vertical}
     .dlg-ft{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--bd);padding:12px 16px;display:flex;gap:8px;justify-content:flex-end}
-
     @media (max-width: 900px){
       .layout{grid-template-columns:1fr}
       .sidebar{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:11}
@@ -71,10 +63,7 @@
       .dlg-bd{padding:12px;gap:10px}
       .row{grid-template-columns:1fr}
     }
-
     .fab{position:fixed;right:14px;bottom:calc(14px + var(--safe-bottom));width:56px;height:56px;border-radius:999px;background:#0b63f3;color:#fff;display:none;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(11,99,243,.35);z-index:15;font-size:26px;font-weight:900}
-
-    /* KPI cards */
     .kpi-grid{display:grid;grid-template-columns:repeat(1,1fr);gap:10px}
     @media(min-width:560px){ .kpi-grid{grid-template-columns:repeat(2,1fr)} }
     @media(min-width:900px){ .kpi-grid{grid-template-columns:repeat(5,1fr)} }
@@ -87,7 +76,6 @@
     .kpi-card.kpi-asset  { border-left:4px solid #f59e0b; background:linear-gradient(180deg,var(--orangeA), #ffffff 58%); }
     .kpi-card.kpi-profit .kpi-title{ color:#166534; }
     .kpi-card.kpi-profit .kpi-value{ font-size:22px; }
-
     .filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 16px 0 16px}
     .date{height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:#fff}
     .sep{color:#94a3b8}
@@ -119,6 +107,7 @@
     </header>
 
     <div class="topbar">
+      <!-- Dropdown cabang (owner only) -->
       <div id="branchRow" style="display:none; margin-bottom:10px; gap:8px; align-items:center; flex-wrap:wrap">
         <span style="font-size:12px;color:#475569;">Cabang</span>
         <select id="branchSelect" class="input" style="width:260px;max-width:100%">
@@ -127,6 +116,7 @@
         <button id="btnTambah" class="btn btn-primary">+ Tambah Transaksi</button>
       </div>
 
+      <!-- Filter Jenis -->
       <div class="chips">
         <div class="chip active" data-j="all">Semua</div>
         <div class="chip" data-j="tarik">Tarik Tunai</div>
@@ -136,6 +126,7 @@
       </div>
     </div>
 
+    <!-- FILTER TANGGAL + EXPORT -->
     <div class="filters">
       <button class="btn-sm btn-ghost" id="presetToday">Hari ini</button>
       <button class="btn-sm btn-ghost" id="preset7">7H</button>
@@ -151,6 +142,7 @@
     </div>
 
     <div class="grid">
+      <!-- KPI Transaksi -->
       <div class="card">
         <h3 style="margin-bottom:10px">KPI Transaksi <span id="kpiTglLabel" class="pill" style="margin-left:8px">Hari ini</span></h3>
         <div class="kpi-grid">
@@ -182,13 +174,18 @@
         </div>
       </div>
 
+      <!-- KPI Master Saldo Akun -->
       <div class="card">
         <h3 style="margin-bottom:10px">KPI Master Saldo Akun</h3>
         <div id="kpiSaldoWrap" class="kpi-grid"></div>
       </div>
 
+      <!-- Riwayat -->
       <div class="card">
         <h3>Riwayat Transaksi</h3>
+        <div id="totalTransaksi" style="margin:6px 0; font-weight:bold;">
+          Jumlah Total Transaksi = 0
+        </div>
         <table>
           <thead>
             <tr>
@@ -209,6 +206,11 @@
           </thead>
           <tbody id="tb"></tbody>
         </table>
+        <div style="margin-top:10px; display:flex; gap:8px; align-items:center; justify-content:center;">
+          <button class="btn-sm btn-ghost" id="btnPrev">⟨ Prev</button>
+          <span class="pill" id="pageInfo">Hal 1</span>
+          <button class="btn-sm btn-ghost" id="btnNext">Next ⟩</button>
+        </div>
       </div>
     </div>
   </div>
@@ -235,7 +237,7 @@
   </div>
 </div>
 
-<!-- MODAL FORM -->
+<!-- MODAL FORM TRANSAKSI -->
 <div class="modal" id="modalForm">
   <div class="dialog">
     <div class="dlg-hd">
@@ -275,6 +277,7 @@
         </div>
       </div>
 
+      <!-- ROW NOMINAL -->
       <div class="row" id="rowNominal">
         <div>
           <label id="labelNominal">Nominal (Rp)</label>
@@ -284,6 +287,7 @@
         </div>
       </div>
 
+      <!-- ROW ADMIN DALAM & LUAR -->
       <div class="row" id="rowAdminDua">
         <div>
           <label>Admin Dalam</label>
@@ -299,6 +303,7 @@
         </div>
       </div>
 
+      <!-- ROW ADMIN LUAR SAJA -->
       <div class="row" id="rowAdminLuarOnly" style="display:none">
         <div>
           <label>Admin Luar</label>
@@ -308,6 +313,7 @@
         </div>
       </div>
 
+      <!-- ROW FEE BANK -->
       <div class="row" id="rowFeeBank" style="display:none">
         <div>
           <label>Fee Bank (Transfer)</label>
@@ -317,6 +323,7 @@
         </div>
       </div>
 
+      <!-- ROW PULSA -->
       <div class="row" id="rowPulsa" style="display:none">
         <div>
           <label>Modal (harga modal)</label>
@@ -361,9 +368,17 @@
   let cacheAcc={ cash:[], rekening:[], server_pulsa:[] }
   let filterJenis='all'
   let lastRiwayatRows = []
+  let editMode=false, editId=null, editIdTrx=null
   const isOwner = ()=> gRole==='owner'
+
+  // Pagination state
+  let page = 0
+  const pageSize = 25
+  let totalRows = 0
+
   function toastErr(t){ const m=$('msgErr'); m.textContent=t; m.style.display='block'; setTimeout(()=>m.style.display='none',3000) }
 
+  // Tanggal helpers
   const fmtHuman = (d)=> d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric', hour:'2-digit', minute:'2-digit'})
   const fmtHumanDateOnly = (d)=> d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
   const toISODate = (d)=> d.toISOString().slice(0,10)
@@ -393,10 +408,9 @@
     $('kpiTglLabel').textContent = same? 'Hari ini' : `${f} – ${t}`
   }
 
-  ;(()=>{ // mask input numeric
-    const ids=['f_nom','f_admin_dalam','f_admin_luar','f_fee_bank','f_admin_luar_only','f_modal','f_jual']
-    ids.forEach(id=>{
-      const el=$(id); if(!el) return
+  // mask input numeric
+  ;(()=>{ const ids=['f_nom','f_admin_dalam','f_admin_luar','f_fee_bank','f_admin_luar_only','f_modal','f_jual']
+    ids.forEach(id=>{ const el=$(id); if(!el) return
       el.addEventListener('input', e=>{
         const raw=e.target.value.replace(/\D/g,'')
         e.target.value = raw? new Intl.NumberFormat('id-ID').format(Number(raw)) : ''
@@ -405,7 +419,9 @@
   })()
 
   async function boot(){
+    // default preset: Hari ini
     setPreset(1)
+
     const { data:{ session } } = await supabase.auth.getSession()
     if(!session){ location.href='login.html'; return }
     const { data: prof, error } = await supabase.from('profiles').select('role,branch_code,full_name,email').eq('id', session.user.id).single()
@@ -435,13 +451,15 @@
   }
 
   async function refreshByRange(){
-    await loadKPISaldo()
+    page = 0 // reset ke halaman 1 saat ganti rentang
     await loadKPITransaksi()
+    await loadKPISaldo()
     await loadRiwayat()
   }
 
   async function loadBranches(){
-    const sel=$('branchSelect'); sel.innerHTML='<option value="">Memuat cabang…</option>'
+    const sel=$('branchSelect')
+    sel.innerHTML='<option value="">Memuat cabang…</option>'
     let list=[]
     const { data: br, error: ebr } = await supabase.from('branches').select('code,name').order('name')
     if(!ebr && br && br.length){
@@ -476,10 +494,11 @@
     ;(data||[]).forEach(a=>{ if(cacheAcc[a.account_type]) cacheAcc[a.account_type].push(a) })
   }
 
-  // KPI Transaksi
+  // ====== KPI TRANSAKSI ======
   async function loadKPITransaksi(){
     const cab = viewBranch || gBranch
     const { tmin, tmax } = getRangeISO()
+
     const { data, error } = await supabase
       .from('transactions')
       .select('jenis, nominal, admin_dalam, admin_luar, fee_bank, branch_code, created_at')
@@ -502,7 +521,7 @@
     if(gRole==='owner') $('kpi_profit').textContent = fmtRp(profit)
   }
 
-  // KPI Master Saldo Akun
+  // ====== KPI MASTER SALDO ======
   function renderKPISaldoCards(accounts){
     const wrap = $('kpiSaldoWrap')
     const list = Array.isArray(accounts) ? accounts : []
@@ -552,7 +571,7 @@
     renderKPISaldoCards(data||[])
   }
 
-  // Riwayat
+  // ====== RIWAYAT + PAGINATION ======
   const saldoBlock = (srcName, srcVal, dstName, dstVal) => {
     const fmt = v => (v ?? null) !== null ? fmtNum(v) : '-'
     let html = ''
@@ -565,8 +584,20 @@
     const cab = viewBranch || gBranch
     const { tmin, tmax } = getRangeISO()
 
-    const { data, error } = await supabase
-      .from('v_tx_summary')
+    // 1) total count (respect range + jenis)
+    let totalFilter = supabase.from('v_tx_summary')
+      .select('*', { count:'exact', head:true })
+      .eq('branch_code', cab)
+      .gte('created_at', tmin)
+      .lte('created_at', tmax)
+
+    if(filterJenis!=='all'){ totalFilter = totalFilter.eq('jenis', filterJenis) }
+    const { count: cnt } = await totalFilter
+    totalRows = cnt || 0
+    $('totalTransaksi').textContent = 'Jumlah Total Transaksi = ' + totalRows
+
+    // 2) data page (respect range + jenis)
+    let dataQuery = supabase.from('v_tx_summary')
       .select(`
         id,
         id_trx,
@@ -593,23 +624,31 @@
       .eq('branch_code', cab)
       .gte('created_at', tmin)
       .lte('created_at', tmax)
+
+    if(filterJenis!=='all'){ dataQuery = dataQuery.eq('jenis', filterJenis) }
+
+    const { data, error } = await dataQuery
       .order('created_at', { ascending:false })
-      .limit(500)
+      .range(page*pageSize, (page+1)*pageSize - 1)
 
     if(error){
       $('tb').innerHTML = `<tr><td colspan="13" style="color:#991b1b">Gagal memuat riwayat: ${error.message}</td></tr>`
+      $('btnPrev').disabled = true; $('btnNext').disabled = true; $('pageInfo').textContent = 'Hal -'
       return
     }
 
-    const rows = (data||[]).filter(r=> filterJenis==='all' ? true : (r.jenis===filterJenis))
+    const rows = data || []
     lastRiwayatRows = rows
 
     if(rows.length===0){
       $('tb').innerHTML = `<tr><td colspan="13" style="color:#64748b">Belum ada transaksi dalam rentang ini.</td></tr>`
+      $('btnPrev').disabled = page===0
+      $('btnNext').disabled = (page+1)*pageSize >= totalRows
+      $('pageInfo').textContent = `Hal ${page+1}`
       return
     }
 
-    let i = 1
+    let i = 1 + page*pageSize
     $('tb').innerHTML = rows.map(r=>{
       const user = r.created_by_name || '-'
       const tgl = fmtHuman(new Date(r.created_at))
@@ -642,9 +681,14 @@
         </td>
       </tr>`
     }).join('')
+
+    // update tombol
+    $('btnPrev').disabled = page===0
+    $('btnNext').disabled = (page+1)*pageSize >= totalRows
+    $('pageInfo').textContent = `Hal ${page+1}`
   }
 
-  // CSV export (tetap)
+  // ====== Export CSV ======
   function csvEscape(value){
     if(value==null) return ''
     const s = String(value).replace(/\r?\n/g,' ').replace(/\s+/g,' ').trim()
@@ -661,17 +705,27 @@
       'Keterangan'
     ]
     const lines = [header.join(',')]
-    let i=1
+    let i=1 + page*pageSize
     for(const r of rows){
       const user = r.created_by_name || ''
       const tgl  = fmtHuman(new Date(r.created_at))
       const sumber = `${r.src_account_name || ''}${r.dst_account_name ? ' → '+r.dst_account_name : ''}`
-
       const rec = [
-        i++, user, tgl, (r.id_trx || r.id), sumber, r.jenis || '',
-        (r.src_saldo_awal ?? ''), (r.dst_saldo_awal ?? ''), (r.nominal ?? 0),
-        (r.admin_dalam ?? 0), (r.admin_luar ?? 0), (r.fee_bank ?? 0),
-        (r.src_saldo_akhir ?? ''), (r.dst_saldo_akhir ?? ''), r.note || ''
+        i++,
+        user,
+        tgl,
+        (r.id_trx || r.id),
+        sumber,
+        r.jenis || '',
+        (r.src_saldo_awal ?? ''),
+        (r.dst_saldo_awal ?? ''),
+        (r.nominal ?? 0),
+        (r.admin_dalam ?? 0),
+        (r.admin_luar ?? 0),
+        (r.fee_bank ?? 0),
+        (r.src_saldo_akhir ?? ''),
+        (r.dst_saldo_akhir ?? ''),
+        r.note || ''
       ].map(csvEscape)
       lines.push(rec.join(','))
     }
@@ -680,37 +734,68 @@
     const f = range.from || toISODate(new Date())
     const t = range.to   || toISODate(new Date())
     const same = f===t
-    const fname = same ? `riwayat_${f}.csv` : `riwayat_${f}_sampai_${t}.csv`
+    const fname = same ? `riwayat_${f}_p${page+1}.csv` : `riwayat_${f}_sampai_${t}_p${page+1}.csv`
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.href = url; link.download = fname; link.style.display='none'
     document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url)
   }
 
-  // Delegasi klik aksi
+  // ====== Delegasi tombol Aksi ======
   document.addEventListener('click', async (e)=>{
-    const btn = e.target.closest('button[data-act]'); if(!btn) return
-    const tr = btn.closest('tr[data-id]'); if(!tr) return
-    const id = tr.getAttribute('data-id'); const act = btn.getAttribute('data-act')
+    const btn = e.target.closest('button[data-act]')
+    if(!btn) return
+    const tr = btn.closest('tr[data-id]')
+    if(!tr) return
+    const id = tr.getAttribute('data-id')
+    const act = btn.getAttribute('data-act')
+
     if(act==='del'){
       if(!confirm('Hapus transaksi ini?')) return
       const { error } = await supabase.from('transactions').delete().eq('id', id)
       if(error){ alert('Gagal hapus: '+error.message); return }
       await refreshByRange()
     } else if(act==='edit'){
-      alert('Edit: akan diaktifkan.')
+      const row = lastRiwayatRows.find(r => r.id === id)
+      if(!row){ alert('Data transaksi tidak ditemukan'); return }
+      editMode = true
+      editId = id
+      editIdTrx = row.id_trx
+
+      setupForm(row.jenis)
+
+      $('f_jenis').value = row.jenis
+      $('f_branch').value = row.branch_code
+      if(row.src_account_id) $('f_sumber').value = row.src_account_id
+      if(row.dst_account_id) $('f_terima').value = row.dst_account_id
+      $('f_nom').value = fmtNum(row.nominal || 0)
+      $('f_admin_dalam').value = fmtNum(row.admin_dalam || 0)
+      $('f_admin_luar').value  = fmtNum(row.admin_luar || 0)
+      $('f_fee_bank').value    = fmtNum(row.fee_bank || 0)
+      $('f_ket').value         = row.note || ''
+      if(row.jenis==='pulsa'){
+        $('f_modal').value = fmtNum(row.nominal || 0)
+        $('f_jual').value  = fmtNum((row.nominal||0) + (row.admin_luar||0))
+      }
+      if(row.jenis==='jasa'){
+        $('f_admin_luar_only').value = fmtNum(row.admin_luar || 0)
+      }
+      openForm()
     }
   })
 
-  // Chips
+  // ====== Chips Jenis ======
   document.querySelectorAll('.chip').forEach(ch=>{
-    ch.addEventListener('click', ()=>{
+    ch.addEventListener('click', async ()=>{
       document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'))
-      ch.classList.add('active'); filterJenis = ch.dataset.j; loadRiwayat()
+      ch.classList.add('active')
+      filterJenis = ch.dataset.j
+      page = 0
+      await loadRiwayat()
     })
   })
 
-  // Range events
+  // ====== Date preset & apply ======
   $('presetToday').onclick = async ()=>{ setPreset(1); await refreshByRange() }
   $('preset7').onclick     = async ()=>{ setPreset(7); await refreshByRange() }
   $('preset30').onclick    = async ()=>{ setPreset(30); await refreshByRange() }
@@ -722,10 +807,14 @@
     await refreshByRange()
   }
 
-  // Export
+  // ====== Pagination buttons ======
+  $('btnPrev').onclick = async ()=>{ if(page>0){ page--; await loadRiwayat() } }
+  $('btnNext').onclick = async ()=>{ if((page+1)*pageSize < totalRows){ page++; await loadRiwayat() } }
+
+  // ====== Export ======
   $('btnExport').onclick = ()=> exportCSV()
 
-  // Modal logic
+  // ====== Modal helpers ======
   function openJenis(){ $('modalJenis').classList.add('show') }
   function closeJenis(){ $('modalJenis').classList.remove('show') }
   function openForm(){ $('modalForm').classList.add('show') }
@@ -734,7 +823,7 @@
   $('btnTambah').onclick = openJenis
   $('fabAdd').onclick = openJenis
   $('xJenis').onclick = $('batalJenis').onclick = closeJenis
-  $('xForm').onclick = $('batalForm').onclick = ()=>{ closeForm(); }
+  $('xForm').onclick = $('batalForm').onclick = ()=>{ closeForm(); editMode=false; editId=null; }
 
   function fillSelect(sel, items){
     sel.innerHTML = (items||[]).map(i=>`<option value="${i.id}">${i.name}</option>`).join('')
@@ -744,11 +833,15 @@
 
   document.querySelectorAll('#modalJenis [data-pilih]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      const jenis = btn.getAttribute('data-pilih'); closeJenis(); setupForm(jenis); openForm()
+      const jenis = btn.getAttribute('data-pilih')
+      closeJenis()
+      setupForm(jenis)
+      openForm()
     })
   })
 
   function setupForm(jenis){
+    // reset
     $('dlgTitle').textContent = `Form ${jenis.toUpperCase()}`
     $('f_jenis').value = jenis
     $('f_branch').value = viewBranch || gBranch
@@ -758,6 +851,7 @@
     const sumber=$('f_sumber'), terima=$('f_terima')
     const laci = findLaci()
 
+    // default hide
     $('rowNominal').style.display='none'
     $('rowAdminDua').style.display='none'
     $('rowAdminLuarOnly').style.display='none'
@@ -793,7 +887,7 @@
     }
   }
 
-  // enforce TARIK: hanya salah satu admin
+  // enforce TARIK: hanya salah satu admin terisi
   $('f_admin_dalam').addEventListener('input', ()=>{ if(parseNum($('f_admin_dalam').value)>0){ $('f_admin_luar').value='' } })
   $('f_admin_luar').addEventListener('input',  ()=>{ if(parseNum($('f_admin_luar').value)>0){ $('f_admin_dalam').value='' } })
 
@@ -813,6 +907,7 @@
         if(!terima) throw new Error('Terima Dana (rekening) wajib diisi.')
         const laci = findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai di cabang ini.')
         row.src_account_id = laci.id
+
         const nominal = parseNum($('f_nom').value)
         const ad = parseNum($('f_admin_dalam').value)
         const al = parseNum($('f_admin_luar').value)
@@ -827,6 +922,7 @@
         if(!sumber) throw new Error('Sumber Dana (rekening/server) wajib diisi.')
         const laci = findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai di cabang ini.')
         row.dst_account_id = laci.id
+
         const nominal = parseNum($('f_nom').value)
         const al = parseNum($('f_admin_luar_only').value)
         const fb = parseNum($('f_fee_bank').value)
@@ -840,6 +936,7 @@
         if(!sumber) throw new Error('Sumber Dana (rekening/server) wajib diisi.')
         const laci = findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai di cabang ini.')
         row.dst_account_id = laci.id
+
         const modal = parseNum($('f_modal').value)
         const jual  = parseNum($('f_jual').value)
         if(modal<=0) throw new Error('Modal harus > 0.')
@@ -857,18 +954,25 @@
         row.dst_account_id = laci.id
         const al = parseNum($('f_admin_luar_only').value)
         if(al<=0) throw new Error('Fee Admin (Admin Luar) harus > 0.')
-        row.nominal    = al
+        row.nominal    = 0           // jasa tidak memindah pokok
         row.admin_luar = al
         row.admin_dalam = 0
         row.fee_bank = 0
+      }
+
+      // EDIT MODE: hapus transaksi lama dulu
+      if(editMode && editId){
+        const { error:delErr } = await supabase.from('transactions').delete().eq('id', editId)
+        if(delErr) throw new Error('Gagal hapus transaksi lama: '+delErr.message)
       }
 
       const { error } = await supabase.from('transactions').insert(row)
       if(error) throw error
 
       $('modalForm').classList.remove('show')
+      editMode=false; editId=null; editIdTrx=null
 
-      // *** REFRESH BERURUT + JEDA MINI (agar KPI pasti terbaru) ***
+      // Refresh berurut + jeda
       await new Promise(r => setTimeout(r, 150))
       await loadKPISaldo()
       await loadKPITransaksi()
@@ -878,8 +982,12 @@
 
   $('lnk-logout').addEventListener('click', async ()=>{ await supabase.auth.signOut(); location.href='login.html' })
 
-  document.getElementById('btnExport').onclick = ()=> exportCSV()
+  // Pagination buttons already wired above
 
+  // Export button
+  $('btnExport').onclick = ()=> exportCSV()
+
+  // Start
   boot()
 </script>
 </body>
