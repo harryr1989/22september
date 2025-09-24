@@ -574,10 +574,17 @@
   }
 
   // ====== RIWAYAT (respect range) ======
-  const twoLinesSaldo = (labelA, valA, labelB, valB) => {
-    const a = (valA ?? null) !== null ? fmtNum(valA) : '-'
-    const b = (valB ?? null) !== null ? fmtNum(valB) : '-'
-    return `<div>${labelA}: <b>${a}</b></div><div>${labelB}: <b>${b}</b></div>`
+  // helper: tampilkan dua baris saldo dengan NAMA AKUN
+  const saldoBlock = (srcName, srcVal, dstName, dstVal) => {
+    const fmt = v => (v ?? null) !== null ? fmtNum(v) : '-'
+    let html = ''
+    if (srcName || srcVal !== undefined) {
+      html += `<div>${(srcName || 'SRC')}: <b>${fmt(srcVal)}</b></div>`
+    }
+    if (dstName || dstVal !== undefined) {
+      html += `<div>${(dstName || 'DST')}: <b>${fmt(dstVal)}</b></div>`
+    }
+    return html || '-'
   }
 
   async function loadRiwayat(){
@@ -635,8 +642,8 @@
       const sumberDana = dst ? `${src} → ${dst}` : `${src}`
       const userTanggal = `(<span style="color:#1d4ed8">${user}</span>, ${tgl})`
 
-      const saldoAwalCell  = twoLinesSaldo('SRC', r.src_saldo_awal,  'DST', r.dst_saldo_awal)
-      const saldoAkhirCell = twoLinesSaldo('SRC', r.src_saldo_akhir, 'DST', r.dst_saldo_akhir)
+      const saldoAwalCell  = saldoBlock(r.src_account_name, r.src_saldo_awal,  r.dst_account_name, r.dst_saldo_awal)
+      const saldoAkhirCell = saldoBlock(r.src_account_name, r.src_saldo_akhir, r.dst_account_name, r.dst_saldo_akhir)
 
       return `<tr data-id="${r.id}">
         <td>${i++}</td>
