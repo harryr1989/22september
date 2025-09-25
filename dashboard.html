@@ -66,8 +66,8 @@
     .sidebar-meta{font-size:12px; color:#93a3b8}
     .btn-logout{
       display:flex; align-items:center; justify-content:center; gap:8px;
-      height:38px; border-radius:10px; border:1px solid #374151; background:#111827; color:#fff; cursor:pointer;
-      font-size:14px; text-decoration:none;
+      height:38px; border-radius:10px; border:1px solid #374151;
+      background:#111827; color:#fff; cursor:pointer; font-size:14px;
     }
     .btn-logout:hover{background:#1f2937; border-color:#475569}
 
@@ -115,7 +115,7 @@
     </nav>
 
     <div class="sidebar-footer">
-      <a href="#" id="btnSidebarLogout" class="btn-logout">🚪 Keluar / Ganti Shift</a>
+      <button id="btnSidebarLogout" class="btn-logout" type="button">🚪 Keluar / Ganti Shift</button>
       <div class="sidebar-meta">© AMKO • Dashboard v1</div>
     </div>
   </aside>
@@ -137,147 +137,148 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    // ====== Sidebar toggle (mobile) ======
-    const sidebar = document.getElementById('sidebar');
-    document.getElementById('toggleSidebar').addEventListener('click', ()=>{
-      sidebar.classList.toggle('open');
-    });
-
-    // ====== Inisialisasi Supabase ======
-    const SUPABASE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // ====== State role (awal dari localStorage, lalu sinkron dari Supabase) ======
-    let role = (localStorage.getItem("user_role") || "kasir").toLowerCase();
-    const roleBadge = document.getElementById('roleBadge');
-    roleBadge.textContent = "Role: " + role.toUpperCase();
-
-    // ====== Konfigurasi menu ======
-    // ownerOnly: true -> hanya tampil bila role === "owner"
-    const menuConfig = [
-      { label:"Dashboard", icon:"📊", link:"./dashboard.html", ownerOnly:true },
-      { label:"Transaksi Mini ATM", icon:"🧮", link:"./transaksi-mini-atm.html" },
-      { label:"Saldo Real", icon:"📑", link:"./saldo-real.html" },
-      { label:"Master Saldo Akun", icon:"💰", link:"./master-saldo-akun.html" },
-      { label:"Mutasi Saldo", icon:"🔄", link:"./mutasi-saldo.html" },
-      { label:"Laporan", icon:"🧮", link:"./laporan.html", ownerOnly:true },
-
-      { group:"Pengaturan", ownerOnly:true },
-      { label:"Manajemen Pengguna", icon:"👥", link:"./manajemen-pengguna.html", parent:"Pengaturan", ownerOnly:true },
-      { label:"Hak Akses", icon:"🔑", link:"./hak-akses.html", parent:"Pengaturan", ownerOnly:true }
-    ];
-
-    function renderSidebar(){
-      const nav = document.getElementById("menuList");
-      nav.innerHTML = "";
-      let currentGroup = "";
-
-      menuConfig.forEach(item=>{
-        if(item.ownerOnly && role !== "owner") return; // sembunyikan untuk non-owner
-
-        if(item.group){
-          const div = document.createElement("div");
-          div.className = "group-title";
-          div.textContent = item.group;
-          nav.appendChild(div);
-          currentGroup = item.group;
-          return;
-        }
-
-        const a = document.createElement("a");
-        a.href = item.link;
-        a.innerHTML = `<span class="ico">${item.icon}</span>${item.label}`;
-
-        if(item.parent && item.parent === currentGroup){
-          a.classList.add("submenu-item");
-          a.style.marginLeft = "36px";
-          a.style.fontSize = "13px";
-        }
-        nav.appendChild(a);
-      });
-
-      // Tandai menu aktif berdasarkan URL
-      markActive(nav);
-    }
-
-    function markActive(nav){
-      const links = nav.querySelectorAll("a[href]");
-      const here = location.pathname.split("/").pop() || "dashboard.html";
-      links.forEach(a=>{
-        const target = a.getAttribute("href");
-        if(target.endsWith(here)) a.classList.add("active");
-      });
-    }
-
-    // Render awal pakai role dari localStorage
-    renderSidebar();
-
-    // ====== Ambil role dari Supabase session & sinkron ======
-    async function getRoleFromSupabase(){
-      const { data: { session } } = await sb.auth.getSession();
-
-      if(!session || !session.user){
-        return null; // belum login
+    // Pastikan semua script jalan setelah DOM siap
+    document.addEventListener('DOMContentLoaded', () => {
+      // ====== Sidebar toggle (mobile) ======
+      const sidebar = document.getElementById('sidebar');
+      const toggleBtn = document.getElementById('toggleSidebar');
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', ()=> sidebar.classList.toggle('open'));
       }
 
-      // 1) metadata
-      let r =
-        (session.user.user_metadata && session.user.user_metadata.role) ||
-        (session.user.app_metadata && session.user.app_metadata.role) ||
-        "";
+      // ====== Inisialisasi Supabase ======
+      const SUPABASE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
+      const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      // 2) fallback ke tabel profiles.role (opsional)
-      if(!r){
-        const { data: prof } = await sb
-          .from("profiles")
-          .select("role")
-          .eq("id", session.user.id)
-          .maybeSingle();
-        r = prof?.role || "";
+      // ====== State role (awal dari localStorage, lalu sinkron dari Supabase) ======
+      let role = (localStorage.getItem("user_role") || "kasir").toLowerCase();
+      const roleBadge = document.getElementById('roleBadge');
+      if (roleBadge) roleBadge.textContent = "Role: " + role.toUpperCase();
+
+      // ====== Konfigurasi menu ======
+      const menuConfig = [
+        { label:"Dashboard", icon:"📊", link:"./dashboard.html", ownerOnly:true },
+        { label:"Transaksi Mini ATM", icon:"🧮", link:"./transaksi-mini-atm.html" },
+        { label:"Saldo Real", icon:"📑", link:"./saldo-real.html" },
+        { label:"Master Saldo Akun", icon:"💰", link:"./master-saldo-akun.html" },
+        { label:"Mutasi Saldo", icon:"🔄", link:"./mutasi-saldo.html" },
+        { label:"Laporan", icon:"🧮", link:"./laporan.html", ownerOnly:true },
+        { group:"Pengaturan", ownerOnly:true },
+        { label:"Manajemen Pengguna", icon:"👥", link:"./manajemen-pengguna.html", parent:"Pengaturan", ownerOnly:true },
+        { label:"Hak Akses", icon:"🔑", link:"./hak-akses.html", parent:"Pengaturan", ownerOnly:true }
+      ];
+
+      function renderSidebar(){
+        const nav = document.getElementById("menuList");
+        if (!nav) return;
+        nav.innerHTML = "";
+        let currentGroup = "";
+
+        menuConfig.forEach(item=>{
+          if(item.ownerOnly && role !== "owner") return;
+
+          if(item.group){
+            const div = document.createElement("div");
+            div.className = "group-title";
+            div.textContent = item.group;
+            nav.appendChild(div);
+            currentGroup = item.group;
+            return;
+          }
+
+          const a = document.createElement("a");
+          a.href = item.link;
+          a.innerHTML = `<span class="ico">${item.icon}</span>${item.label}`;
+
+          if(item.parent && item.parent === currentGroup){
+            a.classList.add("submenu-item");
+            a.style.marginLeft = "36px";
+            a.style.fontSize = "13px";
+          }
+          nav.appendChild(a);
+        });
+
+        markActive(nav);
       }
 
-      return (r || "kasir").toLowerCase();
-    }
+      function markActive(nav){
+        const links = nav.querySelectorAll("a[href]");
+        const here = location.pathname.split("/").pop() || "dashboard.html";
+        links.forEach(a=>{
+          const target = a.getAttribute("href");
+          if(target.endsWith(here)) a.classList.add("active");
+        });
+      }
 
-    async function syncRole(){
-      try{
+      // Render awal
+      renderSidebar();
+
+      // ====== Ambil role dari Supabase session & sinkron ======
+      async function getRoleFromSupabase(){
+        try{
+          const { data: { session } } = await sb.auth.getSession();
+          if(!session || !session.user) return null;
+
+          let r =
+            session.user.user_metadata?.role ||
+            session.user.app_metadata?.role || "";
+
+          if(!r){
+            const { data: prof } = await sb
+              .from("profiles")
+              .select("role")
+              .eq("id", session.user.id)
+              .maybeSingle();
+            r = prof?.role || "";
+          }
+          return (r || "kasir").toLowerCase();
+        }catch(e){
+          console.error("getRoleFromSupabase error:", e);
+          return null;
+        }
+      }
+
+      async function syncRole(){
         const r = await getRoleFromSupabase();
-        if(!r) return; // tidak mengubah jika belum login
-
+        if(!r) return;
         if(r !== role){
           role = r;
           localStorage.setItem("user_role", role);
-          roleBadge.textContent = "Role: " + role.toUpperCase();
-
-          // rerender sidebar sesuai role terbaru
-          const nav = document.getElementById("menuList");
-          nav.innerHTML = "";
+          if (roleBadge) roleBadge.textContent = "Role: " + role.toUpperCase();
           renderSidebar();
         }
-      }catch(err){
-        console.error("Gagal sinkron role:", err);
       }
-    }
 
-    // Sinkron sekali saat load + saat auth state berubah
-    syncRole();
-    sb.auth.onAuthStateChange(()=> syncRole());
+      syncRole();
+      sb.auth.onAuthStateChange(()=> syncRole());
 
-    // ====== LOGOUT (di sidebar bawah) ======
-    document.getElementById("btnSidebarLogout").addEventListener("click", async (e)=>{
-      e.preventDefault();
-      try{
-        // signOut Supabase
-        await sb.auth.signOut();
-      }catch(err){
-        console.warn("SignOut error:", err);
-      }finally{
-        // bersihkan data lokal & redirect
-        localStorage.removeItem("user_role");
-        // (opsional) bersihkan email tersimpan
-        // localStorage.removeItem("remember_email");
-        window.location.replace("./login.html");
+      // ====== LOGOUT (di sidebar bawah) ======
+      const btnLogout = document.getElementById("btnSidebarLogout");
+      if (btnLogout) {
+        btnLogout.addEventListener("click", async ()=>{
+          console.log("[Logout] mulai signOut…");
+          try{
+            // 1) Coba global signout (untuk PKCE / server-side)
+            const { error: e1 } = await sb.auth.signOut({ scope: "global" });
+            if (e1) {
+              console.warn("Global signOut gagal, coba local:", e1.message);
+              // 2) Fallback ke local signout
+              const { error: e2 } = await sb.auth.signOut({ scope: "local" });
+              if (e2) console.warn("Local signOut juga ada error:", e2.message);
+            }
+          }catch(err){
+            console.error("signOut exception:", err);
+          }finally{
+            // Tetap bersihkan & redirect walau signOut error
+            try { localStorage.removeItem("user_role"); } catch(e){}
+            try { localStorage.removeItem("remember_email"); } catch(e){}
+            // Pakai replace agar tidak balik dengan tombol Back
+            window.location.replace("./login.html");
+          }
+        });
+      } else {
+        console.error("Element #btnSidebarLogout tidak ditemukan di DOM.");
       }
     });
   </script>
