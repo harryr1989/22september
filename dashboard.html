@@ -2,10 +2,12 @@
 <html lang="id">
 <head>
   <meta charset="utf-8" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AMKO Dashboard</title>
 
-  <!-- Favicon inline (hilangkan 404) -->
+  <!-- Favicon inline supaya tidak 404 -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231769aa'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-family='Arial' font-size='34' fill='white'%3EAM%3C/text%3E%3C/svg%3E"/>
 
   <style>
@@ -51,6 +53,30 @@
   </style>
 </head>
 <body>
+  <!-- ====== Auth Guard (paling awal) ====== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Inisialisasi Supabase + guard awal
+    const SUPABASE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function guard() {
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) {
+          try { localStorage.removeItem("user_role"); } catch {}
+          window.location.replace("./login.html");
+        }
+      } catch (e) {
+        window.location.replace("./login.html");
+      }
+    }
+    guard();
+    sb.auth.onAuthStateChange((ev) => { if (ev === "SIGNED_OUT") window.location.replace("./login.html"); });
+    window.addEventListener("pageshow", (e) => { if (e.persisted) { guard(); } });
+  </script>
+
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">
@@ -61,8 +87,7 @@
     <nav class="nav" id="menuList"><!-- diisi via JS --></nav>
 
     <div class="sidebar-footer">
-      <!-- Failsafe logout pakai onclick juga -->
-      <button id="btnSidebarLogout" class="btn-logout" type="button" onclick="window.__handleLogout && window.__handleLogout(event)">🚪 Keluar / Ganti Shift</button>
+      <button id="btnSidebarLogout" class="btn-logout" type="button">🚪 Keluar / Ganti Shift</button>
       <div class="sidebar-meta">© AMKO • Dashboard v1</div>
     </div>
   </aside>
@@ -80,26 +105,10 @@
     </div>
   </main>
 
-  <!-- Supabase JS CDN -->
-  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script>
-    // Inisialisasi UI dasar
+    // ===== UI dasar =====
     const sidebar = document.getElementById('sidebar');
     document.getElementById('toggleSidebar').addEventListener('click', ()=> sidebar.classList.toggle('open'));
-
-    // ===== Supabase init =====
-    const SUPABASE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
-    let sb = null;
-    // Tunggu CDN siap
-    (function waitSupabase(){
-      if (window.supabase) {
-        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      } else {
-        setTimeout(waitSupabase, 20);
-      }
-    })();
 
     // ===== Role & Sidebar =====
     let role = (localStorage.getItem("user_role") || "kasir").toLowerCase();
@@ -117,6 +126,7 @@
       { label:"Manajemen Pengguna", icon:"👥", link:"./manajemen-pengguna.html", parent:"Pengaturan", ownerOnly:true },
       { label:"Hak Akses", icon:"🔑", link:"./hak-akses.html", parent:"Pengaturan", ownerOnly:true }
     ];
+
     function renderSidebar(){
       const nav = document.getElementById("menuList");
       nav.innerHTML = "";
@@ -141,13 +151,11 @@
     }
     renderSidebar();
 
-    // Sinkron role dari Supabase
+    // Sinkron role dari Supabase (kalau metadata/profiles tersedia)
     async function syncRole(){
       try{
-        if(!sb){ return; }
         const { data: { session } } = await sb.auth.getSession();
         if(!session || !session.user) return;
-
         let r = session.user.user_metadata?.role || session.user.app_metadata?.role || "";
         if(!r){
           const { data: prof } = await sb.from("profiles").select("role").eq("id", session.user.id).maybeSingle();
@@ -162,33 +170,22 @@
         }
       }catch(e){ console.warn("syncRole:", e); }
     }
-    // jalankan dan dengarkan perubahan auth
-    (function waitAndSync(){
-      if (sb) { syncRole(); sb.auth.onAuthStateChange(()=>syncRole()); }
-      else { setTimeout(waitAndSync, 30); }
-    })();
+    syncRole();
+    sb.auth.onAuthStateChange(()=> syncRole());
 
-    // ======= LOGOUT FAILSAFE =======
-    window.__handleLogout = async function(e){
-      if (e) e.preventDefault();
+    // ===== Logout (failsafe) =====
+    document.getElementById("btnSidebarLogout").addEventListener("click", async ()=>{
       try{
-        if (sb) {
-          // coba global dulu, lalu local
-          const g = await sb.auth.signOut({ scope: "global" });
-          if (g?.error) { await sb.auth.signOut({ scope: "local" }); }
-        }
-      }catch(err){
-        console.warn("signOut error:", err);
+        const g = await sb.auth.signOut({ scope: "global" });
+        if (g?.error) { await sb.auth.signOut({ scope: "local" }); }
+      }catch(e){
+        console.warn("signOut error:", e);
       }finally{
-        // selalu bersihkan & redirect
-        try{ localStorage.removeItem("user_role"); }catch{}
-        try{ localStorage.removeItem("remember_email"); }catch{}
+        try { localStorage.removeItem("user_role"); } catch {}
+        try { localStorage.removeItem("remember_email"); } catch {}
         window.location.replace("./login.html");
       }
-    };
-
-    // Pasang juga listener JS (dobel: onclick + addEventListener)
-    document.getElementById("btnSidebarLogout").addEventListener("click", window.__handleLogout);
+    });
   </script>
 </body>
 </html>
