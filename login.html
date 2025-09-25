@@ -3,10 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login • AMKO Mini Link</title>
+  <title>Login • AMKO MiniLink</title>
   <link rel="icon" type="image/x-icon" href="./assets/favicon.ico" />
   <style>
-    :root{--primary:#1f7cc5;--primary-700:#1769aa;--ring:#cbd5e1;--bg:#0b3a66;--bg-deep:#0a2542;--card:#fff;--muted:#6b7280;}
+    :root{
+      --primary:#1f7cc5;--primary-700:#1769aa;--ring:#cbd5e1;
+      --bg:#0b3a66;--bg-deep:#0a2542;--card:#fff;--muted:#6b7280;
+      --accent-red:#dc2626;
+    }
     *{box-sizing:border-box} html,body{height:100%}
     body{
       margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial;
@@ -18,20 +22,23 @@
       box-shadow:0 20px 60px rgba(16,24,40,.25);overflow:hidden;
     }
     .card-h{
-      background:linear-gradient(180deg,var(--primary),var(--primary-700));color:#fff;padding:22px;
-      display:flex;align-items:center;gap:14px;
+      background:linear-gradient(180deg,var(--primary),var(--primary-700));
+      color:#fff;
+      padding:22px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
     }
-    .logo-img{width:44px;height:44px;}
     .brand .title{font-weight:800;font-size:22px;}
-    .brand .tagline{font-size:13px;font-weight:500;opacity:.9;margin-top:2px;}
+    .brand .title .link-red{color:var(--accent-red);font-weight:900;}
+    .brand .tagline{font-size:13px;font-weight:500;opacity:.9;margin-top:4px;}
     .card-b{padding:22px}
     label{font-size:14px;color:#111827;margin-bottom:6px;display:block}
     .input{width:100%;height:44px;border:1px solid var(--ring);border-radius:12px;padding:0 12px;font-size:14px;background:#f8fafc;}
     .input-wrap{position:relative}
-    .toggle-pass{
-      position:absolute;right:12px;top:50%;transform:translateY(-50%);
-      font-size:13px;font-weight:600;color:#2563eb;cursor:pointer;user-select:none;
-    }
+    .toggle-pass{position:absolute;right:12px;top:50%;transform:translateY(-50%);
+      font-size:13px;font-weight:600;color:#2563eb;cursor:pointer;user-select:none;}
     .row-between{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:13px;}
     .link{color:#2563eb;text-decoration:none;font-weight:600}
     .btn{
@@ -50,17 +57,16 @@
 <body>
   <div class="card" role="main" aria-label="Kartu login AMKO">
     <div class="card-h">
-      <img src="./assets/logo-amko-mini-link.svg?v=1" alt="AMKO Mini Link" class="logo-img" />
       <div class="brand">
-        <div class="title">AMKO Mini Link</div>
-        <div class="tagline">Kas Aman &amp; Usaha Lancar</div>
+        <div class="title">AMKO Mini<span class="link-red">Link</span></div>
+        <div class="tagline">Solusi Cepat Tarik &amp; Transfer Dana</div>
       </div>
     </div>
     <div class="card-b">
       <form id="loginForm" novalidate>
         <div class="field" style="margin-bottom:12px">
-          <label for="email">Username</label>
-          <input id="email" type="email" class="input" placeholder="amko@contoh.com" autocomplete="username" required />
+          <label for="email">Email</label>
+          <input id="email" type="email" class="input" placeholder="owner@contoh.com" autocomplete="username" required />
         </div>
         <div class="field" style="margin-bottom:8px">
           <label for="password">Kata Sandi</label>
@@ -81,17 +87,16 @@
 
         <div id="msgBox" class="msg" aria-live="polite"></div>
       </form>
-      <div class="brand-mini">© AMKO Mini Link • v1</div>
+      <div class="brand-mini">© AMKO MiniLink • v1</div>
     </div>
   </div>
 
-  <!-- Supabase JS (UMD) -->
+  <!-- Supabase JS -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
-    const el = (id) => document.getElementById(id);
-    const msgBox = el("msgBox");
-    function setMsg(text, type = "info"){ msgBox.textContent = text||""; msgBox.className = "msg " + (type?type:""); }
-    function setLoading(l){ el("submitBtn").disabled=l; el("btnSpinner").className=l?"":"sr-only"; el("btnText").textContent=l?"Memproses...":"Masuk"; }
+    const el=(id)=>document.getElementById(id);const msgBox=el("msgBox");
+    function setMsg(t,type="info"){msgBox.textContent=t||"";msgBox.className="msg "+(type?type:"");}
+    function setLoading(l){el("submitBtn").disabled=l;el("btnSpinner").className=l?"":"sr-only";el("btnText").textContent=l?"Memproses...":"Masuk";}
 
     const passEl=el("password"),togglePass=el("togglePass"),forgotLink=el("forgotLink");
     togglePass.addEventListener("click",()=>{const isPwd=passEl.type==="password";passEl.type=isPwd?"text":"password";togglePass.textContent=isPwd?"Sembunyikan":"Lihat";});
@@ -100,11 +105,12 @@
     const supabaseUrl="https://kfqcdcvcnyhisbmwftzb.supabase.co";
     const supabaseKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
     let supabase=null;
-    function initSupabase(){const storage=!el("rememberChk").checked?window.sessionStorage:window.localStorage;supabase=window.supabase.createClient(supabaseUrl,supabaseKey,{auth:{persistSession:true,storage,autoRefreshToken:true,detectSessionInUrl:true}});}
+    function initSupabase(){const storage=!el("rememberChk").checked?window.sessionStorage:window.localStorage;
+      supabase=window.supabase.createClient(supabaseUrl,supabaseKey,{auth:{persistSession:true,storage,autoRefreshToken:true,detectSessionInUrl:true}});}
     initSupabase();
 
     async function fetchUserRole(uid){const {data,error}=await supabase.from("profiles").select("role").eq("id",uid).maybeSingle();if(error){setMsg("Gagal ambil role: "+error.message,"error");return null;}return data?data.role:null;}
-    function redirectByRole(role){if(String(role).toLowerCase()==="owner"){window.location.href="dashboard.html";}else{window.location.href="master-saldo-akun.html";}}
+    function redirectByRole(r){if(String(r).toLowerCase()==="owner"){window.location.href="dashboard.html";}else{window.location.href="master-saldo-akun.html";}}
 
     async function redirectIfLoggedIn(){const {data:{session}}=await supabase.auth.getSession();if(session&&session.user){const r=await fetchUserRole(session.user.id);if(r)redirectByRole(r);}}
     redirectIfLoggedIn();
