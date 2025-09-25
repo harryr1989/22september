@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login • AMKO</title>
+  <title>Login • AMKO Mini Link</title>
   <style>
     :root{
       --primary:#1769aa;
@@ -33,7 +33,10 @@
       background:linear-gradient(180deg,#1f7cc5,#1769aa); color:#fff; padding:16px 18px;
       display:flex; align-items:center; gap:12px;
     }
-    .logo{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#ffffff22;border:1px solid #ffffff44;font-weight:800}
+    .logo-img{
+      width:40px; height:40px; border-radius:8px; object-fit:contain; background:#fff;
+      padding:4px; box-shadow:0 2px 6px rgba(0,0,0,.1);
+    }
     .title{font-weight:800;letter-spacing:.3px}
     .card-b{padding:18px}
     label{font-size:14px;color:#1f2937;margin-bottom:6px;display:block}
@@ -69,10 +72,10 @@
 <body>
   <div class="card">
     <div class="card-h">
-      <div class="logo">AM</div>
+      <img src="./assets/logo-amko-mini-link.png" alt="AMKO Mini Link" class="logo-img" />
       <div>
-        <div class="title">AMKO Celluler</div>
-        <div class="muted">Masuk untuk melanjutkan</div>
+        <div class="title">AMKO Mini Link</div>
+        <div class="muted">Kas Aman, Usaha Lancar</div>
       </div>
     </div>
     <div class="card-b">
@@ -101,19 +104,18 @@
         <div id="msgOk" class="ok">Login berhasil. Mengalihkan…</div>
       </form>
 
-      <div class="brand-mini">© AMKO • v1</div>
+      <div class="brand-mini">© AMKO Mini Link • v1</div>
     </div>
   </div>
 
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ======= Konfigurasi Supabase (punya kamu) =======
+    // ======= Konfigurasi Supabase =======
     const SUPABASE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // ======= Elemen UI =======
     const fLogin = document.getElementById("fLogin");
     const btnLogin = document.getElementById("btnLogin");
     const emailEl = document.getElementById("email");
@@ -124,7 +126,6 @@
     const forgotLink = document.getElementById("forgotLink");
     const rememberEl = document.getElementById("remember");
 
-    // ======= Helper =======
     function setLoading(yes){
       btnLogin.disabled = yes;
       btnLogin.textContent = yes ? "Memproses…" : "Masuk";
@@ -164,17 +165,14 @@
       }
     }
     async function fetchRoleFromProfiles(userId){
-      // opsional, jika kamu punya tabel profiles { id, role }
       const { data, error } = await sb.from("profiles").select("role").eq("id", userId).maybeSingle();
       if(error) return null;
       return data?.role || null;
     }
 
-    // ======= If already logged in, redirect immediately =======
     (async function autoRedirectIfSession(){
       const { data: { session } } = await sb.auth.getSession();
       if(session && session.user){
-        // ambil role dari metadata/profiles lalu redirect
         let r =
           session.user.user_metadata?.role ||
           session.user.app_metadata?.role || "";
@@ -185,20 +183,17 @@
       }
     })();
 
-    // ======= Toggle lihat password =======
     togglePass.addEventListener("click", ()=>{
       passEl.type = passEl.type === "password" ? "text" : "password";
       togglePass.textContent = passEl.type === "password" ? "Lihat" : "Sembunyikan";
     });
 
-    // ======= Lupa sandi (opsional: butuh redirect URL di Supabase Auth Settings) =======
     forgotLink.addEventListener("click", async (e)=>{
       e.preventDefault();
       const email = (emailEl.value || "").trim();
       if(!email){ showErr("Masukkan email terlebih dahulu."); return; }
       try{
         setLoading(true);
-        // NOTE: pastikan Auth > Reset Password Redirect URL sudah diisi (mis. ke halaman reset-password.html kamu)
         const { error } = await sb.auth.resetPasswordForEmail(email, {
           // redirectTo: "https://harryr1989.github.io/22september/reset-password.html"
         });
@@ -211,7 +206,6 @@
       }
     });
 
-    // ======= Submit Login =======
     fLogin.addEventListener("submit", async (e)=>{
       e.preventDefault();
       msgErr.style.display = "none";
@@ -232,7 +226,6 @@
 
         persistEmailIfNeeded();
 
-        // Ambil role dari metadata / app_metadata / profiles
         const user = data.user;
         let role =
           user?.user_metadata?.role ||
@@ -244,7 +237,6 @@
 
         role = setRole(role);
         showOk();
-        // Redirect sesuai role
         setTimeout(()=> routeByRole(role), 300);
       }catch(err){
         showErr(err);
@@ -253,7 +245,6 @@
       }
     });
 
-    // Muat email tersimpan (ingat saya)
     loadRememberedEmail();
   </script>
 </body>
