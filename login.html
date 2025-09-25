@@ -4,114 +4,69 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login • AMKO Mini Link</title>
-  <link rel="icon" type="image/png" href="./favicon.png" sizes="32x32" />
+  <link rel="icon" type="image/x-icon" href="./assets/favicon.ico" />
   <style>
-    :root{
-      --primary:#1769aa;
-      --primary-700:#145a90;
-      --ring:#cbd5e1;
-      --gray-900:#0f172a;
-      --gray-700:#374151;
-      --gray-500:#6b7280;
-      --gray-300:#d1d5db;
-      --gray-200:#e5e7eb;
-      --card:#ffffff;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",sans-serif;
-      background:linear-gradient(180deg,#0f4c81 0%, #0b3a66 40%, #0f172a 100%);
-      color:#0f172a; display:flex; align-items:center; justify-content:center;
-      padding:24px;
-    }
-    .card{
-      width:100%; max-width:420px; background:var(--card);
-      border:1px solid var(--gray-200); border-radius:16px; box-shadow:0 16px 40px rgba(16,24,40,.18);
-      overflow:hidden;
-    }
-    .card-h{
-      background:linear-gradient(180deg,#1f7cc5,#1769aa); color:#fff; padding:16px 18px;
-      display:flex; align-items:center; gap:12px;
-    }
-    .logo-img{
-      width:40px; height:40px; border-radius:8px; object-fit:contain; background:#fff;
-      padding:4px; box-shadow:0 2px 6px rgba(0,0,0,.1);
-    }
-    .title{font-weight:800;letter-spacing:.3px}
-    .tagline{font-size:12px;font-weight:600;color:#ff0000} /* merah */
-    .card-b{padding:18px}
-    label{font-size:14px;color:#1f2937;margin-bottom:6px;display:block}
-    .input{
-      width:100%; height:42px; border:1px solid var(--ring); border-radius:10px; padding:0 12px; font-size:14px;
-    }
-    .row{display:flex; gap:10px}
-    .btn{
-      width:100%; height:44px; border:none; cursor:pointer; font-weight:700; border-radius:10px;
-      background:linear-gradient(180deg,#1f7cc5,#1769aa); color:#fff;
-    }
-    .btn:disabled{opacity:.6; cursor:not-allowed}
-    .muted{font-size:12px;color:#6b7280}
-    .field{margin-bottom:12px}
-    .toggle-pass{
-      position:absolute; right:12px; top:50%; transform:translateY(-50%);
-      font-size:12px; color:#2563eb; cursor:pointer; user-select:none;
-    }
+    :root{--primary:#1f7cc5;--primary-700:#1769aa;--ring:#cbd5e1;--bg:#0b3a66;--bg-deep:#0a2542;--card:#fff;--muted:#6b7280;}
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:sans-serif;background:radial-gradient(80% 120% at 50% 0%,var(--bg) 0%,var(--bg-deep) 70%);
+         display:flex;align-items:center;justify-content:center;padding:24px;}
+    .card{width:100%;max-width:440px;background:var(--card);border:1px solid #e6e8ee;border-radius:22px;
+          box-shadow:0 20px 60px rgba(16,24,40,.25);overflow:hidden;}
+    .card-h{background:linear-gradient(180deg,var(--primary),var(--primary-700));color:#fff;padding:22px;
+            display:flex;align-items:center;gap:14px;}
+    .logo-img{width:44px;height:44px;}
+    .brand .title{font-weight:800;font-size:22px;}
+    .card-b{padding:22px}
+    label{font-size:14px;color:#111827;margin-bottom:6px;display:block}
+    .input{width:100%;height:44px;border:1px solid var(--ring);border-radius:12px;padding:0 12px;font-size:14px;background:#f8fafc;}
     .input-wrap{position:relative}
-    .err{
-      margin-top:10px; padding:10px; border-radius:10px; background:#fff3f3; color:#b91c1c; font-size:13px; display:none;
-      border:1px solid #fecaca;
-    }
-    .ok{
-      margin-top:10px; padding:10px; border-radius:10px; background:#f0fdf4; color:#166534; font-size:13px; display:none;
-      border:1px solid #bbf7d0;
-    }
-    .foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
-    .link{font-size:12px;color:#2563eb;text-decoration:none}
-    .brand-mini{font-size:12px;color:#6b7280;text-align:center;margin-top:14px}
+    .toggle-pass{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:600;color:#2563eb;cursor:pointer;}
+    .row-between{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:13px;}
+    .link{color:#2563eb;text-decoration:none;font-weight:600}
+    .btn{width:100%;height:46px;margin-top:14px;border:none;cursor:pointer;font-weight:800;border-radius:12px;
+         background:linear-gradient(180deg,var(--primary),var(--primary-700));color:#fff;}
+    .brand-mini{font-size:12px;color:#6b7280;text-align:center;margin:18px 0 4px}
   </style>
 </head>
 <body>
   <div class="card">
     <div class="card-h">
-      <img src="./assets/logo-amko-mini-link.png" alt="AMKO Mini Link" class="logo-img" />
-      <div>
-        <div class="title">AMKO Mini Link</div>
-        <div class="tagline">Kas Aman, Usaha Lancar</div>
-      </div>
+      <img src="./assets/logo-amko-mini-link.svg?v=1" alt="AMKO Mini Link" class="logo-img" />
+      <div class="brand"><div class="title">AMKO Mini Link</div></div>
     </div>
     <div class="card-b">
-      <form id="fLogin">
-        <div class="field">
+      <form>
+        <div class="field" style="margin-bottom:12px">
           <label for="email">Email</label>
-          <input id="email" type="email" class="input" placeholder="owner@contoh.com" autocomplete="email" required />
+          <input id="email" type="email" class="input" placeholder="owner@contoh.com" required />
         </div>
-        <div class="field">
+        <div class="field" style="margin-bottom:8px">
           <label for="password">Kata Sandi</label>
           <div class="input-wrap">
-            <input id="password" type="password" class="input" placeholder="••••••••" autocomplete="current-password" required />
+            <input id="password" type="password" class="input" placeholder="••••••••" required />
             <span id="togglePass" class="toggle-pass">Lihat</span>
           </div>
         </div>
-        <div class="foot">
-          <label class="muted" style="display:flex;align-items:center;gap:6px">
-            <input type="checkbox" id="remember" />
-            Ingat saya
-          </label>
+        <div class="row-between">
+          <label><input type="checkbox" /> Ingat saya</label>
           <a href="#" id="forgotLink" class="link">Lupa sandi?</a>
         </div>
-        <button id="btnLogin" class="btn" type="submit">Masuk</button>
-
-        <div id="msgErr" class="err"></div>
-        <div id="msgOk" class="ok">Login berhasil. Mengalihkan…</div>
+        <button class="btn" type="submit">Masuk</button>
       </form>
-
       <div class="brand-mini">© AMKO Mini Link • v1</div>
     </div>
   </div>
-
-  <!-- Supabase JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- (script login tetap sama seperti versi sebelumnya) -->
+  <script>
+    const passEl=document.getElementById("password");
+    const togglePass=document.getElementById("togglePass");
+    const forgotLink=document.getElementById("forgotLink");
+    togglePass.addEventListener("click",()=>{
+      passEl.type=passEl.type==="password"?"text":"password";
+      togglePass.textContent=passEl.type==="password"?"Lihat":"Sembunyikan";
+    });
+    forgotLink.addEventListener("click",e=>{
+      e.preventDefault();alert("Reset sandi hanya oleh Admin/Owner. Hubungi Admin.");
+    });
+  </script>
 </body>
 </html>
