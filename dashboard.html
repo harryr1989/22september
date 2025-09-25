@@ -4,99 +4,47 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AMKO Dashboard</title>
+
+  <!-- Favicon inline (hilangkan 404) -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231769aa'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-family='Arial' font-size='34' fill='white'%3EAM%3C/text%3E%3C/svg%3E"/>
+
   <style>
     :root{
       --sidebar-w: 260px;
-      --primary:#1769aa;
-      --primary-700:#145a90;
-      --primary-900:#0f4c81;
-      --gray-900:#111827;
-      --gray-700:#374151;
-      --gray-500:#6b7280;
-      --gray-300:#d1d5db;
-      --gray-200:#e5e7eb;
-      --card:#ffffff;
-      --ring:#cbd5e1;
+      --primary:#1769aa; --ring:#cbd5e1;
+      --gray-200:#e5e7eb; --gray-300:#d1d5db; --gray-500:#6b7280;
+      --gray-700:#374151; --gray-900:#111827;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",sans-serif;
-      background:#f6f9fb; color:#0f172a; display:flex;
-    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",sans-serif;background:#f6f9fb;color:#0f172a;display:flex}
 
     /* SIDEBAR */
-    .sidebar{
-      width:var(--sidebar-w);
-      background:#0f172a; color:#e5e7eb;
-      border-right:1px solid #0b1222;
-      position:fixed; inset:0 auto 0 0; z-index:30;
-      display:flex; flex-direction:column;
-    }
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.06);
-      background:linear-gradient(180deg,#0f4c81,#0b3a66); color:#fff;
-    }
-    .brand .logo{
-      width:36px; height:36px; border-radius:10px; display:grid; place-items:center;
-      background:#ffffff22; border:1px solid #ffffff33; font-weight:800;
-    }
-    .brand .title{font-weight:800; letter-spacing:.3px}
-
+    .sidebar{width:var(--sidebar-w);background:#0f172a;color:#e5e7eb;border-right:1px solid #0b1222;position:fixed;inset:0 auto 0 0;z-index:30;display:flex;flex-direction:column}
+    .brand{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,#0f4c81,#0b3a66);color:#fff}
+    .brand .logo{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:#ffffff22;border:1px solid #ffffff33;font-weight:800}
+    .brand .title{font-weight:800;letter-spacing:.3px}
     .nav{padding:10px}
-    .nav a{
-      display:flex; align-items:center; gap:10px; text-decoration:none; color:#e5e7eb;
-      padding:10px 12px; border-radius:10px; font-size:14px;
-    }
-    .nav a .ico{width:22px; text-align:center}
+    .nav a{display:flex;align-items:center;gap:10px;text-decoration:none;color:#e5e7eb;padding:10px 12px;border-radius:10px;font-size:14px}
+    .nav a .ico{width:22px;text-align:center}
     .nav a:hover{background:#1f2937}
-    .nav a.active{background:#0b3a66; border:1px solid #1f4f83}
-
-    .nav .group-title{
-      margin:12px 10px 6px; font-size:12px; color:#9ca3af; text-transform:uppercase; letter-spacing:.5px;
-    }
-    .submenu a{font-size:13px; padding:8px 10px; margin-left:36px}
-
-    /* Sidebar footer + logout */
-    .sidebar-footer{
-      margin-top:auto; padding:10px; border-top:1px solid rgba(255,255,255,.06);
-      display:flex; flex-direction:column; gap:8px;
-    }
-    .sidebar-meta{font-size:12px; color:#93a3b8}
-    .btn-logout{
-      display:flex; align-items:center; justify-content:center; gap:8px;
-      height:38px; border-radius:10px; border:1px solid #374151;
-      background:#111827; color:#fff; cursor:pointer; font-size:14px;
-    }
-    .btn-logout:hover{background:#1f2937; border-color:#475569}
+    .nav a.active{background:#0b3a66;border:1px solid #1f4f83}
+    .group-title{margin:12px 10px 6px;font-size:12px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px}
+    .submenu a{font-size:13px;padding:8px 10px;margin-left:36px}
+    .sidebar-footer{margin-top:auto;padding:10px;border-top:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;gap:8px}
+    .sidebar-meta{font-size:12px;color:#93a3b8}
+    .btn-logout{display:flex;align-items:center;justify-content:center;gap:8px;height:38px;border-radius:10px;border:1px solid #374151;background:#111827;color:#fff;cursor:pointer;font-size:14px}
+    .btn-logout:hover{background:#1f2937;border-color:#475569}
 
     /* MAIN */
-    .main{
-      margin-left:var(--sidebar-w);
-      flex:1; min-width:0;
-      display:flex; flex-direction:column;
-    }
-    .topbar{
-      height:56px; display:flex; align-items:center; gap:10px; padding:0 16px;
-      background:#fff; border-bottom:1px solid var(--gray-200); position:sticky; top:0; z-index:20;
-    }
-    .toggleBtn{
-      display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px;
-      border:1px solid var(--ring); border-radius:8px; background:#fff; cursor:pointer;
-    }
+    .main{margin-left:var(--sidebar-w);flex:1;min-width:0;display:flex;flex-direction:column}
+    .topbar{height:56px;display:flex;align-items:center;gap:10px;padding:0 16px;background:#fff;border-bottom:1px solid var(--gray-200);position:sticky;top:0;z-index:20}
+    .toggleBtn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid var(--ring);border-radius:8px;background:#fff;cursor:pointer}
+    .container{max-width:1200px;margin:20px auto;padding:0 16px}
+    .empty{margin:28px 0;padding:28px;border:1px dashed var(--gray-300);border-radius:12px;background:#fff;color:#4b5563;text-align:center;font-size:18px;font-weight:700}
+    .muted{color:#6b7280;font-size:12px}
 
-    .container{max-width:1200px; margin:20px auto; padding:0 16px}
-
-    .empty{
-      margin:28px 0; padding:28px; border:1px dashed var(--gray-300); border-radius:12px; background:#fff; color:#4b5563;
-      text-align:center; font-size:18px; font-weight:700;
-    }
-    .muted{color:#6b7280; font-size:12px}
-
-    /* Responsive sidebar */
     @media (max-width: 980px){
-      .sidebar{transform:translateX(-100%); transition:transform .25s ease}
+      .sidebar{transform:translateX(-100%);transition:transform .25s ease}
       .sidebar.open{transform:translateX(0)}
       .main{margin-left:0}
     }
@@ -110,12 +58,11 @@
       <div class="title">AMKO Celluler</div>
     </div>
 
-    <nav class="nav" id="menuList">
-      <!-- Diisi via JS sesuai role -->
-    </nav>
+    <nav class="nav" id="menuList"><!-- diisi via JS --></nav>
 
     <div class="sidebar-footer">
-      <button id="btnSidebarLogout" class="btn-logout" type="button">🚪 Keluar / Ganti Shift</button>
+      <!-- Failsafe logout pakai onclick juga -->
+      <button id="btnSidebarLogout" class="btn-logout" type="button" onclick="window.__handleLogout && window.__handleLogout(event)">🚪 Keluar / Ganti Shift</button>
       <div class="sidebar-meta">© AMKO • Dashboard v1</div>
     </div>
   </aside>
@@ -134,153 +81,114 @@
   </main>
 
   <!-- Supabase JS CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    // Pastikan semua script jalan setelah DOM siap
-    document.addEventListener('DOMContentLoaded', () => {
-      // ====== Sidebar toggle (mobile) ======
-      const sidebar = document.getElementById('sidebar');
-      const toggleBtn = document.getElementById('toggleSidebar');
-      if (toggleBtn) {
-        toggleBtn.addEventListener('click', ()=> sidebar.classList.toggle('open'));
+    // Inisialisasi UI dasar
+    const sidebar = document.getElementById('sidebar');
+    document.getElementById('toggleSidebar').addEventListener('click', ()=> sidebar.classList.toggle('open'));
+
+    // ===== Supabase init =====
+    const SUPABASE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
+    let sb = null;
+    // Tunggu CDN siap
+    (function waitSupabase(){
+      if (window.supabase) {
+        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      } else {
+        setTimeout(waitSupabase, 20);
       }
+    })();
 
-      // ====== Inisialisasi Supabase ======
-      const SUPABASE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
-      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
-      const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ===== Role & Sidebar =====
+    let role = (localStorage.getItem("user_role") || "kasir").toLowerCase();
+    const roleBadge = document.getElementById('roleBadge');
+    roleBadge.textContent = "Role: " + role.toUpperCase();
 
-      // ====== State role (awal dari localStorage, lalu sinkron dari Supabase) ======
-      let role = (localStorage.getItem("user_role") || "kasir").toLowerCase();
-      const roleBadge = document.getElementById('roleBadge');
-      if (roleBadge) roleBadge.textContent = "Role: " + role.toUpperCase();
-
-      // ====== Konfigurasi menu ======
-      const menuConfig = [
-        { label:"Dashboard", icon:"📊", link:"./dashboard.html", ownerOnly:true },
-        { label:"Transaksi Mini ATM", icon:"🧮", link:"./transaksi-mini-atm.html" },
-        { label:"Saldo Real", icon:"📑", link:"./saldo-real.html" },
-        { label:"Master Saldo Akun", icon:"💰", link:"./master-saldo-akun.html" },
-        { label:"Mutasi Saldo", icon:"🔄", link:"./mutasi-saldo.html" },
-        { label:"Laporan", icon:"🧮", link:"./laporan.html", ownerOnly:true },
-        { group:"Pengaturan", ownerOnly:true },
-        { label:"Manajemen Pengguna", icon:"👥", link:"./manajemen-pengguna.html", parent:"Pengaturan", ownerOnly:true },
-        { label:"Hak Akses", icon:"🔑", link:"./hak-akses.html", parent:"Pengaturan", ownerOnly:true }
-      ];
-
-      function renderSidebar(){
-        const nav = document.getElementById("menuList");
-        if (!nav) return;
-        nav.innerHTML = "";
-        let currentGroup = "";
-
-        menuConfig.forEach(item=>{
-          if(item.ownerOnly && role !== "owner") return;
-
-          if(item.group){
-            const div = document.createElement("div");
-            div.className = "group-title";
-            div.textContent = item.group;
-            nav.appendChild(div);
-            currentGroup = item.group;
-            return;
-          }
-
-          const a = document.createElement("a");
-          a.href = item.link;
-          a.innerHTML = `<span class="ico">${item.icon}</span>${item.label}`;
-
-          if(item.parent && item.parent === currentGroup){
-            a.classList.add("submenu-item");
-            a.style.marginLeft = "36px";
-            a.style.fontSize = "13px";
-          }
-          nav.appendChild(a);
-        });
-
-        markActive(nav);
-      }
-
-      function markActive(nav){
-        const links = nav.querySelectorAll("a[href]");
-        const here = location.pathname.split("/").pop() || "dashboard.html";
-        links.forEach(a=>{
-          const target = a.getAttribute("href");
-          if(target.endsWith(here)) a.classList.add("active");
-        });
-      }
-
-      // Render awal
-      renderSidebar();
-
-      // ====== Ambil role dari Supabase session & sinkron ======
-      async function getRoleFromSupabase(){
-        try{
-          const { data: { session } } = await sb.auth.getSession();
-          if(!session || !session.user) return null;
-
-          let r =
-            session.user.user_metadata?.role ||
-            session.user.app_metadata?.role || "";
-
-          if(!r){
-            const { data: prof } = await sb
-              .from("profiles")
-              .select("role")
-              .eq("id", session.user.id)
-              .maybeSingle();
-            r = prof?.role || "";
-          }
-          return (r || "kasir").toLowerCase();
-        }catch(e){
-          console.error("getRoleFromSupabase error:", e);
-          return null;
+    const menuConfig = [
+      { label:"Dashboard", icon:"📊", link:"./dashboard.html", ownerOnly:true },
+      { label:"Transaksi Mini ATM", icon:"🧮", link:"./transaksi-mini-atm.html" },
+      { label:"Saldo Real", icon:"📑", link:"./saldo-real.html" },
+      { label:"Master Saldo Akun", icon:"💰", link:"./master-saldo-akun.html" },
+      { label:"Mutasi Saldo", icon:"🔄", link:"./mutasi-saldo.html" },
+      { label:"Laporan", icon:"🧮", link:"./laporan.html", ownerOnly:true },
+      { group:"Pengaturan", ownerOnly:true },
+      { label:"Manajemen Pengguna", icon:"👥", link:"./manajemen-pengguna.html", parent:"Pengaturan", ownerOnly:true },
+      { label:"Hak Akses", icon:"🔑", link:"./hak-akses.html", parent:"Pengaturan", ownerOnly:true }
+    ];
+    function renderSidebar(){
+      const nav = document.getElementById("menuList");
+      nav.innerHTML = "";
+      let currentGroup = "";
+      menuConfig.forEach(item=>{
+        if(item.ownerOnly && role !== "owner") return;
+        if(item.group){
+          const div = document.createElement("div");
+          div.className = "group-title"; div.textContent = item.group; nav.appendChild(div);
+          currentGroup = item.group; return;
         }
-      }
+        const a = document.createElement("a");
+        a.href = item.link;
+        a.innerHTML = `<span class="ico">${item.icon}</span>${item.label}`;
+        if(item.parent && item.parent === currentGroup){
+          a.classList.add("submenu-item"); a.style.marginLeft="36px"; a.style.fontSize="13px";
+        }
+        nav.appendChild(a);
+      });
+      const here = location.pathname.split("/").pop() || "dashboard.html";
+      nav.querySelectorAll("a[href]").forEach(a=>{ if(a.getAttribute("href").endsWith(here)) a.classList.add("active"); });
+    }
+    renderSidebar();
 
-      async function syncRole(){
-        const r = await getRoleFromSupabase();
-        if(!r) return;
+    // Sinkron role dari Supabase
+    async function syncRole(){
+      try{
+        if(!sb){ return; }
+        const { data: { session } } = await sb.auth.getSession();
+        if(!session || !session.user) return;
+
+        let r = session.user.user_metadata?.role || session.user.app_metadata?.role || "";
+        if(!r){
+          const { data: prof } = await sb.from("profiles").select("role").eq("id", session.user.id).maybeSingle();
+          r = prof?.role || "";
+        }
+        r = (r || "kasir").toLowerCase();
         if(r !== role){
           role = r;
           localStorage.setItem("user_role", role);
-          if (roleBadge) roleBadge.textContent = "Role: " + role.toUpperCase();
+          roleBadge.textContent = "Role: " + role.toUpperCase();
           renderSidebar();
         }
-      }
+      }catch(e){ console.warn("syncRole:", e); }
+    }
+    // jalankan dan dengarkan perubahan auth
+    (function waitAndSync(){
+      if (sb) { syncRole(); sb.auth.onAuthStateChange(()=>syncRole()); }
+      else { setTimeout(waitAndSync, 30); }
+    })();
 
-      syncRole();
-      sb.auth.onAuthStateChange(()=> syncRole());
-
-      // ====== LOGOUT (di sidebar bawah) ======
-      const btnLogout = document.getElementById("btnSidebarLogout");
-      if (btnLogout) {
-        btnLogout.addEventListener("click", async ()=>{
-          console.log("[Logout] mulai signOut…");
-          try{
-            // 1) Coba global signout (untuk PKCE / server-side)
-            const { error: e1 } = await sb.auth.signOut({ scope: "global" });
-            if (e1) {
-              console.warn("Global signOut gagal, coba local:", e1.message);
-              // 2) Fallback ke local signout
-              const { error: e2 } = await sb.auth.signOut({ scope: "local" });
-              if (e2) console.warn("Local signOut juga ada error:", e2.message);
-            }
-          }catch(err){
-            console.error("signOut exception:", err);
-          }finally{
-            // Tetap bersihkan & redirect walau signOut error
-            try { localStorage.removeItem("user_role"); } catch(e){}
-            try { localStorage.removeItem("remember_email"); } catch(e){}
-            // Pakai replace agar tidak balik dengan tombol Back
-            window.location.replace("./login.html");
-          }
-        });
-      } else {
-        console.error("Element #btnSidebarLogout tidak ditemukan di DOM.");
+    // ======= LOGOUT FAILSAFE =======
+    window.__handleLogout = async function(e){
+      if (e) e.preventDefault();
+      try{
+        if (sb) {
+          // coba global dulu, lalu local
+          const g = await sb.auth.signOut({ scope: "global" });
+          if (g?.error) { await sb.auth.signOut({ scope: "local" }); }
+        }
+      }catch(err){
+        console.warn("signOut error:", err);
+      }finally{
+        // selalu bersihkan & redirect
+        try{ localStorage.removeItem("user_role"); }catch{}
+        try{ localStorage.removeItem("remember_email"); }catch{}
+        window.location.replace("./login.html");
       }
-    });
+    };
+
+    // Pasang juga listener JS (dobel: onclick + addEventListener)
+    document.getElementById("btnSidebarLogout").addEventListener("click", window.__handleLogout);
   </script>
 </body>
 </html>
