@@ -5,17 +5,19 @@
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
   <meta http-equiv="Pragma" content="no-cache">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AMKO Dashboard</title>
+  <title>Amko MiniLink — Dashboard</title>
 
   <!-- Favicon inline supaya tidak 404 -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231769aa'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-family='Arial' font-size='34' fill='white'%3EAM%3C/text%3E%3C/svg%3E"/>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231769aa'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-family='Arial' font-size='30' fill='white'%3EML%3C/text%3E%3C/svg%3E"/>
 
   <style>
     :root{
       --sidebar-w: 260px;
       --primary:#1769aa; --ring:#cbd5e1;
-      --gray-200:#e5e7eb; --gray-300:#d1d5db; --gray-500:#6b7280;
-      --gray-700:#374151; --gray-900:#111827;
+      --gray-100:#f1f5f9; --gray-200:#e5e7eb; --gray-300:#d1d5db;
+      --gray-400:#9ca3af; --gray-500:#6b7280; --gray-700:#374151; --gray-900:#111827;
+      --card:#ffffff;
+      --ok:#10b981; --warn:#f59e0b; --danger:#ef4444;
     }
     *{box-sizing:border-box} html,body{height:100%}
     body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",sans-serif;background:#f6f9fb;color:#0f172a;display:flex}
@@ -34,21 +36,49 @@
     .submenu a{font-size:13px;padding:8px 10px;margin-left:36px}
     .sidebar-footer{margin-top:auto;padding:10px;border-top:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;gap:8px}
     .sidebar-meta{font-size:12px;color:#93a3b8}
-    .btn-logout{display:flex;align-items:center;justify-content:center;gap:8px;height:38px;border-radius:10px;border:1px solid #374151;background:#111827;color:#fff;cursor:pointer;font-size:14px}
-    .btn-logout:hover{background:#1f2937;border-color:#475569}
 
     /* MAIN */
     .main{margin-left:var(--sidebar-w);flex:1;min-width:0;display:flex;flex-direction:column}
     .topbar{height:56px;display:flex;align-items:center;gap:10px;padding:0 16px;background:#fff;border-bottom:1px solid var(--gray-200);position:sticky;top:0;z-index:20}
     .toggleBtn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid var(--ring);border-radius:8px;background:#fff;cursor:pointer}
     .container{max-width:1200px;margin:20px auto;padding:0 16px}
-    .empty{margin:28px 0;padding:28px;border:1px dashed var(--gray-300);border-radius:12px;background:#fff;color:#4b5563;text-align:center;font-size:18px;font-weight:700}
+
+    /* ===== Ringkasan ===== */
+    .summary{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--card);border:1px solid var(--gray-200);border-radius:12px}
+    .summary-left{display:flex;flex-direction:column}
+    .greet{font-weight:800;font-size:18px}
+    .dateshift{color:#4b5563;font-size:13px;margin-top:4px}
+    .summary-right{display:flex;align-items:center;gap:8px}
+    .summary-right label{font-size:12px;color:#6b7280}
+    .select{height:36px;border:1px solid var(--gray-300);border-radius:8px;background:#fff;padding:0 10px;font-size:14px;min-width:230px}
     .muted{color:#6b7280;font-size:12px}
+    .badge{margin-left:auto;font-weight:800}
+
+    .spacer{height:14px}
+
+    /* ===== KPI Big Card ===== */
+    .kpi-card{background:#fff;border:1px solid var(--gray-200);border-radius:12px}
+    .kpi-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--gray-200)}
+    .kpi-title{font-weight:800}
+    .kpi-body{padding:8px 14px}
+    .kpi-row{display:grid;grid-template-columns: 1.2fr 1fr 1fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--gray-200)}
+    .kpi-row:last-child{border-bottom:none}
+    .kpi-name{font-size:13px;color:#374151}
+    .kpi-value{font-size:20px;font-weight:800}
+    .kpi-hint{font-size:12px;color:#9ca3af;justify-self:end;text-align:right}
+    .skeleton{border-radius:8px;background:linear-gradient(90deg,#f1f5f9, #e5e7eb, #f1f5f9);background-size:200% 100%;animation:shimmer 1.1s infinite;height:22px}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
     @media (max-width: 980px){
       .sidebar{transform:translateX(-100%);transition:transform .25s ease}
       .sidebar.open{transform:translateX(0)}
       .main{margin-left:0}
+      .summary{flex-direction:column;align-items:flex-start}
+      .badge{margin-left:0}
+      .summary-right{width:100%}
+      .select{width:100%}
+      .kpi-row{grid-template-columns: 1fr;gap:4px}
+      .kpi-hint{justify-self:start;text-align:left}
     }
   </style>
 </head>
@@ -56,7 +86,6 @@
   <!-- ====== Auth Guard (paling awal) ====== -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Inisialisasi Supabase + guard awal
     const SUPABASE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -66,6 +95,7 @@
         const { data: { session } } = await sb.auth.getSession();
         if (!session) {
           try { localStorage.removeItem("user_role"); } catch {}
+          try { localStorage.removeItem("user_name"); } catch {}
           window.location.replace("./login.html");
         }
       } catch (e) {
@@ -73,22 +103,22 @@
       }
     }
     guard();
-    sb.auth.onAuthStateChange((ev) => { if (ev === "SIGNED_OUT") window.location.replace("./login.html"); });
+
+    sb.auth.onAuthStateChange((ev) => {
+      if (ev === "SIGNED_OUT") window.location.replace("./login.html");
+    });
     window.addEventListener("pageshow", (e) => { if (e.persisted) { guard(); } });
   </script>
 
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <div class="logo">AM</div>
-      <div class="title">AMKO Celluler</div>
+      <div class="logo">ML</div>
+      <div class="title">Amko MiniLink</div>
     </div>
-
     <nav class="nav" id="menuList"><!-- diisi via JS --></nav>
-
     <div class="sidebar-footer">
-      <button id="btnSidebarLogout" class="btn-logout" type="button">🚪 Keluar / Ganti Shift</button>
-      <div class="sidebar-meta">© AMKO • Dashboard v1</div>
+      <div class="sidebar-meta">© Amko MiniLink • Dashboard v1</div>
     </div>
   </aside>
 
@@ -97,24 +127,93 @@
     <div class="topbar">
       <button class="toggleBtn" id="toggleSidebar" title="Toggle sidebar">☰</button>
       <strong>Dashboard</strong>
-      <span class="muted" id="roleBadge" style="margin-left:auto"></span>
+      <span class="muted badge" id="roleBadge"></span>
     </div>
 
     <div class="container">
-      <div class="empty">Selamat Datang</div>
+      <!-- ===== Ringkasan + Pemilih Cabang ===== -->
+      <section class="summary">
+        <div class="summary-left">
+          <div class="greet" id="greetText">Selamat Datang</div>
+          <div class="dateshift" id="dateShiftText">-</div>
+        </div>
+        <div class="summary-right" id="branchArea" style="display:none">
+          <label for="branchSelect">Cabang</label>
+          <select id="branchSelect" class="select">
+            <option value="__ALL__">Semua Cabang</option>
+          </select>
+        </div>
+      </section>
+
+      <div class="spacer"></div>
+
+      <!-- ===== KPI Big Card (semua KPI di satu card) ===== -->
+      <section class="kpi-card">
+        <div class="kpi-head">
+          <div class="kpi-title">KPI Utama Hari Ini</div>
+          <div class="muted" id="lastUpdated">Last updated —</div>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-row">
+            <div class="kpi-name">Omzet Hari Ini</div>
+            <div class="kpi-value" id="kpiOmzet"><div class="skeleton"></div></div>
+            <div class="kpi-hint" id="kpiOmzetHint">—</div>
+          </div>
+          <div class="kpi-row">
+            <div class="kpi-name">Jumlah Transaksi (x)</div>
+            <div class="kpi-value" id="kpiTxCount"><div class="skeleton"></div></div>
+            <div class="kpi-hint" id="kpiTxHint">—</div>
+          </div>
+          <div class="kpi-row">
+            <div class="kpi-name">Profit Admin Hari Ini</div>
+            <div class="kpi-value" id="kpiProfitAdmin"><div class="skeleton"></div></div>
+            <div class="kpi-hint" id="kpiProfitHint">Admin diterima − biaya bank</div>
+          </div>
+          <div class="kpi-row">
+            <div class="kpi-name">Pengeluaran</div>
+            <div class="kpi-value" id="kpiExpense"><div class="skeleton"></div></div>
+            <div class="kpi-hint">Operasional hari ini</div>
+          </div>
+          <div class="kpi-row">
+            <div class="kpi-name">Profit Bersih</div>
+            <div class="kpi-value" id="kpiNet"><div class="skeleton"></div></div>
+            <div class="kpi-hint">Profit Admin − Pengeluaran</div>
+          </div>
+          <div class="kpi-row">
+            <div class="kpi-name">Asset Cash (Laci Tunai)</div>
+            <div class="kpi-value" id="kpiCash"><div class="skeleton"></div></div>
+            <div class="kpi-hint">Akun cash terkunci</div>
+          </div>
+          <div class="kpi-row">
+            <div class="kpi-name">Asset Saldo (Bank + Server Pulsa)</div>
+            <div class="kpi-value" id="kpiSaldo"><div class="skeleton"></div></div>
+            <div class="kpi-hint">Non-cash total</div>
+          </div>
+          <div class="kpi-row">
+            <div class="kpi-name">Total Asset</div>
+            <div class="kpi-value" id="kpiAsset"><div class="skeleton"></div></div>
+            <div class="kpi-hint">Cash + Saldo</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="spacer"></div>
+      <div class="muted">Berikutnya: Quick Actions & Riwayat Terbaru (bisa ditambahkan setelah uji KPI).</div>
     </div>
   </main>
 
   <script>
-    // ===== UI dasar =====
+    // ===== UI dasar & sidebar =====
     const sidebar = document.getElementById('sidebar');
     document.getElementById('toggleSidebar').addEventListener('click', ()=> sidebar.classList.toggle('open'));
 
-    // ===== Role & Sidebar =====
+    // ===== Badge & role awal (fallback sebelum sync) =====
     let role = (localStorage.getItem("user_role") || "kasir").toLowerCase();
+    let username = localStorage.getItem("user_name") || "USER";
     const roleBadge = document.getElementById('roleBadge');
-    roleBadge.textContent = "Role: " + role.toUpperCase();
+    roleBadge.textContent = (username.toUpperCase() + "-" + role.toUpperCase());
 
+    // ===== Menu dengan kontrol ownerOnly =====
     const menuConfig = [
       { label:"Dashboard", icon:"📊", link:"./dashboard.html", ownerOnly:true },
       { label:"Transaksi Mini ATM", icon:"🧮", link:"./transaksi-mini-atm.html" },
@@ -126,7 +225,6 @@
       { label:"Manajemen Pengguna", icon:"👥", link:"./manajemen-pengguna.html", parent:"Pengaturan", ownerOnly:true },
       { label:"Hak Akses", icon:"🔑", link:"./hak-akses.html", parent:"Pengaturan", ownerOnly:true }
     ];
-
     function renderSidebar(){
       const nav = document.getElementById("menuList");
       nav.innerHTML = "";
@@ -151,40 +249,288 @@
     }
     renderSidebar();
 
-    // Sinkron role dari Supabase (kalau metadata/profiles tersedia)
+    // ===== Util: tanggal Indonesia & shift =====
+    function formatTanggalID(date){
+      const hari = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+      const bulan = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+      return `${hari[date.getDay()]}, ${String(date.getDate()).padStart(2,"0")} ${bulan[date.getMonth()]} ${date.getFullYear()}`;
+    }
+    function getShiftByHour(h){
+      if (h >= 6 && h < 13) return "Shift Pagi";
+      if (h >= 13 && h < 20) return "Shift Siang";
+      return "Shift Malam";
+    }
+    function getGreeting(h){
+      if (h >= 5 && h < 11) return "Selamat Pagi";
+      if (h >= 11 && h < 15) return "Selamat Siang";
+      if (h >= 15 && h < 19) return "Selamat Sore";
+      return "Selamat Malam";
+    }
+    function fmtRupiah(n){
+      if (n===null || n===undefined || isNaN(n)) return "—";
+      try{ return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(n); }catch{ return "Rp " + (n||0).toLocaleString("id-ID");}
+    }
+
+    // ===== Elemen ringkasan =====
+    const greetText = document.getElementById("greetText");
+    const dateShiftText = document.getElementById("dateShiftText");
+    const branchArea = document.getElementById("branchArea");
+    const branchSelect = document.getElementById("branchSelect");
+    const lastUpdatedEl = document.getElementById("lastUpdated");
+
+    function renderSummaryBar(){
+      const now = new Date();
+      const h = now.getHours();
+      greetText.textContent = `${getGreeting(h)}, ${username.split(" ")[0] || "User"}`;
+      dateShiftText.textContent = `${formatTanggalID(now)} • ${getShiftByHour(h)}`;
+      if (role === "owner") {
+        branchArea.style.display = "";
+        loadBranchesToSelect();
+      } else {
+        branchArea.style.display = "none";
+      }
+    }
+
+    // ===== Ambil cabang (owner) & simpan pilihan =====
+    async function loadBranchesToSelect(){
+      try{
+        branchSelect.innerHTML = `<option value="__ALL__">Semua Cabang</option>`;
+        const { data, error } = await sb.from("branches").select("code,name").order("name", { ascending:true });
+        if (error) throw error;
+
+        (data || []).forEach(b=>{
+          const opt = document.createElement("option");
+          opt.value = b.code;
+          opt.textContent = b.name; // hanya nama cabang
+          branchSelect.appendChild(opt);
+        });
+
+        const saved = localStorage.getItem("selected_branch_code") || "__ALL__";
+        branchSelect.value = saved;
+
+        branchSelect.onchange = ()=>{
+          localStorage.setItem("selected_branch_code", branchSelect.value);
+          window.dispatchEvent(new CustomEvent("branch:changed", { detail: { code: branchSelect.value }}));
+          refreshKPI(); // reload KPI saat cabang berubah
+        };
+      }catch(e){
+        console.warn("loadBranchesToSelect:", e);
+      }
+    }
+
+    // ===== Sinkron nama, role, dan cabang kasir dari Supabase =====
     async function syncRole(){
       try{
         const { data: { session } } = await sb.auth.getSession();
         if(!session || !session.user) return;
+
+        // ROLE
         let r = session.user.user_metadata?.role || session.user.app_metadata?.role || "";
         if(!r){
-          const { data: prof } = await sb.from("profiles").select("role").eq("id", session.user.id).maybeSingle();
-          r = prof?.role || "";
+          const { data: profRole } = await sb.from("profiles").select("role").eq("id", session.user.id).maybeSingle();
+          r = profRole?.role || "";
         }
         r = (r || "kasir").toLowerCase();
-        if(r !== role){
-          role = r;
-          localStorage.setItem("user_role", role);
-          roleBadge.textContent = "Role: " + role.toUpperCase();
-          renderSidebar();
+
+        // NAME
+        let uname = session.user.user_metadata?.full_name
+                 || session.user.user_metadata?.name
+                 || (session.user.email ? session.user.email.split("@")[0] : "")
+                 || "User";
+
+        // BRANCH (untuk kasir)
+        let userBranch = localStorage.getItem("user_branch_code") || "";
+        if (r !== "owner") {
+          const { data: profBranch } = await sb.from("profiles").select("branch_code").eq("id", session.user.id).maybeSingle();
+          userBranch = profBranch?.branch_code || userBranch || "";
+          if (userBranch) localStorage.setItem("user_branch_code", userBranch);
+          localStorage.setItem("selected_branch_code", userBranch); // konsisten untuk fetch KPI
         }
+
+        // Simpan & render
+        localStorage.setItem("user_role", r);
+        localStorage.setItem("user_name", uname);
+
+        role = r; username = uname;
+        roleBadge.textContent = (uname.toUpperCase() + "-" + r.toUpperCase());
+
+        renderSidebar();
+        renderSummaryBar();
+        refreshKPI();
       }catch(e){ console.warn("syncRole:", e); }
     }
+    renderSummaryBar();
     syncRole();
-    sb.auth.onAuthStateChange(()=> syncRole());
+    sb.auth.onAuthStateChange(()=> { syncRole(); });
 
-    // ===== Logout (failsafe) =====
-    document.getElementById("btnSidebarLogout").addEventListener("click", async ()=>{
-      try{
-        const g = await sb.auth.signOut({ scope: "global" });
-        if (g?.error) { await sb.auth.signOut({ scope: "local" }); }
-      }catch(e){
-        console.warn("signOut error:", e);
-      }finally{
-        try { localStorage.removeItem("user_role"); } catch {}
-        try { localStorage.removeItem("remember_email"); } catch {}
-        window.location.replace("./login.html");
+    // ===== Util range "hari ini" =====
+    function todayRange(){
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0,0,0);
+      const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23,59,59,999);
+      return { start: start.toISOString(), end: end.toISOString() };
+    }
+    function selectedBranchCode(){
+      if (role === "owner") return localStorage.getItem("selected_branch_code") || "__ALL__";
+      return localStorage.getItem("selected_branch_code") || localStorage.getItem("user_branch_code") || "";
+    }
+
+    // ===== Elemen KPI =====
+    const elOmzet = document.getElementById("kpiOmzet");
+    const elOmzetHint = document.getElementById("kpiOmzetHint");
+    const elTxCount = document.getElementById("kpiTxCount");
+    const elTxHint = document.getElementById("kpiTxHint");
+    const elProfitAdmin = document.getElementById("kpiProfitAdmin");
+    const elProfitHint = document.getElementById("kpiProfitHint");
+    const elExpense = document.getElementById("kpiExpense");
+    const elNet = document.getElementById("kpiNet");
+    const elCash = document.getElementById("kpiCash");
+    const elSaldo = document.getElementById("kpiSaldo");
+    const elAsset = document.getElementById("kpiAsset");
+
+    function setSkeleton(on=true){
+      const s = `<div class="skeleton"></div>`;
+      if(on){
+        elOmzet.innerHTML = s; elTxCount.innerHTML = s; elProfitAdmin.innerHTML = s;
+        elExpense.innerHTML = s; elNet.innerHTML = s; elCash.innerHTML = s; elSaldo.innerHTML = s; elAsset.innerHTML = s;
       }
+    }
+
+    // ===== Fetch KPI =====
+    async function refreshKPI(){
+      setSkeleton(true);
+      elOmzetHint.textContent = "—";
+      elTxHint.textContent = "—";
+      elProfitHint.textContent = "Admin diterima − biaya bank";
+      lastUpdatedEl.textContent = "Last updated —";
+
+      const br = selectedBranchCode();
+      const { start, end } = todayRange();
+
+      let omzet = 0, txCount = 0, profitAdmin = 0, expense = 0;
+      let cash = 0, saldoNonCash = 0, totalAsset = 0;
+
+      try{
+        // --- Transaksi harian (omzet, jumlah tx, profit admin) ---
+        let dataTx = null; let errTx = null;
+
+        // Coba v_tx_summary (disarankan)
+        if (!dataTx){
+          let q = sb.from("v_tx_summary")
+                    .select("amount, admin_in, bank_fee, jenis, branch_code, created_at")
+                    .gte("created_at", start).lte("created_at", end);
+          if (br && br !== "__ALL__") q = q.eq("branch_code", br);
+          const { data, error } = await q;
+          if (!error) dataTx = data; else errTx = error;
+        }
+
+        // Fallback: transactions_mini_atm
+        if (!dataTx){
+          let q2 = sb.from("transactions_mini_atm")
+                     .select("amount, admin_in, bank_fee, jenis, branch_code, created_at")
+                     .gte("created_at", start).lte("created_at", end);
+          if (br && br !== "__ALL__") q2 = q2.eq("branch_code", br);
+          const { data, error } = await q2;
+          if (!error) dataTx = data; else errTx = error;
+        }
+
+        if (dataTx && dataTx.length){
+          const facing = ["tarik","transfer","pulsa","jasa"];
+          dataTx.forEach(r=>{
+            const jenis = (r.jenis||"").toString().toLowerCase();
+            if (facing.includes(jenis)){
+              omzet += (Number(r.amount)||0);
+              txCount += 1;
+              profitAdmin += (Number(r.admin_in)||0) - (Number(r.bank_fee)||0);
+            }
+          });
+        } else if (errTx) {
+          console.warn("tx fetch:", errTx);
+        }
+
+        // --- Pengeluaran (operasional) ---
+        let dataMut = null; let errMut = null;
+        if (!dataMut){
+          let q3 = sb.from("v_mutasi_summary")
+                     .select("jenis, amount, branch_code, created_at")
+                     .gte("created_at", start).lte("created_at", end);
+          if (br && br !== "__ALL__") q3 = q3.eq("branch_code", br);
+          const { data, error } = await q3;
+          if (!error) dataMut = data; else errMut = error;
+        }
+        if (!dataMut){
+          let q4 = sb.from("mutasi_saldo")
+                     .select("jenis, nominal, branch_code, created_at")
+                     .gte("created_at", start).lte("created_at", end);
+          if (br && br !== "__ALL__") q4 = q4.eq("branch_code", br);
+          const { data, error } = await q4;
+          if (!error) {
+            dataMut = (data||[]).map(x=>({jenis:x.jenis, amount:x.nominal, branch_code:x.branch_code, created_at:x.created_at}));
+          } else errMut = error;
+        }
+        if (dataMut && dataMut.length){
+          dataMut.forEach(r=>{
+            const jenis = (r.jenis||"").toString().toLowerCase();
+            if (jenis === "operasional") expense += (Number(r.amount)||0);
+          });
+        } else if (errMut) {
+          console.warn("mutasi fetch:", errMut);
+        }
+
+        // --- Asset (saldo akun) ---
+        let qAcc = sb.from("accounts").select("type, is_locked, balance, branch_code");
+        if (br && br !== "__ALL__") qAcc = qAcc.eq("branch_code", br);
+        const { data:accs, error:errAcc } = await qAcc;
+        if (!errAcc && accs){
+          accs.forEach(a=>{
+            const t = (a.type||"").toString().toLowerCase();
+            const bal = Number(a.balance)||0;
+            if (t === "cash" && a.is_locked) cash += bal; // laci tunai (locked)
+            else if (t === "bank" || t === "server_pulsa") saldoNonCash += bal;
+          });
+        } else if (errAcc){ console.warn("accounts fetch:", errAcc); }
+
+        totalAsset = cash + saldoNonCash;
+
+        // --- Render angka ---
+        elOmzet.textContent       = fmtRupiah(omzet);
+        elTxCount.textContent     = `${txCount}x`;
+        elProfitAdmin.textContent = fmtRupiah(profitAdmin);
+        elExpense.textContent     = fmtRupiah(expense);
+        elNet.textContent         = fmtRupiah(profitAdmin - expense);
+        elCash.textContent        = fmtRupiah(cash);
+        elSaldo.textContent       = fmtRupiah(saldoNonCash);
+        elAsset.textContent       = fmtRupiah(totalAsset);
+
+        elOmzetHint.textContent = (selectedBranchCode()==="__ALL__" || !selectedBranchCode()) ? "Semua cabang" : "Filter cabang aktif";
+        elTxHint.textContent    = "Tarik • Transfer • Pulsa • Jasa";
+
+        lastUpdatedEl.textContent = "Last updated " + new Date().toLocaleTimeString("id-ID");
+      }catch(e){
+        console.error("refreshKPI error:", e);
+        elOmzet.textContent="—"; elTxCount.textContent="—"; elProfitAdmin.textContent="—";
+        elExpense.textContent="—"; elNet.textContent="—"; elCash.textContent="—"; elSaldo.textContent="—"; elAsset.textContent="—";
+      }
+    }
+
+    // ===== Elemen ringkasan awal =====
+    function renderSummaryBar(){
+      const now = new Date(); const h = now.getHours();
+      greetText.textContent = `${getGreeting(h)}, ${username.split(" ")[0] || "User"}`;
+      dateShiftText.textContent = `${formatTanggalID(now)} • ${getShiftByHour(h)}`;
+      if (role === "owner") branchArea.style.display = ""; else branchArea.style.display = "none";
+    }
+
+    // Inisialisasi awal
+    renderSummaryBar();
+    syncRole();
+    sb.auth.onAuthStateChange(()=> { syncRole(); });
+    refreshKPI();
+    window.addEventListener("focus", ()=> {
+      const now = new Date(); const h = now.getHours();
+      greetText.textContent = `${getGreeting(h)}, ${username.split(" ")[0] || "User"}`;
+      dateShiftText.textContent = `${formatTanggalID(now)} • ${getShiftByHour(h)}`;
+      lastUpdatedEl.textContent = "Last updated " + new Date().toLocaleTimeString("id-ID");
     });
   </script>
 </body>
