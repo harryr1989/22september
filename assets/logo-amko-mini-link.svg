@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <rect width="160" height="160" fill="white"/>
+  <!-- Rantai biru -->
+  <circle cx="60" cy="80" r="28" stroke="#1f7cc5" stroke-width="14" fill="none"/>
+  <circle cx="92" cy="60" r="28" stroke="#1f7cc5" stroke-width="14" fill="none"/>
+  <!-- Bar chart biru -->
+  <rect x="100" y="90" width="10" height="40" fill="#1f7cc5"/>
+  <rect x="115" y="75" width="10" height="55" fill="#1f7cc5"/>
+  <rect x="130" y="60" width="10" height="70" fill="#1f7cc5"/>
+</svg>
