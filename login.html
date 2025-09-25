@@ -8,64 +8,115 @@
   <style>
     :root{--primary:#1f7cc5;--primary-700:#1769aa;--ring:#cbd5e1;--bg:#0b3a66;--bg-deep:#0a2542;--card:#fff;--muted:#6b7280;}
     *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;font-family:sans-serif;background:radial-gradient(80% 120% at 50% 0%,var(--bg) 0%,var(--bg-deep) 70%);
-         display:flex;align-items:center;justify-content:center;padding:24px;}
-    .card{width:100%;max-width:440px;background:var(--card);border:1px solid #e6e8ee;border-radius:22px;
-          box-shadow:0 20px 60px rgba(16,24,40,.25);overflow:hidden;}
-    .card-h{background:linear-gradient(180deg,var(--primary),var(--primary-700));color:#fff;padding:22px;
-            display:flex;align-items:center;gap:14px;}
+    body{
+      margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial;
+      background:radial-gradient(80% 120% at 50% 0%,var(--bg) 0%,var(--bg-deep) 70%);
+      display:flex;align-items:center;justify-content:center;padding:24px;
+    }
+    .card{
+      width:100%;max-width:440px;background:var(--card);border:1px solid #e6e8ee;border-radius:22px;
+      box-shadow:0 20px 60px rgba(16,24,40,.25);overflow:hidden;
+    }
+    .card-h{
+      background:linear-gradient(180deg,var(--primary),var(--primary-700));color:#fff;padding:22px;
+      display:flex;align-items:center;gap:14px;
+    }
     .logo-img{width:44px;height:44px;}
     .brand .title{font-weight:800;font-size:22px;}
+    .brand .tagline{font-size:13px;font-weight:500;opacity:.9;margin-top:2px;}
     .card-b{padding:22px}
     label{font-size:14px;color:#111827;margin-bottom:6px;display:block}
     .input{width:100%;height:44px;border:1px solid var(--ring);border-radius:12px;padding:0 12px;font-size:14px;background:#f8fafc;}
     .input-wrap{position:relative}
-    .toggle-pass{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:600;color:#2563eb;cursor:pointer;}
+    .toggle-pass{
+      position:absolute;right:12px;top:50%;transform:translateY(-50%);
+      font-size:13px;font-weight:600;color:#2563eb;cursor:pointer;user-select:none;
+    }
     .row-between{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:13px;}
     .link{color:#2563eb;text-decoration:none;font-weight:600}
-    .btn{width:100%;height:46px;margin-top:14px;border:none;cursor:pointer;font-weight:800;border-radius:12px;
-         background:linear-gradient(180deg,var(--primary),var(--primary-700));color:#fff;}
+    .btn{
+      width:100%;height:46px;margin-top:14px;border:none;cursor:pointer;font-weight:800;border-radius:12px;
+      background:linear-gradient(180deg,var(--primary),var(--primary-700));color:#fff;transition:opacity .2s;
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    }
+    .btn[disabled]{opacity:.7;cursor:not-allowed}
     .brand-mini{font-size:12px;color:#6b7280;text-align:center;margin:18px 0 4px}
+    .msg{margin-top:10px;font-size:13px}
+    .msg.error{color:#b91c1c}
+    .msg.info{color:#0369a1}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
   </style>
 </head>
 <body>
-  <div class="card">
+  <div class="card" role="main" aria-label="Kartu login AMKO">
     <div class="card-h">
       <img src="./assets/logo-amko-mini-link.svg?v=1" alt="AMKO Mini Link" class="logo-img" />
-      <div class="brand"><div class="title">AMKO Mini Link</div></div>
+      <div class="brand">
+        <div class="title">AMKO Mini Link</div>
+        <div class="tagline">Kas Aman &amp; Usaha Lancar</div>
+      </div>
     </div>
     <div class="card-b">
-      <form>
+      <form id="loginForm" novalidate>
         <div class="field" style="margin-bottom:12px">
-          <label for="email">Email</label>
-          <input id="email" type="email" class="input" placeholder="owner@contoh.com" required />
+          <label for="email">Username</label>
+          <input id="email" type="email" class="input" placeholder="amko@contoh.com" autocomplete="username" required />
         </div>
         <div class="field" style="margin-bottom:8px">
           <label for="password">Kata Sandi</label>
           <div class="input-wrap">
-            <input id="password" type="password" class="input" placeholder="••••••••" required />
-            <span id="togglePass" class="toggle-pass">Lihat</span>
+            <input id="password" type="password" class="input" placeholder="••••••••" autocomplete="current-password" required />
+            <span id="togglePass" class="toggle-pass" aria-label="Tampilkan kata sandi">Lihat</span>
           </div>
         </div>
         <div class="row-between">
-          <label><input type="checkbox" /> Ingat saya</label>
+          <label><input id="rememberChk" type="checkbox" checked /> Ingat saya</label>
           <a href="#" id="forgotLink" class="link">Lupa sandi?</a>
         </div>
-        <button class="btn" type="submit">Masuk</button>
+
+        <button id="submitBtn" class="btn" type="submit">
+          <span id="btnText">Masuk</span>
+          <span id="btnSpinner" class="sr-only" aria-hidden="true">⏳</span>
+        </button>
+
+        <div id="msgBox" class="msg" aria-live="polite"></div>
       </form>
       <div class="brand-mini">© AMKO Mini Link • v1</div>
     </div>
   </div>
+
+  <!-- Supabase JS (UMD) -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
-    const passEl=document.getElementById("password");
-    const togglePass=document.getElementById("togglePass");
-    const forgotLink=document.getElementById("forgotLink");
-    togglePass.addEventListener("click",()=>{
-      passEl.type=passEl.type==="password"?"text":"password";
-      togglePass.textContent=passEl.type==="password"?"Lihat":"Sembunyikan";
-    });
-    forgotLink.addEventListener("click",e=>{
-      e.preventDefault();alert("Reset sandi hanya oleh Admin/Owner. Hubungi Admin.");
+    const el = (id) => document.getElementById(id);
+    const msgBox = el("msgBox");
+    function setMsg(text, type = "info"){ msgBox.textContent = text||""; msgBox.className = "msg " + (type?type:""); }
+    function setLoading(l){ el("submitBtn").disabled=l; el("btnSpinner").className=l?"":"sr-only"; el("btnText").textContent=l?"Memproses...":"Masuk"; }
+
+    const passEl=el("password"),togglePass=el("togglePass"),forgotLink=el("forgotLink");
+    togglePass.addEventListener("click",()=>{const isPwd=passEl.type==="password";passEl.type=isPwd?"text":"password";togglePass.textContent=isPwd?"Sembunyikan":"Lihat";});
+    forgotLink.addEventListener("click",e=>{e.preventDefault();alert("Reset sandi hanya oleh Admin/Owner. Hubungi Admin.");});
+
+    const supabaseUrl="https://kfqcdcvcnyhisbmwftzb.supabase.co";
+    const supabaseKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
+    let supabase=null;
+    function initSupabase(){const storage=!el("rememberChk").checked?window.sessionStorage:window.localStorage;supabase=window.supabase.createClient(supabaseUrl,supabaseKey,{auth:{persistSession:true,storage,autoRefreshToken:true,detectSessionInUrl:true}});}
+    initSupabase();
+
+    async function fetchUserRole(uid){const {data,error}=await supabase.from("profiles").select("role").eq("id",uid).maybeSingle();if(error){setMsg("Gagal ambil role: "+error.message,"error");return null;}return data?data.role:null;}
+    function redirectByRole(role){if(String(role).toLowerCase()==="owner"){window.location.href="dashboard.html";}else{window.location.href="master-saldo-akun.html";}}
+
+    async function redirectIfLoggedIn(){const {data:{session}}=await supabase.auth.getSession();if(session&&session.user){const r=await fetchUserRole(session.user.id);if(r)redirectByRole(r);}}
+    redirectIfLoggedIn();
+
+    el("loginForm").addEventListener("submit",async e=>{
+      e.preventDefault();setMsg("");setLoading(true);initSupabase();
+      const email=el("email").value.trim(),password=el("password").value;
+      if(!email||!password){setMsg("Email & sandi wajib diisi","error");setLoading(false);return;}
+      const {data,error}=await supabase.auth.signInWithPassword({email,password});
+      if(error){setMsg("Login gagal: "+error.message,"error");setLoading(false);return;}
+      const role=await fetchUserRole(data.user.id);if(!role){setLoading(false);return;}
+      setMsg("Login berhasil. Mengarahkan...","info");redirectByRole(role);
     });
   </script>
 </body>
