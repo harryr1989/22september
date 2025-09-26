@@ -7,11 +7,8 @@
   <style>
     :root{
       --bg:#f6f8fb; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#0b63f3;
-      --card:#fff; --bd:#e2e8f0; --muted:#64748b; --txt:#0f172a;
-      --shadow:0 6px 18px rgba(15,23,42,.08);
-      --touch:50px; --radius:16px;
-      --H_HDR:54px;  /* tinggi header */
-      --H_BAR:46px;  /* tinggi bar cabang */
+      --card:#fff; --bd:#e2e8f0; --txt:#0f172a; --shadow:0 6px 18px rgba(15,23,42,.08);
+      --touch:50px; --radius:16px; --H_HDR:54px; --H_BAR:46px;
       --blueA:#dbeafe; --greenA:#f0fdf4; --orangeA:#fff7ed;
     }
     *{box-sizing:border-box}
@@ -19,88 +16,59 @@
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt)}
     .layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
 
-    /* ===== Sidebar (tetap) ===== */
+    /* Sidebar */
     .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px}
     .brand{color:#fff;font-weight:800;font-size:20px;margin-bottom:12px}
     .nav{display:flex;flex-direction:column;gap:6px}
-    .nav a{
-      display:flex !important; align-items:center; gap:10px;
-      padding:10px 12px; border-radius:10px; text-decoration:none;
-      color:var(--sbfg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
+    .nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;text-decoration:none;color:var(--sbfg)}
     .nav a:hover{background:rgba(255,255,255,.10)}
     .nav a.active{background:var(--pri);color:#fff}
-    .nav a .ico{width:20px;flex:0 0 20px;display:inline-flex;align-items:center;justify-content:center}
-    .nav a .label{flex:1;min-width:0}
-    .group{margin-top:6px;border:1px solid rgba(255,255,255,.08);border-radius:10px;overflow:hidden}
-    .group-header{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#10263d;cursor:pointer;font-size:12px;color:#c6d3e1}
-    .group-header .title{display:flex;gap:8px;align-items:center;font-weight:800;text-transform:uppercase;letter-spacing:.2px}
-    .chev{transition:transform .2s ease}
-    .group.collapsed .chev{transform:rotate(-90deg)}
-    .group-body{padding:6px;background:#0f253f;display:flex;flex-direction:column;gap:4px}
-    .group-body a{background:transparent}
 
-    /* ===== Header ===== */
+    /* Header */
     header{position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;min-height:var(--H_HDR)}
     .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px}
 
-    /* ===== BAR CABANG (di bawah header) ===== */
-    .branchbar{
-      position:sticky; top:var(--H_HDR); z-index:55;
-      display:flex; gap:10px; align-items:center;
-      padding:10px 12px; background:#eef2f7; border-bottom:1px solid #dbe0e6; min-height:var(--H_BAR)
-    }
+    /* Branch bar */
+    .branchbar{position:sticky;top:var(--H_HDR);z-index:55;display:flex;gap:10px;align-items:center;padding:10px 12px;background:#eef2f7;border-bottom:1px solid #dbe0e6;min-height:var(--H_BAR)}
     .bb-select{min-width:260px;height:36px;border:1px solid #cfd6de;border-radius:8px;padding:0 10px;background:#fff;outline:none;font-size:14px}
     .bb-now{font-size:14px;color:#1f2a37}
     @media (max-width:720px){ .branchbar{flex-wrap:wrap;gap:8px} }
 
-    /* ===== Grid & Card ===== */
+    /* Grid & cards */
     .grid{display:grid;grid-template-columns:1fr;gap:12px;margin:12px 16px}
     .card{background:var(--card);border:1px solid var(--bd);border-radius:16px;box-shadow:var(--shadow);padding:14px}
     .card h3{margin:0 0 6px 0}
 
-    /* KPI: lebih compact + tidak melebar */
-    .kpi-grid{
-      display:grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap:8px;
-      align-items:stretch;
-    }
+    /* KPI */
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
     .kpi-card{background:#fff;border:1px solid var(--bd);border-radius:14px;box-shadow:var(--shadow);padding:10px;display:flex;flex-direction:column;gap:2px}
     .kpi-title{font-size:11px;color:#475569}
-    .kpi-value{font-size:16px;font-weight:800;line-height:1.1}
-    .kpi-card.kpi-omset  { border-left:4px solid #2563eb; background:linear-gradient(180deg,var(--blueA), #ffffff 58%); }
-    .kpi-card.kpi-profit { border-left:4px solid #16a34a; background:linear-gradient(180deg,var(--greenA), #ffffff 58%); }
-    .kpi-card.kpi-asset  { border-left:4px solid #f59e0b; background:linear-gradient(180deg,var(--orangeA), #ffffff 58%); }
-    .kpi-card.kpi-profit .kpi-title{ color:#166534; }
-    .kpi-card.kpi-profit .kpi-value{ font-size:18px; }
+    .kpi-value{font-size:16px;font-weight:800}
+    .kpi-card.kpi-omset{border-left:4px solid #2563eb;background:linear-gradient(180deg,var(--blueA),#fff 58%)}
+    .kpi-card.kpi-profit{border-left:4px solid #16a34a;background:linear-gradient(180deg,var(--greenA),#fff 58%)}
 
-    /* ===== BAR TOTAL ASSET (sederhana) ===== */
-    .asset-card{ margin-bottom: 0; }           /* (2) kecilkan jarak ke bawah */
-    .asset-main{
-      display:flex;align-items:center;justify-content:space-between;
-      background:#f8fafc;border:1px solid var(--bd);border-radius:12px;padding:10px 12px
-    }
-    .asset-label{font-size:12px;font-weight:800;letter-spacing:.3px;color:#334155}
-    .asset-value{font-size:18px;font-weight:900; color:#16a34a;} /* (3) hijau */
+    /* Asset bar */
+    .asset-card{margin-bottom:0}
+    .asset-main{display:flex;align-items:center;justify-content:space-between;background:#f8fafc;border:1px solid var(--bd);border-radius:12px;padding:10px 12px}
+    .asset-label{font-size:12px;font-weight:800;color:#334155}
+    .asset-value{font-size:18px;font-weight:900;color:#16a34a}
 
-    /* KPI SALDO: tarik ke atas sedikit agar jarak dengan bar asset lebih kecil */
-    .kpi-saldo-card{ margin-top: -6px; }      /* (2) kecilkan gap spesifik */
+    .kpi-saldo-card{margin-top:-6px}
 
-    /* Tabel */
+    /* Table */
     table{width:100%;border-collapse:collapse;background:#fff}
     th,td{padding:10px;border:1px solid var(--bd);font-size:14px;text-align:left;vertical-align:top}
     th{background:#f8fafc}
 
-    /* Filter bar (di dalam Card Riwayat) */
+    /* Filters */
     .filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0 10px 0}
-    .date{height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:#fff}
+    .sel{height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:#fff;min-width:170px}
     .btn-sm{height:36px;padding:6px 10px;border-radius:10px;font-weight:700;cursor:pointer}
     .btn-primary{background:#0b63f3;color:#fff}
-    .btn-blue{background:#2563eb;color:#fff}
     .btn-ghost{background:#f1f5f9}
     .btn-danger{background:#fee2e2;color:#991b1b}
-    .sep{color:#94a3b8}
+    .btn-sm:disabled{opacity:.5;cursor:not-allowed}
+    .date-input{height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:#fff;font:inherit}
 
     /* Modal */
     .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:100}
@@ -115,25 +83,29 @@
     .icon-input textarea{min-height:96px;resize:vertical}
     .dlg-ft{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--bd);padding:12px 16px;display:flex;gap:8px;justify-content:flex-end}
 
-    @media (max-width: 900px){
+    @media (max-width:900px){
       .layout{grid-template-columns:1fr}
       .sidebar{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:65}
       .brand{margin:0}
       .row{grid-template-columns:1fr}
     }
 
-    .fab{display:none}
+    /* Modal Pilih Jenis (sesuai screenshot) */
+    #modalJenis .dlg-hd{background:#0b63f3;color:#fff;font-weight:700;font-size:15px}
+    #modalJenis .dlg-bd{padding:0}
+    .pilih-jenis{display:flex;flex-direction:column;gap:10px;padding:16px}
+    .jenis-btn{background:#fff;color:#0b63f3;border:2px solid #0b63f3;border-radius:8px;padding:12px;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;text-align:center}
+    .jenis-btn:hover{background:#0b63f3;color:#fff}
   </style>
 </head>
 <body>
 <div class="layout">
-  <!-- ===== Sidebar ===== -->
+  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">AMKO</div>
     <nav class="nav" id="menuList"></nav>
   </aside>
 
-  <!-- ===== Main ===== -->
   <div>
     <!-- Header -->
     <header>
@@ -148,77 +120,72 @@
       </div>
     </header>
 
-    <!-- BAR CABANG -->
+    <!-- Branch bar -->
     <div id="branchTopBar" class="branchbar">
       <select id="branchTopSelect" class="bb-select"><option value="">-- Pilih Toko --</option></select>
       <span class="bb-now">TOKO SEKARANG: <strong id="bbNowName">-</strong></span>
     </div>
 
-    <!-- GRID -->
+    <!-- Content -->
     <div class="grid">
-      <!-- KPI Transaksi -->
+      <!-- KPI -->
       <div class="card">
         <h3 style="margin-bottom:8px">KPI Transaksi <span id="kpiTglLabel" class="pill" style="margin-left:8px">Hari ini</span></h3>
         <div class="kpi-grid">
-          <div class="kpi-card kpi-omset">
-            <div class="kpi-title">Omset</div>
-            <div id="kpi_omset" class="kpi-value">Rp 0</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-title">Tarik</div>
-            <div id="kpi_tarik" class="kpi-value">Rp 0</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-title">Transfer</div>
-            <div id="kpi_transfer" class="kpi-value">Rp 0</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-title">Fee Bank</div>
-            <div id="kpi_fee" class="kpi-value">Rp 0</div>
-          </div>
-          <div class="kpi-card kpi-profit" id="kpi_profit_wrap" style="display:none">
-            <div class="kpi-title">Profit</div>
-            <div id="kpi_profit" class="kpi-value">Rp 0</div>
-          </div>
+          <div class="kpi-card kpi-omset"><div class="kpi-title">Omset</div><div id="kpi_omset" class="kpi-value">Rp 0</div></div>
+          <div class="kpi-card"><div class="kpi-title">Tarik</div><div id="kpi_tarik" class="kpi-value">Rp 0</div></div>
+          <div class="kpi-card"><div class="kpi-title">Transfer</div><div id="kpi_transfer" class="kpi-value">Rp 0</div></div>
+          <div class="kpi-card"><div class="kpi-title">Fee Bank</div><div id="kpi_fee" class="kpi-value">Rp 0</div></div>
+          <div class="kpi-card kpi-profit" id="kpi_profit_wrap" style="display:none"><div class="kpi-title">Profit</div><div id="kpi_profit" class="kpi-value">Rp 0</div></div>
         </div>
       </div>
 
-      <!-- ==== BAR TOTAL ASSET ==== -->
+      <!-- Asset bar -->
       <div class="card asset-card">
         <div class="asset-main">
           <div class="asset-label">TOTAL ASSET</div>
           <div class="asset-value" id="assetTotalValue">Rp 0</div>
         </div>
       </div>
-      <!-- ==== END BAR TOTAL ASSET ==== -->
 
-      <!-- KPI Master Saldo Akun -->
+      <!-- KPI Saldo akun -->
       <div class="card kpi-saldo-card">
         <h3 style="margin-bottom:8px">KPI Master Saldo Akun</h3>
         <div id="kpiSaldoWrap" class="kpi-grid"></div>
       </div>
 
-      <!-- CARD RIWAYAT (Filter di atas tabel) -->
+      <!-- Riwayat -->
       <div class="card">
         <h3 style="margin-bottom:8px">Riwayat Transaksi</h3>
 
-        <!-- === FILTER BAR === -->
+        <!-- Filters -->
         <div class="filters">
-          <button class="btn-sm btn-ghost" id="presetToday">Hari ini</button>
-          <button class="btn-sm btn-ghost" id="preset7">7H</button>
-          <button class="btn-sm btn-ghost" id="preset30">30H</button>
-          <span class="sep">|</span>
-          <input type="date" id="dateFrom" class="date">
-          <span>–</span>
-          <input type="date" id="dateTo" class="date">
-          <button class="btn-sm btn-blue" id="applyRange">Terapkan</button>
+          <!-- BADGE diganti jadi FILTER TANGGAL -->
+          <input id="fltDate" type="date" class="date-input" />
+
+          <select id="fltUser" class="sel">
+            <option value="">Semua User</option>
+          </select>
+
+          <select id="fltJenis" class="sel">
+            <option value="">Semua Jenis</option>
+            <option value="tarik">Tarik Tunai</option>
+            <option value="transfer">Transfer</option>
+            <option value="pulsa">Pulsa / Kuota</option>
+            <option value="jasa">Jasa ATM</option>
+          </select>
+
+          <select id="fltRek" class="sel">
+            <option value="">Semua Rek/Server</option>
+          </select>
+
           <div style="flex:1"></div>
           <button id="btnTambah" class="btn-sm btn-primary">+ Tambah Transaksi</button>
-          <button class="btn-sm btn-primary" id="btnExport">Export Excel</button>
+          <button class="btn-sm btn-primary" id="btnExport" disabled>Export Excel</button>
         </div>
-        <!-- === END FILTER BAR === -->
 
-        <div id="totalTransaksi" style="margin:6px 0; font-weight:bold;">Jumlah Total Transaksi = 0</div>
+        <div id="totalTransaksi" style="margin:6px 0;font-weight:bold;">Jumlah Total Transaksi = 0</div>
+
         <table>
           <thead>
             <tr>
@@ -239,7 +206,8 @@
           </thead>
           <tbody id="tb"></tbody>
         </table>
-        <div style="margin-top:10px; display:flex; gap:8px; align-items:center; justify-content:center;">
+
+        <div style="margin-top:10px;display:flex;gap:8px;align-items:center;justify-content:center;">
           <button class="btn-sm btn-ghost" id="btnPrev">⟨ Prev</button>
           <span class="pill" id="pageInfo">Hal 1</span>
           <button class="btn-sm btn-ghost" id="btnNext">Next ⟩</button>
@@ -249,18 +217,18 @@
   </div>
 </div>
 
-<!-- ===== MODAL PILIH JENIS ===== -->
+<!-- Modal Pilih Jenis -->
 <div class="modal" id="modalJenis">
   <div class="dialog">
     <div class="dlg-hd">
       <span>Pilih Jenis Transaksi</span>
       <button class="btn btn-ghost" id="xJenis" style="height:40px">✖</button>
     </div>
-    <div class="dlg-bd" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <button class="btn btn-blue" data-pilih="tarik">Tarik Tunai</button>
-      <button class="btn btn-blue" data-pilih="transfer">Transfer</button>
-      <button class="btn btn-blue" data-pilih="pulsa">Pulsa</button>
-      <button class="btn btn-blue" data-pilih="jasa">Jasa</button>
+    <div class="pilih-jenis">
+      <button class="jenis-btn" data-pilih="tarik">Tarik Tunai</button>
+      <button class="jenis-btn" data-pilih="transfer">Transfer</button>
+      <button class="jenis-btn" data-pilih="pulsa">Pulsa / Kuota</button>
+      <button class="jenis-btn" data-pilih="jasa">Jasa ATM</button>
     </div>
     <div class="dlg-ft">
       <button class="btn btn-ghost" id="batalJenis">Batal</button>
@@ -268,7 +236,7 @@
   </div>
 </div>
 
-<!-- ===== MODAL FORM (diperbesar) ===== -->
+<!-- Modal Form -->
 <div class="modal" id="modalForm">
   <div class="dialog">
     <div class="dlg-hd">
@@ -368,20 +336,19 @@
   const fmtNum = n => new Intl.NumberFormat('id-ID').format(Number(n||0))
   const parseNum = v => Number(String(v||'').replace(/[^0-9]/g,''))||0
 
-  // ===== helper cabang aktif (sinkron dengan BAR CABANG) =====
+  // Active branch helpers
   const getActive = ()=>({ code: localStorage.getItem('current_branch_code')||'', name: localStorage.getItem('current_branch_name')||'' })
   const setActive = (code,name)=>{ localStorage.setItem('current_branch_code',code||''); localStorage.setItem('current_branch_name',name||'') }
 
   let gRole=null, gBranch=null, viewBranch=null
   let cacheAcc={ cash:[], rekening:[], server_pulsa:[] }
-  let filterJenis='all'
   let lastRiwayatRows=[]
   let editMode=false, editId=null
 
   // Pagination
   let page=0, pageSize=25, totalRows=0
 
-  // Range tanggal
+  // Range tanggal (default hari ini, tapi bisa dipilih via input[type=date])
   let range={from:null,to:null}
   const toISODate = d => new Date(d).toISOString().slice(0,10)
   const startOfDayISO = d=>{const x=new Date(d);x.setHours(0,0,0,0);return x.toISOString()}
@@ -389,24 +356,28 @@
   const fmtHuman = d=> new Date(d).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
   const fmtHumanDateOnly = d => new Date(d).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
 
-  function setPreset(days){
-    const end = new Date()
-    const start = new Date(); start.setHours(0,0,0,0); start.setDate(end.getDate()-(days-1))
-    range.from = toISODate(start); range.to = toISODate(end)
-    $('dateFrom').value = range.from; $('dateTo').value = range.to; updateRangeLabel()
+  // Filters model
+  const flt = { user:'', jenis:'', acc:'' }
+
+  function setPresetToday(){
+    const today = new Date()
+    const iso = toISODate(today)
+    range.from = iso
+    range.to   = iso
+    const fDate = $('fltDate')
+    if(fDate){ fDate.value = iso }
+    $('kpiTglLabel').textContent = fmtHumanDateOnly(today)
+  }
+  function setDateRange(dateISO){
+    // set range to single selected date
+    range.from = dateISO
+    range.to   = dateISO
+    $('kpiTglLabel').textContent = fmtHumanDateOnly(dateISO)
   }
   function getRangeISO(){
-    if(!range.from || !range.to){
-      const t=new Date(); const s=new Date(); s.setHours(0,0,0,0)
-      return { tmin: s.toISOString(), tmax: endOfDayISO(t) }
-    }
-    return { tmin: startOfDayISO(new Date(range.from)), tmax: endOfDayISO(new Date(range.to)) }
-  }
-  function updateRangeLabel(){
-    const f = range.from ? fmtHumanDateOnly(range.from) : '-'
-    const t = range.to   ? fmtHumanDateOnly(range.to)   : '-'
-    const same = range.from===range.to
-    const kpiLbl = $('kpiTglLabel'); if(kpiLbl) kpiLbl.textContent = same? 'Hari ini' : `${f} – ${t}`
+    // interpret range.from/to (YYYY-MM-DD) as that whole day
+    const pick = range.from || toISODate(new Date())
+    return { tmin: startOfDayISO(new Date(pick)), tmax: endOfDayISO(new Date(pick)) }
   }
 
   // mask angka
@@ -415,7 +386,8 @@
   })})()
 
   async function boot(){
-    setPreset(1) // default Hari ini
+    // set default date (today)
+    setPresetToday()
 
     const { data:{ session } } = await supabase.auth.getSession()
     if(!session){ location.href='login.html'; return }
@@ -427,17 +399,30 @@
     viewBranch = saved.code || gBranch || ''
     if(!saved.code && viewBranch){ setActive(viewBranch, viewBranch) }
 
-    // tampilkan info user
+    // user info
     $('me').textContent = prof?.full_name || prof?.email || '-'
     $('roleBadge').textContent = `role: ${gRole}`
     $('branchBadge').textContent = `branch: ${viewBranch||'-'}`
 
-    // profit hanya owner
+    // profit only owner
     $('kpi_profit_wrap').style.display = (String(gRole).toLowerCase()==='owner') ? 'block':'none'
 
-    await initSidebar()     // render menu sidebar
-    await initBranchBar()   // isi dropdown & label bar cabang (auto apply)
+    await initSidebar()
+    await initBranchBar()
     await loadAccounts()
+    await populateFilterOptions()
+
+    // listener date filter (auto apply)
+    const fDate = $('fltDate')
+    if(fDate){
+      fDate.addEventListener('change', async ()=>{
+        const val = fDate.value || toISODate(new Date())
+        setDateRange(val)
+        $('btnExport').disabled = true
+        await refreshByRange()
+      })
+    }
+
     await refreshByRange()
   }
 
@@ -456,7 +441,27 @@
     ;(data||[]).forEach(a=>{ if(cacheAcc[a.account_type]) cacheAcc[a.account_type].push(a) })
   }
 
-  // ===== KPI transaksi =====
+  // Isi pilihan filter
+  async function populateFilterOptions(){
+    // USER
+    const { data: users } = await supabase.from('profiles').select('full_name').order('full_name')
+    const uSel = $('fltUser')
+    uSel.innerHTML = '<option value="">Semua User</option>' + (users||[])
+      .filter(u=>u.full_name && u.full_name.trim().length>0)
+      .map(u=>`<option value="${u.full_name}">${u.full_name}</option>`).join('')
+
+    // REK/SERVER
+    const list=[...(cacheAcc.rekening||[]), ...(cacheAcc.server_pulsa||[])]
+    const rSel = $('fltRek')
+    rSel.innerHTML = '<option value="">Semua Rek/Server</option>' + list.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')
+
+    // On change → reload (disable export dulu biar konsisten)
+    uSel.onchange = ()=>{ flt.user = uSel.value||''; $('btnExport').disabled=true; refreshByRange() }
+    $('fltJenis').onchange = ()=>{ flt.jenis = $('fltJenis').value||''; $('btnExport').disabled=true; refreshByRange() }
+    rSel.onchange = ()=>{ flt.acc = rSel.value||''; $('btnExport').disabled=true; refreshByRange() }
+  }
+
+  // KPI transaksi
   async function loadKPITransaksi(){
     const { tmin, tmax } = getRangeISO()
     const { data } = await supabase.from('transactions')
@@ -475,37 +480,52 @@
     if(String(gRole).toLowerCase()==='owner') $('kpi_profit').textContent=fmtRp(profit)
   }
 
-  // ===== BAR TOTAL ASSET updater (hanya total) =====
+  // Asset bar & KPI saldo
   function updateAssetBar(list){
     const totalAsset = (list||[]).reduce((s,a)=> s + Number(a.saldo||0), 0)
-    const elTotal=$('assetTotalValue')
-    if(elTotal) elTotal.textContent = fmtRp(totalAsset)
+    $('assetTotalValue').textContent = fmtRp(totalAsset)
   }
-
-  // ===== KPI saldo akun =====
+  async function loadKPISaldo(){
+    const { data } = await supabase.from('accounts').select('id,name,account_type,branch_code,saldo').eq('branch_code', viewBranch).order('name')
+    updateAssetBar(data||[])
+    renderKPISaldoCards(data||[])
+  }
   function renderKPISaldoCards(list){
     const wrap=$('kpiSaldoWrap')
     const laci=(list||[]).filter(a=> a.account_type==='cash' && /laci/i.test(a.name||''))
     const rek=(list||[]).filter(a=> a.account_type==='rekening').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
     const srv=(list||[]).filter(a=> a.account_type==='server_pulsa').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
 
-    let html = ''
-    const card = a => `
-      <div class="kpi-card" title="ID: ${a.id}">
-        <div class="kpi-title">${a.name || (a.account_type||'').toUpperCase()}</div>
-        <div class="kpi-value">${fmtRp(a.saldo||0)}</div>
-      </div>
-    `
+    let html=''
+    const card = a => `<div class="kpi-card" title="ID: ${a.id}"><div class="kpi-title">${a.name|| (a.account_type||'').toUpperCase()}</div><div class="kpi-value">${fmtRp(a.saldo||0)}</div></div>`
     laci.forEach(a=> html+=card(a)); rek.forEach(a=> html+=card(a)); srv.forEach(a=> html+=card(a))
-    if(!html){
-      html = `<div class="kpi-card"><div class="kpi-title">Tidak ada akun</div><div class="kpi-value">Rp 0</div></div>`
-    }
-    wrap.innerHTML = html
+    if(!html) html = `<div class="kpi-card"><div class="kpi-title">Tidak ada akun</div><div class="kpi-value">Rp 0</div></div>`
+    wrap.innerHTML=html
   }
-  async function loadKPISaldo(){
-    const { data } = await supabase.from('accounts').select('id,name,account_type,branch_code,saldo').eq('branch_code', viewBranch).order('name')
-    updateAssetBar(data||[])
-    renderKPISaldoCards(data||[])
+
+  // ===== Export helpers =====
+  function csvEscape(v){ if(v==null) return ''; const s=String(v).replace(/\r?\n/g,' ').replace(/\s+/g,' ').trim(); return /[",;]/.test(s)?`"${s.replace(/"/g,'""')}"`:s }
+  function updateExportState(){
+    const hasData = (lastRiwayatRows||[]).length > 0
+    const btn = $('btnExport')
+    if(btn) btn.disabled = !hasData
+  }
+  function exportCSV(){
+    const rows=lastRiwayatRows||[]
+    if(rows.length===0) return // silent
+    const header=['No urut','User','Tanggal','ID Trx','Sumber Dana','Jenis','SRC Saldo Awal','DST Saldo Awal','Nominal','Admin Dalam','Admin Luar','Fee Bank','SRC Saldo Akhir','DST Saldo Akhir','Keterangan']
+    const lines=[header.join(',')]
+    let i=1 + page*pageSize
+    for(const r of rows){
+      const rec=[i++,r.created_by_name||'',fmtHuman(r.created_at),(r.id_trx||r.id),
+        `${r.src_account_name||''}${r.dst_account_name?` → ${r.dst_account_name}`:''}`, r.jenis||'',
+        (r.src_saldo_awal??''),(r.dst_saldo_awal??''),(r.nominal??0),(r.admin_dalam??0),(r.admin_luar??0),(r.fee_bank??0),(r.src_saldo_akhir??''),(r.dst_saldo_akhir??''), r.note||''].map(csvEscape)
+      lines.push(rec.join(','))
+    }
+    const f=range.from||toISODate(new Date()), t=range.to||toISODate(new Date()); const same=f===t
+    const fname = same?`riwayat_${f}_p${page+1}.csv`:`riwayat_${f}_sampai_${t}_p${page+1}.csv`
+    const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'})
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fname; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500)
   }
 
   // ===== Riwayat + Pagination =====
@@ -519,38 +539,46 @@
 
   async function loadRiwayat(){
     const { tmin, tmax } = getRangeISO()
-    if(!viewBranch){ $('tb').innerHTML=`<tr><td colspan="13">Pilih cabang terlebih dahulu.</td></tr>`; return }
+    if(!viewBranch){
+      $('tb').innerHTML=`<tr><td colspan="13">Pilih cabang terlebih dahulu.</td></tr>`
+      $('btnPrev').disabled=true; $('btnNext').disabled=true; $('pageInfo').textContent='Hal -'
+      lastRiwayatRows=[]; updateExportState(); return
+    }
 
-    // count
+    // COUNT
     let qCount = supabase.from('v_tx_summary').select('*',{ count:'exact', head:true })
       .eq('branch_code', viewBranch).gte('created_at', tmin).lte('created_at', tmax)
-    if(filterJenis!=='all') qCount = qCount.eq('jenis', filterJenis)
+    if(flt.jenis) qCount = qCount.eq('jenis', flt.jenis)
+    if(flt.user)  qCount = qCount.eq('created_by_name', flt.user)
+    if(flt.acc)   qCount = qCount.or(`src_account_id.eq.${flt.acc},dst_account_id.eq.${flt.acc}`)
     const { count:cnt } = await qCount
     totalRows = cnt || 0
     $('totalTransaksi').textContent = 'Jumlah Total Transaksi = ' + totalRows
 
-    // data
+    // DATA
     let dataQuery = supabase.from('v_tx_summary').select(`
       id, id_trx, jenis, src_account_id, src_account_name, dst_account_id, dst_account_name,
-      nominal, admin_dalam, admin_luar, fee_bank, saldo_awal, saldo_akhir,
+      nominal, admin_dalam, admin_luar, fee_bank,
       src_saldo_awal, src_saldo_akhir, dst_saldo_awal, dst_saldo_akhir,
       note, created_by_name, created_at, branch_code
     `).eq('branch_code', viewBranch).gte('created_at', tmin).lte('created_at', tmax)
-    if(filterJenis!=='all') dataQuery = dataQuery.eq('jenis', filterJenis)
+    if(flt.jenis) dataQuery = dataQuery.eq('jenis', flt.jenis)
+    if(flt.user)  dataQuery = dataQuery.eq('created_by_name', flt.user)
+    if(flt.acc)   dataQuery = dataQuery.or(`src_account_id.eq.${flt.acc},dst_account_id.eq.${flt.acc}`)
 
     const { data, error } = await dataQuery.order('created_at',{ascending:false}).range(page*pageSize,(page+1)*pageSize-1)
     if(error){
       $('tb').innerHTML = `<tr><td colspan="13" style="color:#991b1b">Gagal memuat riwayat: ${error.message}</td></tr>`
       $('btnPrev').disabled=true; $('btnNext').disabled=true; $('pageInfo').textContent='Hal -'
-      return
+      lastRiwayatRows=[]; updateExportState(); return
     }
     const rows=data||[]; lastRiwayatRows=rows
     if(rows.length===0){
-      $('tb').innerHTML = `<tr><td colspan="13" style="color:#64748b">Belum ada transaksi dalam rentang ini.</td></tr>`
+      $('tb').innerHTML = `<tr><td colspan="13" style="color:#64748b">Belum ada transaksi pada tanggal ini.</td></tr>`
       $('btnPrev').disabled = page===0
       $('btnNext').disabled = (page+1)*pageSize >= totalRows
       $('pageInfo').textContent = `Hal ${page+1}`
-      return
+      updateExportState(); return
     }
 
     let i = 1 + page*pageSize
@@ -586,41 +614,23 @@
     $('btnPrev').disabled = page===0
     $('btnNext').disabled = (page+1)*pageSize >= totalRows
     $('pageInfo').textContent = `Hal ${page+1}`
+    updateExportState()
   }
 
-  // ===== Export CSV (page current) =====
-  function csvEscape(v){ if(v==null) return ''; const s=String(v).replace(/\r?\n/g,' ').replace(/\s+/g,' ').trim(); return /[",;]/.test(s)?`"${s.replace(/"/g,'""')}"`:s }
-  function exportCSV(){
-    const rows=lastRiwayatRows||[]
-    const header=['No urut','User','Tanggal','ID Trx','Sumber Dana','Jenis','SRC Saldo Awal','DST Saldo Awal','Nominal','Admin Dalam','Admin Luar','Fee Bank','SRC Saldo Akhir','DST Saldo Akhir','Keterangan']
-    const lines=[header.join(',')]
-    let i=1 + page*pageSize
-    for(const r of rows){
-      const rec=[i++,r.created_by_name||'',fmtHuman(r.created_at),(r.id_trx||r.id),
-        `${r.src_account_name||''}${r.dst_account_name?` → ${r.dst_account_name}`:''}`, r.jenis||'',
-        (r.src_saldo_awal??''),(r.dst_saldo_awal??''),(r.nominal??0),(r.admin_dalam??0),(r.admin_luar??0),(r.fee_bank??0),(r.src_saldo_akhir??''),(r.dst_saldo_akhir??''), r.note||''].map(csvEscape)
-      lines.push(rec.join(','))
-    }
-    const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'})
-    const f=range.from||toISODate(new Date()), t=range.to||toISODate(new Date()); const same=f===t
-    const fname = same?`riwayat_${f}_p${page+1}.csv`:`riwayat_${f}_sampai_${t}_p${page+1}.csv`
-    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fname; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500)
-  }
-
-  // ===== Events umum =====
-  $('presetToday').onclick=async()=>{setPreset(1); await refreshByRange()}
-  $('preset7').onclick=async()=>{setPreset(7); await refreshByRange()}
-  $('preset30').onclick=async()=>{setPreset(30); await refreshByRange()}
-  $('applyRange').onclick=async()=>{const f=$('dateFrom').value,t=$('dateTo').value; if(!f||!t) return alert('Pilih tanggal Dari & Sampai.'); if(new Date(f)>new Date(t)) return alert('Tanggal Dari tidak boleh melewati Sampai.'); range.from=f; range.to=t; updateRangeLabel(); await refreshByRange()}
+  // Events: export & pagination
+  $('btnExport').onclick=()=>exportCSV()
   $('btnPrev').onclick=async()=>{ if(page>0){ page--; await loadRiwayat() } }
   $('btnNext').onclick=async()=>{ if((page+1)*pageSize < totalRows){ page++; await loadRiwayat() } }
-  $('btnExport').onclick=()=>exportCSV()
+
+  // Modal jenis
   $('btnTambah').onclick=()=>$('modalJenis').classList.add('show')
   $('xJenis').onclick=$('batalJenis').onclick=()=>$('modalJenis').classList.remove('show')
+
+  // Modal form
   $('xForm').onclick=$('batalForm').onclick=()=>{ $('modalForm').classList.remove('show'); editMode=false; editId=null; }
   document.querySelectorAll('#modalJenis [data-pilih]').forEach(b=>b.addEventListener('click',()=>{ const j=b.getAttribute('data-pilih'); $('modalJenis').classList.remove('show'); setupForm(j); $('modalForm').classList.add('show') }))
 
-  // dropdown jenis → setup form
+  // Helpers form
   function fillSelect(sel, items){ sel.innerHTML=(items||[]).map(i=>`<option value="${i.id}">${i.name}</option>`).join('') || '<option value="">(Tidak ada opsi)</option>' }
   const findLaci = ()=> (cacheAcc.cash||[]).find(a=>/laci/i.test(a.name||'')) || null
 
@@ -653,11 +663,11 @@
     }
   }
 
-  // enforce TARIK: salah satu admin terisi
+  // Admin dalam/luar eksklusif untuk TARIK
   $('f_admin_dalam').addEventListener('input',()=>{ if(parseNum($('f_admin_dalam').value)>0) $('f_admin_luar').value='' })
   $('f_admin_luar').addEventListener('input',()=>{ if(parseNum($('f_admin_luar').value)>0) $('f_admin_dalam').value='' })
 
-  // Simpan transaksi (insert; jika editMode, hapus dulu id lama)
+  // Simpan transaksi
   document.addEventListener('click', async (e)=>{
     const actBtn = e.target.closest('button[data-act]')
     if(!actBtn) return
@@ -731,13 +741,13 @@
     }catch(e){ const m=$('msgErr'); m.textContent='Gagal simpan: '+(e.message||e); m.style.display='block'; setTimeout(()=>m.style.display='none',3000) }
   }
 
-  // ====== BAR CABANG: isi & onchange auto-apply ======
+  // Branch bar
   async function initBranchBar(){
     const sel=$('branchTopSelect'), lbl=$('bbNowName')
     const { data:{ session } } = await supabase.auth.getSession()
     let role=(localStorage.getItem('user_role')||'').toLowerCase(), prof=null
     if(session){ const { data } = await supabase.from('profiles').select('role,branch_code').eq('id',session.user.id).maybeSingle(); prof=data||null; if(prof?.role) role=prof.role.toLowerCase() }
-    if(!role) role='kasir'  // fallback agar sidebar & dropdown tidak kosong
+    if(!role) role='kasir'
 
     let list=[]
     if(role==='owner'){
@@ -758,10 +768,8 @@
       lbl.textContent='-'
     }
 
-    // NON-owner: dropdown disembunyikan (seperti semula)
     if(role!=='owner'){ sel.style.display='none' }
 
-    // AUTO APPLY saat onchange
     sel.onchange = async ()=>{
       const code = sel.value
       const name = sel.options[sel.selectedIndex]?.text || code
@@ -771,11 +779,12 @@
       viewBranch = code
       $('branchBadge').textContent = `branch: ${code}`
       await loadAccounts()
+      await populateFilterOptions()
       await refreshByRange()
     }
   }
 
-  // ===== Sidebar renderer (tetap) =====
+  // Sidebar
   async function initSidebar(){
     const roleLS=(localStorage.getItem("user_role")||gRole||"kasir").toLowerCase();
     const menuModel=[
@@ -818,7 +827,7 @@
     })
   }
 
-  // start
+  // Start
   boot()
 </script>
 </body>
