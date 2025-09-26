@@ -7,8 +7,10 @@
   <style>
     :root{
       --bg:#f6f8fb; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#0b63f3;
-      --card:#fff; --bd:#e2e8f0; --txt:#0f172a; --shadow:0 6px 18px rgba(15,23,42,.08);
-      --touch:50px; --radius:16px; --H_HDR:54px; --H_BAR:46px;
+      --card:#fff; --bd:#e2e8f0; --muted:#64748b; --txt:#0f172a;
+      --shadow:0 6px 18px rgba(15,23,42,.08);
+      --touch:50px; --radius:16px;
+      --H_HDR:54px; --H_BAR:46px;
       --blueA:#dbeafe; --greenA:#f0fdf4; --orangeA:#fff7ed;
     }
     *{box-sizing:border-box}
@@ -40,10 +42,10 @@
     .card h3{margin:0 0 6px 0}
 
     /* KPI */
-    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;align-items:stretch}
     .kpi-card{background:#fff;border:1px solid var(--bd);border-radius:14px;box-shadow:var(--shadow);padding:10px;display:flex;flex-direction:column;gap:2px}
     .kpi-title{font-size:11px;color:#475569}
-    .kpi-value{font-size:16px;font-weight:800}
+    .kpi-value{font-size:16px;font-weight:800;line-height:1.1}
     .kpi-card.kpi-omset{border-left:4px solid #2563eb;background:linear-gradient(180deg,var(--blueA),#fff 58%)}
     .kpi-card.kpi-profit{border-left:4px solid #16a34a;background:linear-gradient(180deg,var(--greenA),#fff 58%)}
 
@@ -96,6 +98,20 @@
     .pilih-jenis{display:flex;flex-direction:column;gap:10px;padding:16px}
     .jenis-btn{background:#fff;color:#0b63f3;border:2px solid #0b63f3;border-radius:8px;padding:12px;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;text-align:center}
     .jenis-btn:hover{background:#0b63f3;color:#fff}
+
+    /* WARNA KONDISI: Laci Tunai */
+    .kpi-card.laci-low{
+      border-left:4px solid #ef4444;
+      background:linear-gradient(180deg,#fee2e2,#ffffff 58%);
+    }
+    .kpi-card.laci-mid{
+      border-left:4px solid #f59e0b;
+      background:linear-gradient(180deg,#fef3c7,#ffffff 58%);
+    }
+    .kpi-card.laci-high{
+      border-left:4px solid #16a34a;
+      background:linear-gradient(180deg,#dcfce7,#ffffff 58%);
+    }
   </style>
 </head>
 <body>
@@ -160,7 +176,7 @@
 
         <!-- Filters -->
         <div class="filters">
-          <!-- BADGE diganti jadi FILTER TANGGAL -->
+          <!-- Badge diganti jadi filter tanggal -->
           <input id="fltDate" type="date" class="date-input" />
 
           <select id="fltUser" class="sel">
@@ -348,7 +364,7 @@
   // Pagination
   let page=0, pageSize=25, totalRows=0
 
-  // Range tanggal (default hari ini, tapi bisa dipilih via input[type=date])
+  // Range tanggal (default hari ini; single date)
   let range={from:null,to:null}
   const toISODate = d => new Date(d).toISOString().slice(0,10)
   const startOfDayISO = d=>{const x=new Date(d);x.setHours(0,0,0,0);return x.toISOString()}
@@ -369,13 +385,11 @@
     $('kpiTglLabel').textContent = fmtHumanDateOnly(today)
   }
   function setDateRange(dateISO){
-    // set range to single selected date
     range.from = dateISO
     range.to   = dateISO
     $('kpiTglLabel').textContent = fmtHumanDateOnly(dateISO)
   }
   function getRangeISO(){
-    // interpret range.from/to (YYYY-MM-DD) as that whole day
     const pick = range.from || toISODate(new Date())
     return { tmin: startOfDayISO(new Date(pick)), tmax: endOfDayISO(new Date(pick)) }
   }
@@ -386,7 +400,7 @@
   })})()
 
   async function boot(){
-    // set default date (today)
+    // default date (today)
     setPresetToday()
 
     const { data:{ session } } = await supabase.auth.getSession()
@@ -485,22 +499,45 @@
     const totalAsset = (list||[]).reduce((s,a)=> s + Number(a.saldo||0), 0)
     $('assetTotalValue').textContent = fmtRp(totalAsset)
   }
+
+  function renderKPISaldoCards(list){
+    const wrap=$('kpiSaldoWrap')
+    const laci=(list||[]).filter(a=> a.account_type==='cash' && /laci/i.test(a.name||''))   // << batasi ke "laci"
+    const rek=(list||[]).filter(a=> a.account_type==='rekening').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
+    const srv=(list||[]).filter(a=> a.account_type==='server_pulsa').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
+
+    // Tentukan kelas warna untuk Laci Tunai
+    const laciClass = (a)=>{
+      const s = Number(a.saldo||0)
+      if (s < 10_000_000) return 'laci-low'      // < 10jt -> merah
+      if (s < 20_000_000) return 'laci-mid'      // 10–19,99jt -> kuning
+      return 'laci-high'                          // >= 20jt -> hijau
+    }
+
+    const card = a => {
+      const isLaci = (a.account_type==='cash' && /laci/i.test(a.name||'')) // << hapus /laci/i kalau mau semua cash diwarnai
+      const extraClass = isLaci ? (' ' + laciClass(a)) : ''
+      return `
+        <div class="kpi-card${extraClass}" title="ID: ${a.id}">
+          <div class="kpi-title">${a.name|| (a.account_type||'').toUpperCase()}</div>
+          <div class="kpi-value">${fmtRp(a.saldo||0)}</div>
+        </div>
+      `
+    }
+
+    let html=''
+    laci.forEach(a=> html+=card(a))  // laci duluan
+    rek.forEach(a=> html+=card(a))
+    srv.forEach(a=> html+=card(a))
+
+    if(!html) html = `<div class="kpi-card"><div class="kpi-title">Tidak ada akun</div><div class="kpi-value">Rp 0</div></div>`
+    wrap.innerHTML=html
+  }
+
   async function loadKPISaldo(){
     const { data } = await supabase.from('accounts').select('id,name,account_type,branch_code,saldo').eq('branch_code', viewBranch).order('name')
     updateAssetBar(data||[])
     renderKPISaldoCards(data||[])
-  }
-  function renderKPISaldoCards(list){
-    const wrap=$('kpiSaldoWrap')
-    const laci=(list||[]).filter(a=> a.account_type==='cash' && /laci/i.test(a.name||''))
-    const rek=(list||[]).filter(a=> a.account_type==='rekening').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
-    const srv=(list||[]).filter(a=> a.account_type==='server_pulsa').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
-
-    let html=''
-    const card = a => `<div class="kpi-card" title="ID: ${a.id}"><div class="kpi-title">${a.name|| (a.account_type||'').toUpperCase()}</div><div class="kpi-value">${fmtRp(a.saldo||0)}</div></div>`
-    laci.forEach(a=> html+=card(a)); rek.forEach(a=> html+=card(a)); srv.forEach(a=> html+=card(a))
-    if(!html) html = `<div class="kpi-card"><div class="kpi-title">Tidak ada akun</div><div class="kpi-value">Rp 0</div></div>`
-    wrap.innerHTML=html
   }
 
   // ===== Export helpers =====
