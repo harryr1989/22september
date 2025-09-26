@@ -11,7 +11,6 @@
       --sidebar-w:240px;
       --brand:#0a5eb6;
       --blue-900:#0b3a66;
-      --blue-800:#0e4a8a;
       --gray-50:#f6f9fb;
       --gray-100:#f1f5f9; --gray-200:#e5e7eb; --gray-300:#d1d5db; --gray-400:#94a3b8;
       --text:#0f172a; --muted:#64748b;
@@ -125,30 +124,12 @@
       <section class="totalbar">
         <div class="totalbar-title">TOTAL KESELURUHAN</div>
         <div class="totgrid">
-          <div class="totitem">
-            <div class="totlabel">Aset Cash</div>
-            <div class="totval" id="totCash"><span class="skeleton"></span></div>
-          </div>
-          <div class="totitem">
-            <div class="totlabel">Aset Saldo</div>
-            <div class="totval" id="totSaldo"><span class="skeleton"></span></div>
-          </div>
-          <div class="totitem">
-            <div class="totlabel">Total Aset</div>
-            <div class="totval" id="totAsset"><span class="skeleton"></span></div>
-          </div>
-          <div class="totitem">
-            <div class="totlabel">Profit</div>
-            <div class="totval c-green" id="totProfit"><span class="skeleton"></span></div>
-          </div>
-          <div class="totitem">
-            <div class="totlabel">Pengeluaran</div>
-            <div class="totval c-orange" id="totExpense"><span class="skeleton"></span></div>
-          </div>
-          <div class="totitem">
-            <div class="totlabel">Profit Bersih</div>
-            <div class="totval c-green" id="totNet"><span class="skeleton"></span></div>
-          </div>
+          <div class="totitem"><div class="totlabel">Aset Cash</div><div class="totval" id="totCash"><span class="skeleton"></span></div></div>
+          <div class="totitem"><div class="totlabel">Aset Saldo</div><div class="totval" id="totSaldo"><span class="skeleton"></span></div></div>
+          <div class="totitem"><div class="totlabel">Total Aset</div><div class="totval" id="totAsset"><span class="skeleton"></span></div></div>
+          <div class="totitem"><div class="totlabel">Profit</div><div class="totval c-green" id="totProfit"><span class="skeleton"></span></div></div>
+          <div class="totitem"><div class="totlabel">Pengeluaran</div><div class="totval c-orange" id="totExpense"><span class="skeleton"></span></div></div>
+          <div class="totitem"><div class="totlabel">Profit Bersih</div><div class="totval c-green" id="totNet"><span class="skeleton"></span></div></div>
         </div>
         <div class="muted" id="lastUpdatedAll" style="margin-top:6px;">Last updated —</div>
       </section>
@@ -162,10 +143,10 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ====== Supabase Init (mengikuti file sebelumnya) ======
+    // ====== Supabase Init ======
     const SUPABASE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); /* :contentReference[oaicite:1]{index=1} */
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); // struktur mengikuti file dasbor sebelumnya
 
     // ====== Auth Guard ======
     async function guard(){
@@ -186,45 +167,67 @@
     let username=localStorage.getItem("user_name")||"USER";
     document.getElementById("roleBadge").textContent=username.toUpperCase()+"-"+role.toUpperCase();
 
-    // ====== MENU (ownerOnly auto-hide) seperti file lama ======
+    // ====== MENU MODEL (ownerOnly auto-hide) ======
     const menuModel = [
       { type:"item", label:"Dashboard", icon:"📊", link:"./dashboard.html" },
       { type:"item", label:"Transaksi Mini ATM", icon:"🧮", link:"./transaksi-mini-atm.html" },
-      { type:"group", key:"grp_master", title:"Master Data", icon:"📂",
-        items:[
+      {
+        type:"group", key:"grp_master", title:"Master Data", icon:"📂",
+        items: [
           { type:"item", label:"Master Saldo Akun", icon:"💰", link:"./master-saldo-akun.html" },
           { type:"item", label:"Mutasi Saldo", icon:"🔄", link:"./mutasi-saldo.html" },
           { type:"item", label:"Saldo Real", icon:"📑", link:"./saldo-real.html" }
-        ]},
+        ]
+      },
       { type:"item", label:"Laporan", icon:"📘", link:"./laporan.html", ownerOnly:true },
-      { type:"group", key:"grp_pengaturan", title:"Pengaturan", icon:"⚙️", ownerOnly:true,
-        items:[
+      {
+        type:"group", key:"grp_pengaturan", title:"Pengaturan", icon:"⚙️",
+        items: [
           { type:"item", label:"Manajemen Pengguna", icon:"👥", link:"./manajemen-pengguna.html", ownerOnly:true },
           { type:"item", label:"Hak Akses", icon:"🔑", link:"./hak-akses.html", ownerOnly:true }
-        ]}
+        ],
+        ownerOnly:true
+      }
     ];
     function isActive(link){ const here = location.pathname.split("/").pop() || "dashboard.html"; return (link||"").endsWith(here); }
-    function getGroupState(key){ const st=JSON.parse(localStorage.getItem("sidebar_groups_state")||"{}"); return st[key]!==false; }
-    function setGroupState(key,open){ const st=JSON.parse(localStorage.getItem("sidebar_groups_state")||"{}"); st[key]=!!open; localStorage.setItem("sidebar_groups_state",JSON.stringify(st)); }
+    function getGroupState(key){ const st = JSON.parse(localStorage.getItem("sidebar_groups_state")||"{}"); return st[key]!==false; }
+    function setGroupState(key, open){ const st = JSON.parse(localStorage.getItem("sidebar_groups_state")||"{}"); st[key]=!!open; localStorage.setItem("sidebar_groups_state", JSON.stringify(st)); }
     function renderSidebar(){
-      const nav=document.getElementById("menuList"); nav.innerHTML="";
+      const nav=document.getElementById("menuList");
+      nav.innerHTML="";
       menuModel.forEach(node=>{
         if(node.ownerOnly && role!=="owner") return;
         if(node.type==="item"){
-          const a=document.createElement("a"); a.href=node.link; a.textContent=`${node.icon} ${node.label}`;
-          if(isActive(node.link)) a.classList.add("active"); nav.appendChild(a);
+          const a=document.createElement("a");
+          a.href=node.link; a.textContent=`${node.icon} ${node.label}`;
+          if(isActive(node.link)) a.classList.add("active");
+          nav.appendChild(a);
         }else{
-          const group=document.createElement("div"); group.className="group"; if(!getGroupState(node.key)) group.classList.add("collapsed");
-          const head=document.createElement("div"); head.className="group-header";
+          const group=document.createElement("div");
+          group.className="group";
+          if(!getGroupState(node.key)) group.classList.add("collapsed");
+          const head=document.createElement("div");
+          head.className="group-header";
           head.innerHTML=`<div class="title">${node.icon} ${node.title}</div><div class="chev">▾</div>`;
-          head.addEventListener("click",()=>{ const open=!group.classList.contains("collapsed"); if(open) group.classList.add("collapsed"); else group.classList.remove("collapsed"); setGroupState(node.key,!open); });
-          const body=document.createElement("div"); body.className="group-body";
-          (node.items||[]).forEach(it=>{ if(it.ownerOnly && role!=="owner") return; const a=document.createElement("a"); a.href=it.link; a.textContent=`${it.icon} ${it.label}`; if(isActive(it.link)) a.classList.add("active"); body.appendChild(a); });
+          head.addEventListener("click",()=>{
+            const open=!group.classList.contains("collapsed");
+            if(open) group.classList.add("collapsed"); else group.classList.remove("collapsed");
+            setGroupState(node.key, !open);
+          });
+          const body=document.createElement("div");
+          body.className="group-body";
+          (node.items||[]).forEach(it=>{
+            if(it.ownerOnly && role!=="owner") return;
+            const a=document.createElement("a");
+            a.href=it.link; a.textContent=`${it.icon} ${it.label}`;
+            if(isActive(it.link)) a.classList.add("active");
+            body.appendChild(a);
+          });
           group.appendChild(head); group.appendChild(body); nav.appendChild(group);
         }
       });
     }
-    renderSidebar(); /* :contentReference[oaicite:2]{index=2} */
+    renderSidebar();
 
     // ===== Ringkasan tanggal + sapaan =====
     function fullDateShift(){
@@ -253,12 +256,64 @@
     initPeriodSelect();
     function monthRange(year, month){
       const start=new Date(year, month-1, 1, 0,0,0);
-      const end=new Date(year, month, 0, 23,59,59,999); // last day of month
+      const end=new Date(year, month, 0, 23,59,59,999);
       return { start:start.toISOString(), end:end.toISOString() };
     }
     function fmtRupiah(n){return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(n||0)}
 
-    // ====== UI builders ======
+    // ====== Perhitungan KPI (dipakai total & per cabang) ======
+    async function computeKPI(periodStartISO, periodEndISO, branchCodeOrAll="__ALL__"){
+      let omzet=0, tx=0, admin=0, bankFee=0, exp=0;
+      let cash=0, bank=0, pulsa=0;
+
+      // Transaksi
+      let q = sb.from("transactions_mini_atm")
+        .select("amount, admin_in, bank_fee, jenis, branch_code, created_at")
+        .gte("created_at", periodStartISO).lte("created_at", periodEndISO);
+      if (branchCodeOrAll && branchCodeOrAll!=="__ALL__") q=q.eq("branch_code", branchCodeOrAll);
+      let r=await q;
+      if(!r.error && r.data){
+        r.data.forEach(v=>{
+          const j=(v.jenis||"").toLowerCase();
+          if(["tarik","transfer","pulsa","jasa"].includes(j)){
+            tx++; omzet+=+v.amount||0; admin+=+v.admin_in||0; bankFee+=+v.bank_fee||0;
+          }
+        });
+      }
+
+      // Mutasi operasional (pengeluaran)
+      let qm = sb.from("mutasi_saldo")
+        .select("jenis, nominal, branch_code, created_at")
+        .gte("created_at", periodStartISO).lte("created_at", periodEndISO);
+      if (branchCodeOrAll && branchCodeOrAll!=="__ALL__") qm=qm.eq("branch_code", branchCodeOrAll);
+      let rm=await qm;
+      if(!rm.error && rm.data){
+        rm.data.forEach(v=>{ if((v.jenis||"").toLowerCase()==="operasional") exp+=+v.nominal||0; });
+      }
+
+      // Aset (accounts)
+      let qa = sb.from("accounts").select("type,is_locked,balance,branch_code");
+      if (branchCodeOrAll && branchCodeOrAll!=="__ALL__") qa=qa.eq("branch_code", branchCodeOrAll);
+      let ra=await qa;
+      if(!ra.error && ra.data){
+        ra.data.forEach(a=>{
+          const t=(a.type||"").toLowerCase(); const bal=+a.balance||0;
+          if (t==="cash" && a.is_locked) cash+=bal;
+          else if (t==="bank") bank+=bal;
+          else if (t==="server_pulsa") pulsa+=bal;
+        });
+      }
+
+      const pot = bankFee + exp;          // Pot Bank + Operasional
+      const profit = admin - bankFee;     // Profit dari admin_in - bank_fee
+      const net = profit - exp;           // Profit bersih
+      const totalSaldo = bank + pulsa;    // Bank + server pulsa
+      const totalAsset = cash + totalSaldo;
+
+      return { tx, omzet, pot, profit, exp, net, cash, totalSaldo, totalAsset };
+    }
+
+    // ====== Render helper ======
     function kpiPanelSkeleton(){
       return `
         <div class="panel">
@@ -282,98 +337,22 @@
       sec.innerHTML = `
         <div class="bigcard-head">
           <div>${(branch.name||"CABANG").toUpperCase()}</div>
-          <div id="month-${branch.code}"></div>
+          <div>${new Date(+selYear.value, +selMonth.value-1, 1).toLocaleDateString("id-ID",{month:"long",year:"numeric"})}</div>
         </div>
         <div class="bigcard-body" id="body-${branch.code}">
           ${kpiPanelSkeleton()}
         </div>`;
       return sec;
     }
-
-    // ====== Perhitungan KPI (dipakai total & per cabang) ======
-    async function computeKPI(periodStartISO, periodEndISO, branchCodeOrAll="__ALL__"){
-      let omzet=0, txCount=0, adminIn=0, bankFee=0, expense=0;
-      let cash=0, bank=0, pulsa=0;
-
-      // Transaksi (v_tx_summary -> fallback)
-      let dataTx=null;
-      let q = sb.from("v_tx_summary")
-        .select("amount, admin_in, bank_fee, jenis, branch_code, created_at")
-        .gte("created_at", periodStartISO).lte("created_at", periodEndISO);
-      if (branchCodeOrAll && branchCodeOrAll!=="__ALL__") q=q.eq("branch_code", branchCodeOrAll);
-      let r=await q; if(!r.error) dataTx=r.data;
-      if(!dataTx || !dataTx.length){
-        let q2 = sb.from("transactions_mini_atm")
-          .select("amount, admin_in, bank_fee, jenis, branch_code, created_at")
-          .gte("created_at", periodStartISO).lte("created_at", periodEndISO);
-        if (branchCodeOrAll && branchCodeOrAll!=="__ALL__") q2=q2.eq("branch_code", branchCodeOrAll);
-        const r2=await q2; if(!r2.error) dataTx=r2.data;
-      }
-      if (dataTx && dataTx.length){
-        const facing=["tarik","transfer","pulsa","jasa"];
-        dataTx.forEach(row=>{
-          const jenis=(row.jenis||"").toString().toLowerCase();
-          if(facing.includes(jenis)){
-            txCount+=1;
-            omzet   += (+row.amount||0);
-            adminIn += (+row.admin_in||0);
-            bankFee += (+row.bank_fee||0);
-          }
-        });
-      }
-
-      // Mutasi operasional (pengeluaran)
-      let dataMut=null;
-      let q3 = sb.from("v_mutasi_summary")
-        .select("jenis, amount, branch_code, created_at")
-        .gte("created_at", periodStartISO).lte("created_at", periodEndISO);
-      if (branchCodeOrAll && branchCodeOrAll!=="__ALL__") q3=q3.eq("branch_code", branchCodeOrAll);
-      const r3=await q3; if(!r3.error) dataMut=r3.data;
-
-      if(!dataMut || !dataMut.length){
-        let q4 = sb.from("mutasi_saldo")
-          .select("jenis, nominal, branch_code, created_at")
-          .gte("created_at", periodStartISO).lte("created_at", periodEndISO);
-        if (branchCodeOrAll && branchCodeOrAll!=="__ALL__") q4=q4.eq("branch_code", branchCodeOrAll);
-        const r4=await q4;
-        if(!r4.error){
-          dataMut=(r4.data||[]).map(x=>({jenis:x.jenis, amount:x.nominal, branch_code:x.branch_code, created_at:x.created_at}));
-        }
-      }
-      (dataMut||[]).forEach(row=>{ if((row.jenis||"").toLowerCase()==="operasional"){ expense += (+row.amount||0); } });
-
-      // Aset (accounts)
-      let qAcc = sb.from("accounts").select("type,is_locked,balance,branch_code");
-      if (branchCodeOrAll && branchCodeOrAll!=="__ALL__") qAcc=qAcc.eq("branch_code", branchCodeOrAll);
-      const acc=await qAcc;
-      if(!acc.error && acc.data){
-        acc.data.forEach(a=>{
-          const t=(a.type||"").toLowerCase(); const bal=(+a.balance||0);
-          if (t==="cash" && a.is_locked) cash+=bal;
-          else if (t==="bank") bank+=bal;
-          else if (t==="server_pulsa") pulsa+=bal;
-        });
-      }
-
-      const pot = bankFee + expense;
-      const profit = adminIn - bankFee;
-      const net = profit - expense;
-      const totalSaldo = bank + pulsa;
-      const totalAsset = cash + totalSaldo;
-
-      return { txCount, omzet, pot, profit, expense, net, cash, totalSaldo, totalAsset };
-    }
-
-    // ====== Render KPI ke container target ======
     function renderKPIInto(target, k){
       target.innerHTML = `
         <div class="panel">
           <div class="grid2">
-            <div class="item"><div class="label">Total Transaksi</div><div class="value">${k.txCount}x</div></div>
+            <div class="item"><div class="label">Total Transaksi</div><div class="value">${k.tx}x</div></div>
             <div class="item"><div class="label">Omzet</div><div class="value c-green">${fmtRupiah(k.omzet)}</div></div>
             <div class="item"><div class="label">Pot Bank + Operasional</div><div class="value c-orange">${fmtRupiah(k.pot)}</div></div>
             <div class="item"><div class="label">Profit</div><div class="value c-green">${fmtRupiah(k.profit)}</div></div>
-            <div class="item"><div class="label">Pengeluaran</div><div class="value c-orange">${fmtRupiah(k.expense)}</div></div>
+            <div class="item"><div class="label">Pengeluaran</div><div class="value c-orange">${fmtRupiah(k.exp)}</div></div>
             <div class="item"><div class="label">Profit Bersih</div><div class="value c-green">${fmtRupiah(k.net)}</div></div>
             <div class="item"><div class="label">Aset Cash</div><div class="value">${fmtRupiah(k.cash)}</div></div>
             <div class="item"><div class="label">Aset Saldo</div><div class="value">${fmtRupiah(k.totalSaldo)}</div></div>
@@ -390,28 +369,24 @@
           </div>
         </div>`;
     }
-
-    // ====== Render Total Bar ======
     function renderTotalBar(k){
       document.getElementById("totCash").textContent  = fmtRupiah(k.cash);
       document.getElementById("totSaldo").textContent = fmtRupiah(k.totalSaldo);
       document.getElementById("totAsset").textContent = fmtRupiah(k.totalAsset);
       document.getElementById("totProfit").textContent= fmtRupiah(k.profit);
-      document.getElementById("totExpense").textContent= fmtRupiah(k.expense);
+      document.getElementById("totExpense").textContent= fmtRupiah(k.exp);
       document.getElementById("totNet").textContent   = fmtRupiah(k.net);
       document.getElementById("lastUpdatedAll").textContent="Last updated "+new Date().toLocaleTimeString("id-ID");
     }
 
-    // ====== Load & Refresh semua ======
+    // ====== Refresh semua ======
     async function refreshAll(){
-      const year=+selYear.value, month=+selMonth.value;
-      const {start,end}=monthRange(year,month);
+      const {start,end}=monthRange(+selYear.value,+selMonth.value);
 
       // Total keseluruhan
-      document.getElementById("totCash").innerHTML=document.getElementById("totSaldo").innerHTML=
-      document.getElementById("totAsset").innerHTML=document.getElementById("totProfit").innerHTML=
-      document.getElementById("totExpense").innerHTML=document.getElementById("totNet").innerHTML=`<span class="skeleton"></span>`;
-
+      ["totCash","totSaldo","totAsset","totProfit","totExpense","totNet"].forEach(id=>{
+        document.getElementById(id).innerHTML=`<span class="skeleton"></span>`;
+      });
       try{
         const total=await computeKPI(start,end,"__ALL__");
         renderTotalBar(total);
@@ -425,7 +400,6 @@
         if(!error && branches && branches.length){
           for(const b of branches){
             const card=makeBranchCard(b); wrap.appendChild(card);
-            document.getElementById(`month-${b.code}`).textContent = new Date(year,month-1,1).toLocaleDateString("id-ID",{month:"long",year:"numeric"});
             const k=await computeKPI(start,end,b.code);
             renderKPIInto(document.getElementById(`body-${b.code}`), k);
           }
@@ -433,9 +407,25 @@
       }catch(err){ console.error(err); }
     }
 
-    // First load
-    refreshAll();
+    // ===== Debounce + Realtime =====
+    let refreshTimer=null;
+    function scheduleRefresh(delay=400){
+      if(document.hidden){ return; }
+      clearTimeout(refreshTimer);
+      refreshTimer=setTimeout(()=>{ refreshAll(); }, delay);
+    }
+    document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ scheduleRefresh(10); } });
 
+    function setupRealtime(){
+      const ch = sb.channel('realtime-dashboard');
+      ['transactions_mini_atm','mutasi_saldo','accounts','branches'].forEach(tbl=>{
+        ch.on('postgres_changes',{event:'*',schema:'public',table:tbl},()=>scheduleRefresh(300));
+      });
+      ch.subscribe();
+    }
+
+    // First load
+    refreshAll(); setupRealtime();
   </script>
 </body>
 </html>
