@@ -9,7 +9,7 @@
       --bg:#f6f8fb; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#0b63f3;
       --card:#fff; --bd:#e2e8f0; --muted:#64748b; --txt:#0f172a;
       --shadow:0 6px 18px rgba(15,23,42,.08);
-      --touch:48px; --radius:16px;
+      --touch:50px; --radius:16px;
       --H_HDR:54px;  /* tinggi header */
       --H_BAR:46px;  /* tinggi bar cabang */
       --blueA:#dbeafe; --greenA:#f0fdf4; --orangeA:#fff7ed;
@@ -54,8 +54,46 @@
     .bb-now{font-size:14px;color:#1f2a37}
     @media (max-width:720px){ .branchbar{flex-wrap:wrap;gap:8px} }
 
-    /* ===== Filter Tanggal (di bawah bar cabang) ===== */
-    .filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 16px}
+    /* ===== Grid & Card ===== */
+    .grid{display:grid;grid-template-columns:1fr;gap:12px;margin:12px 16px}
+    .card{background:var(--card);border:1px solid var(--bd);border-radius:16px;box-shadow:var(--shadow);padding:14px}
+    .card h3{margin:0 0 6px 0}
+
+    /* KPI: lebih compact + tidak melebar */
+    .kpi-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap:8px;
+      align-items:stretch;
+    }
+    .kpi-card{background:#fff;border:1px solid var(--bd);border-radius:14px;box-shadow:var(--shadow);padding:10px;display:flex;flex-direction:column;gap:2px}
+    .kpi-title{font-size:11px;color:#475569}
+    .kpi-value{font-size:16px;font-weight:800;line-height:1.1}
+    .kpi-card.kpi-omset  { border-left:4px solid #2563eb; background:linear-gradient(180deg,var(--blueA), #ffffff 58%); }
+    .kpi-card.kpi-profit { border-left:4px solid #16a34a; background:linear-gradient(180deg,var(--greenA), #ffffff 58%); }
+    .kpi-card.kpi-asset  { border-left:4px solid #f59e0b; background:linear-gradient(180deg,var(--orangeA), #ffffff 58%); }
+    .kpi-card.kpi-profit .kpi-title{ color:#166534; }
+    .kpi-card.kpi-profit .kpi-value{ font-size:18px; }
+
+    /* ===== BAR TOTAL ASSET (sederhana) ===== */
+    .asset-card{ margin-bottom: 0; }           /* (2) kecilkan jarak ke bawah */
+    .asset-main{
+      display:flex;align-items:center;justify-content:space-between;
+      background:#f8fafc;border:1px solid var(--bd);border-radius:12px;padding:10px 12px
+    }
+    .asset-label{font-size:12px;font-weight:800;letter-spacing:.3px;color:#334155}
+    .asset-value{font-size:18px;font-weight:900; color:#16a34a;} /* (3) hijau */
+
+    /* KPI SALDO: tarik ke atas sedikit agar jarak dengan bar asset lebih kecil */
+    .kpi-saldo-card{ margin-top: -6px; }      /* (2) kecilkan gap spesifik */
+
+    /* Tabel */
+    table{width:100%;border-collapse:collapse;background:#fff}
+    th,td{padding:10px;border:1px solid var(--bd);font-size:14px;text-align:left;vertical-align:top}
+    th{background:#f8fafc}
+
+    /* Filter bar (di dalam Card Riwayat) */
+    .filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0 10px 0}
     .date{height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:#fff}
     .btn-sm{height:36px;padding:6px 10px;border-radius:10px;font-weight:700;cursor:pointer}
     .btn-primary{background:#0b63f3;color:#fff}
@@ -64,32 +102,10 @@
     .btn-danger{background:#fee2e2;color:#991b1b}
     .sep{color:#94a3b8}
 
-    .grid{display:grid;grid-template-columns:1fr;gap:12px;margin:12px 16px}
-    .card{background:var(--card);border:1px solid var(--bd);border-radius:22px;box-shadow:var(--shadow);padding:16px}
-    .card h3{margin:0 0 6px 0}
-
-    /* KPI */
-    .kpi-grid{display:grid;grid-template-columns:repeat(1,1fr);gap:10px}
-    @media(min-width:560px){ .kpi-grid{grid-template-columns:repeat(2,1fr)} }
-    @media(min-width:900px){ .kpi-grid{grid-template-columns:repeat(5,1fr)} }
-    .kpi-card{background:#fff;border:1px solid var(--bd);border-radius:16px;box-shadow:var(--shadow);padding:12px;display:flex;flex-direction:column;gap:6px}
-    .kpi-title{font-size:12px;color:#475569}
-    .kpi-value{font-size:18px;font-weight:800}
-    .kpi-sub{font-size:11px;color:#6b7280}
-    .kpi-card.kpi-omset  { border-left:4px solid #2563eb; background:linear-gradient(180deg,var(--blueA), #ffffff 58%); }
-    .kpi-card.kpi-profit { border-left:4px solid #16a34a; background:linear-gradient(180deg,var(--greenA), #ffffff 58%); }
-    .kpi-card.kpi-asset  { border-left:4px solid #f59e0b; background:linear-gradient(180deg,var(--orangeA), #ffffff 58%); }
-    .kpi-card.kpi-profit .kpi-title{ color:#166534; }
-    .kpi-card.kpi-profit .kpi-value{ font-size:22px; }
-
-    table{width:100%;border-collapse:collapse;background:#fff}
-    th,td{padding:10px;border:1px solid var(--bd);font-size:14px;text-align:left;vertical-align:top}
-    th{background:#f8fafc}
-
     /* Modal */
     .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:100}
     .modal.show{display:flex}
-    .dialog{width:min(820px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:92vh}
+    .dialog{width:min(1024px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:92vh}
     .dlg-hd{background:#0ea5e9;color:#fff;padding:12px 16px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
     .dlg-bd{padding:14px;display:grid;gap:12px;overflow:auto}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -132,71 +148,76 @@
       </div>
     </header>
 
-    <!-- BAR CABANG (tombol Pindah DIHAPUS, onchange langsung aktif) -->
+    <!-- BAR CABANG -->
     <div id="branchTopBar" class="branchbar">
       <select id="branchTopSelect" class="bb-select"><option value="">-- Pilih Toko --</option></select>
       <span class="bb-now">TOKO SEKARANG: <strong id="bbNowName">-</strong></span>
     </div>
 
-    <!-- FILTER TANGGAL + TAMBAH + EXPORT -->
-    <div class="filters">
-      <button class="btn-sm btn-ghost" id="presetToday">Hari ini</button>
-      <button class="btn-sm btn-ghost" id="preset7">7H</button>
-      <button class="btn-sm btn-ghost" id="preset30">30H</button>
-      <span class="sep">|</span>
-      <input type="date" id="dateFrom" class="date">
-      <span>–</span>
-      <input type="date" id="dateTo" class="date">
-      <button class="btn-sm btn-blue" id="applyRange">Terapkan</button>
-      <span class="pill" id="activeRangeLabel">Rentang: -</span>
-      <div style="flex:1"></div>
-      <!-- PERMINTAANMU: Tambah di sini sebelum Export -->
-      <button id="btnTambah" class="btn-sm btn-primary">+ Tambah Transaksi</button>
-      <button class="btn-sm btn-primary" id="btnExport">Export Excel</button>
-    </div>
-
+    <!-- GRID -->
     <div class="grid">
       <!-- KPI Transaksi -->
       <div class="card">
-        <h3 style="margin-bottom:10px">KPI Transaksi <span id="kpiTglLabel" class="pill" style="margin-left:8px">Hari ini</span></h3>
+        <h3 style="margin-bottom:8px">KPI Transaksi <span id="kpiTglLabel" class="pill" style="margin-left:8px">Hari ini</span></h3>
         <div class="kpi-grid">
           <div class="kpi-card kpi-omset">
             <div class="kpi-title">Omset</div>
             <div id="kpi_omset" class="kpi-value">Rp 0</div>
-            <div class="kpi-sub">Σ nominal</div>
           </div>
           <div class="kpi-card">
-            <div class="kpi-title">Tarik Tunai</div>
+            <div class="kpi-title">Tarik</div>
             <div id="kpi_tarik" class="kpi-value">Rp 0</div>
-            <div class="kpi-sub">jenis=tarik</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-title">Transfer</div>
             <div id="kpi_transfer" class="kpi-value">Rp 0</div>
-            <div class="kpi-sub">jenis=transfer</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-title">Fee Bank</div>
             <div id="kpi_fee" class="kpi-value">Rp 0</div>
-            <div class="kpi-sub">Σ fee_bank</div>
           </div>
           <div class="kpi-card kpi-profit" id="kpi_profit_wrap" style="display:none">
-            <div class="kpi-title">Profit <span class="kpi-sub">(owner only)</span></div>
+            <div class="kpi-title">Profit</div>
             <div id="kpi_profit" class="kpi-value">Rp 0</div>
-            <div class="kpi-sub">Σ (adm_dlm+adm_luar−fee)</div>
           </div>
         </div>
       </div>
 
+      <!-- ==== BAR TOTAL ASSET ==== -->
+      <div class="card asset-card">
+        <div class="asset-main">
+          <div class="asset-label">TOTAL ASSET</div>
+          <div class="asset-value" id="assetTotalValue">Rp 0</div>
+        </div>
+      </div>
+      <!-- ==== END BAR TOTAL ASSET ==== -->
+
       <!-- KPI Master Saldo Akun -->
-      <div class="card">
-        <h3 style="margin-bottom:10px">KPI Master Saldo Akun</h3>
+      <div class="card kpi-saldo-card">
+        <h3 style="margin-bottom:8px">KPI Master Saldo Akun</h3>
         <div id="kpiSaldoWrap" class="kpi-grid"></div>
       </div>
 
-      <!-- Riwayat + Pagination -->
+      <!-- CARD RIWAYAT (Filter di atas tabel) -->
       <div class="card">
-        <h3>Riwayat Transaksi</h3>
+        <h3 style="margin-bottom:8px">Riwayat Transaksi</h3>
+
+        <!-- === FILTER BAR === -->
+        <div class="filters">
+          <button class="btn-sm btn-ghost" id="presetToday">Hari ini</button>
+          <button class="btn-sm btn-ghost" id="preset7">7H</button>
+          <button class="btn-sm btn-ghost" id="preset30">30H</button>
+          <span class="sep">|</span>
+          <input type="date" id="dateFrom" class="date">
+          <span>–</span>
+          <input type="date" id="dateTo" class="date">
+          <button class="btn-sm btn-blue" id="applyRange">Terapkan</button>
+          <div style="flex:1"></div>
+          <button id="btnTambah" class="btn-sm btn-primary">+ Tambah Transaksi</button>
+          <button class="btn-sm btn-primary" id="btnExport">Export Excel</button>
+        </div>
+        <!-- === END FILTER BAR === -->
+
         <div id="totalTransaksi" style="margin:6px 0; font-weight:bold;">Jumlah Total Transaksi = 0</div>
         <table>
           <thead>
@@ -247,7 +268,7 @@
   </div>
 </div>
 
-<!-- ===== MODAL FORM ===== -->
+<!-- ===== MODAL FORM (diperbesar) ===== -->
 <div class="modal" id="modalForm">
   <div class="dialog">
     <div class="dlg-hd">
@@ -385,8 +406,7 @@
     const f = range.from ? fmtHumanDateOnly(range.from) : '-'
     const t = range.to   ? fmtHumanDateOnly(range.to)   : '-'
     const same = range.from===range.to
-    $('activeRangeLabel').textContent = `Rentang: ${f} ${same?'':'– '+t}`
-    $('kpiTglLabel').textContent = same? 'Hari ini' : `${f} – ${t}`
+    const kpiLbl = $('kpiTglLabel'); if(kpiLbl) kpiLbl.textContent = same? 'Hari ini' : `${f} – ${t}`
   }
 
   // mask angka
@@ -455,41 +475,36 @@
     if(String(gRole).toLowerCase()==='owner') $('kpi_profit').textContent=fmtRp(profit)
   }
 
+  // ===== BAR TOTAL ASSET updater (hanya total) =====
+  function updateAssetBar(list){
+    const totalAsset = (list||[]).reduce((s,a)=> s + Number(a.saldo||0), 0)
+    const elTotal=$('assetTotalValue')
+    if(elTotal) elTotal.textContent = fmtRp(totalAsset)
+  }
+
   // ===== KPI saldo akun =====
   function renderKPISaldoCards(list){
     const wrap=$('kpiSaldoWrap')
-    const totalAsset = (list||[]).reduce((s,a)=> s + Number(a.saldo||0), 0)
     const laci=(list||[]).filter(a=> a.account_type==='cash' && /laci/i.test(a.name||''))
     const rek=(list||[]).filter(a=> a.account_type==='rekening').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
     const srv=(list||[]).filter(a=> a.account_type==='server_pulsa').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
 
-    let html = `
-      <div class="kpi-card kpi-asset">
-        <div class="kpi-title">Total Asset</div>
-        <div class="kpi-value">${fmtRp(totalAsset)}</div>
-        <div class="kpi-sub">Σ semua akun (cash + rekening + server)</div>
-      </div>
-    `
+    let html = ''
     const card = a => `
       <div class="kpi-card" title="ID: ${a.id}">
         <div class="kpi-title">${a.name || (a.account_type||'').toUpperCase()}</div>
         <div class="kpi-value">${fmtRp(a.saldo||0)}</div>
-        <div class="kpi-sub">${a.account_type}</div>
       </div>
     `
     laci.forEach(a=> html+=card(a)); rek.forEach(a=> html+=card(a)); srv.forEach(a=> html+=card(a))
-    if((list||[]).length===0){
-      html = `
-        <div class="kpi-card kpi-asset">
-          <div class="kpi-title">Total Asset</div>
-          <div class="kpi-value">Rp 0</div>
-          <div class="kpi-sub">Belum ada akun</div>
-        </div>`
+    if(!html){
+      html = `<div class="kpi-card"><div class="kpi-title">Tidak ada akun</div><div class="kpi-value">Rp 0</div></div>`
     }
     wrap.innerHTML = html
   }
   async function loadKPISaldo(){
     const { data } = await supabase.from('accounts').select('id,name,account_type,branch_code,saldo').eq('branch_code', viewBranch).order('name')
+    updateAssetBar(data||[])
     renderKPISaldoCards(data||[])
   }
 
@@ -716,7 +731,7 @@
     }catch(e){ const m=$('msgErr'); m.textContent='Gagal simpan: '+(e.message||e); m.style.display='block'; setTimeout(()=>m.style.display='none',3000) }
   }
 
-  // ====== BAR CABANG: isi & onchange auto-apply (tanpa tombol Pindah) ======
+  // ====== BAR CABANG: isi & onchange auto-apply ======
   async function initBranchBar(){
     const sel=$('branchTopSelect'), lbl=$('bbNowName')
     const { data:{ session } } = await supabase.auth.getSession()
@@ -746,7 +761,7 @@
     // NON-owner: dropdown disembunyikan (seperti semula)
     if(role!=='owner'){ sel.style.display='none' }
 
-    // AUTO APPLY saat onchange (sesuai permintaan)
+    // AUTO APPLY saat onchange
     sel.onchange = async ()=>{
       const code = sel.value
       const name = sel.options[sel.selectedIndex]?.text || code
