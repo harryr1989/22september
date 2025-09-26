@@ -9,61 +9,74 @@
       --bg:#f6f8fb; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#0b63f3;
       --card:#fff; --bd:#e2e8f0; --muted:#64748b; --txt:#0f172a;
       --shadow:0 6px 18px rgba(15,23,42,.08);
-      --touch:48px; --radius:16px; --safe-bottom: env(safe-area-inset-bottom, 0);
+      --touch:48px; --radius:16px;
+      --H_HDR:54px;        /* tinggi header */
+      --H_BAR:46px;        /* tinggi bar cabang */
       --blueA:#dbeafe; --greenA:#f0fdf4; --orangeA:#fff7ed;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt)}
-    button,input,select,textarea{font-family:inherit}
+
     .layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+
+    /* ===== Sidebar (JANGAN DIUBAH) ===== */
     .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px}
     .brand{color:#fff;font-weight:800;font-size:20px;margin-bottom:12px}
     .nav{display:flex;flex-direction:column;gap:6px}
-    .nav a{color:var(--sbfg);text-decoration:none;padding:10px 12px;border-radius:10px;line-height:1.2}
+    .nav a{
+      display:flex !important; align-items:center; gap:10px;
+      padding:10px 12px; border-radius:10px; text-decoration:none;
+      color:var(--sbfg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
     .nav a:hover{background:rgba(255,255,255,.10)}
     .nav a.active{background:var(--pri);color:#fff}
-    header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+    .nav a .ico{width:20px;flex:0 0 20px;display:inline-flex;align-items:center;justify-content:center}
+    .nav a .label{flex:1;min-width:0}
+    .group{margin-top:6px;border:1px solid rgba(255,255,255,.08);border-radius:10px;overflow:hidden}
+    .group-header{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#10263d;cursor:pointer;font-size:12px;color:#c6d3e1}
+    .group-header .title{display:flex;gap:8px;align-items:center;font-weight:800;text-transform:uppercase;letter-spacing:.2px}
+    .chev{transition:transform .2s ease}
+    .group.collapsed .chev{transform:rotate(-90deg)}
+    .group-body{padding:6px;background:#0f253f;display:flex;flex-direction:column;gap:4px}
+    .group-body a{background:transparent}
+
+    /* ===== Header halaman ===== */
+    header{position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;min-height:var(--H_HDR)}
     .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px}
-    .topbar{position:sticky;top:54px;z-index:9;background:linear-gradient(#fff,#fff 75%,transparent);padding:12px 16px;border-bottom:1px solid var(--bd)}
-    .input{border:1px solid var(--bd);background:#fff;border-radius:10px;padding:12px 12px;font-size:16px;height:var(--touch);outline:none}
+
+    /* ===== BAR CABANG (JANGAN DIUBAH) ===== */
+    .branchbar{
+      position:sticky; top:var(--H_HDR); z-index:55;
+      display:flex; gap:10px; align-items:center;
+      padding:10px 12px; background:#eef2f7; border-bottom:1px solid #dbe0e6; min-height:var(--H_BAR)
+    }
+    .bb-select{min-width:260px;height:36px;border:1px solid #cfd6de;border-radius:8px;padding:0 10px;background:#fff;outline:none;font-size:14px}
+    .bb-btn{height:36px;border:0;border-radius:8px;padding:0 12px;cursor:pointer;background:#0b63f3;color:#fff;font-weight:700}
+    .bb-now{font-size:14px;color:#1f2a37}
+    @media (max-width:720px){ .branchbar{flex-wrap:wrap;gap:8px} }
+
+    /* ===== Bar filter di bawah bar cabang ===== */
+    .topbar{position:sticky;top:calc(var(--H_HDR) + var(--H_BAR));z-index:40;background:linear-gradient(#fff,#fff 75%,transparent);padding:12px 16px;border-bottom:1px solid var(--bd)}
     .btn{border:none;border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:700;height:var(--touch)}
     .btn-primary{background:var(--pri);color:#fff}
     .btn-blue{background:#2563eb;color:#fff}
-    .btn-gray{background:#eef2f6}
     .btn-ghost{background:#f1f5f9}
     .btn-danger{background:#fee2e2;color:#991b1b}
     .btn-sm{height:36px;padding:6px 10px;border-radius:10px;font-weight:700}
     .chips{display:flex;gap:8px;flex-wrap:wrap}
     .chip{border:1px solid var(--bd);padding:8px 10px;border-radius:999px;background:#fff;font-size:12px;cursor:pointer}
     .chip.active{background:#0b63f3;color:#fff;border-color:#0b63f3}
+
+    .filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 16px 0 16px}
+    .date{height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:#fff}
+    .sep{color:#94a3b8}
+
     .grid{display:grid;grid-template-columns:1fr;gap:12px;margin:12px 16px}
     .card{background:var(--card);border:1px solid var(--bd);border-radius:22px;box-shadow:var(--shadow);padding:16px}
     .card h3{margin:0 0 6px 0}
-    table{width:100%;border-collapse:collapse;background:#fff}
-    th,td{padding:10px;border:1px solid var(--bd);font-size:14px;text-align:left;vertical-align:top}
-    th{background:#f8fafc}
-    .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:50}
-    .modal.show{display:flex}
-    .dialog{width:min(820px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:92vh}
-    .dlg-hd{background:#0ea5e9;color:#fff;padding:12px 16px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
-    .dlg-bd{padding:14px;display:grid;gap:12px;overflow:auto}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    label{font-size:12px;color:#475569;margin-bottom:6px;display:block}
-    .icon-input{display:flex;gap:8px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:12px;background:#fff;min-height:var(--touch)}
-    .icon-input input,.icon-input select,.icon-input textarea{border:none;outline:none;flex:1;font-size:16px;background:transparent}
-    .icon-input textarea{min-height:96px;resize:vertical}
-    .dlg-ft{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--bd);padding:12px 16px;display:flex;gap:8px;justify-content:flex-end}
-    @media (max-width: 900px){
-      .layout{grid-template-columns:1fr}
-      .sidebar{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:11}
-      .brand{margin:0}
-      .topbar{top:56px;padding:10px 12px}
-      .dialog{width:100%;height:100%;max-height:none;border-radius:0}
-      .dlg-bd{padding:12px;gap:10px}
-      .row{grid-template-columns:1fr}
-    }
-    .fab{position:fixed;right:14px;bottom:calc(14px + var(--safe-bottom));width:56px;height:56px;border-radius:999px;background:#0b63f3;color:#fff;display:none;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(11,99,243,.35);z-index:15;font-size:26px;font-weight:900}
+
+    /* KPI */
     .kpi-grid{display:grid;grid-template-columns:repeat(1,1fr);gap:10px}
     @media(min-width:560px){ .kpi-grid{grid-template-columns:repeat(2,1fr)} }
     @media(min-width:900px){ .kpi-grid{grid-template-columns:repeat(5,1fr)} }
@@ -76,23 +89,43 @@
     .kpi-card.kpi-asset  { border-left:4px solid #f59e0b; background:linear-gradient(180deg,var(--orangeA), #ffffff 58%); }
     .kpi-card.kpi-profit .kpi-title{ color:#166534; }
     .kpi-card.kpi-profit .kpi-value{ font-size:22px; }
-    .filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 16px 0 16px}
-    .date{height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:#fff}
-    .sep{color:#94a3b8}
+
+    table{width:100%;border-collapse:collapse;background:#fff}
+    th,td{padding:10px;border:1px solid var(--bd);font-size:14px;text-align:left;vertical-align:top}
+    th{background:#f8fafc}
+
+    /* Modal */
+    .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:100}
+    .modal.show{display:flex}
+    .dialog{width:min(820px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:92vh}
+    .dlg-hd{background:#0ea5e9;color:#fff;padding:12px 16px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+    .dlg-bd{padding:14px;display:grid;gap:12px;overflow:auto}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    label{font-size:12px;color:#475569;margin-bottom:6px;display:block}
+    .icon-input{display:flex;gap:8px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:12px;background:#fff;min-height:var(--touch)}
+    .icon-input input,.icon-input select,.icon-input textarea{border:none;outline:none;flex:1;font-size:16px;background:transparent}
+    .icon-input textarea{min-height:96px;resize:vertical}
+    .dlg-ft{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--bd);padding:12px 16px;display:flex;gap:8px;justify-content:flex-end}
+
+    @media (max-width: 900px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:65}
+      .brand{margin:0}
+      .row{grid-template-columns:1fr}
+    }
+
+    .fab{position:fixed;right:14px;bottom:14px;width:56px;height:56px;border-radius:999px;background:#0b63f3;color:#fff;display:none;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(11,99,243,.35);z-index:110;font-size:26px;font-weight:900}
   </style>
 </head>
 <body>
 <div class="layout">
-  <aside class="sidebar">
+  <!-- ===== Sidebar (tidak diubah) ===== -->
+  <aside class="sidebar" id="sidebar">
     <div class="brand">AMKO</div>
-    <nav class="nav" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-      <a href="dashboard.html">🏠 Dashboard</a>
-      <a href="master-saldo-akun.html">💳 Master Akun</a>
-      <a class="active" href="transaksi-mini-atm.html">🏧 Mini ATM</a>
-      <a href="#" id="lnk-logout">🚪 Logout</a>
-    </nav>
+    <nav class="nav" id="menuList"></nav>
   </aside>
 
+  <!-- ===== Main ===== -->
   <div>
     <header>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -106,18 +139,17 @@
       </div>
     </header>
 
-    <div class="topbar">
-      <!-- Dropdown cabang (owner only) -->
-      <div id="branchRow" style="display:none; margin-bottom:10px; gap:8px; align-items:center; flex-wrap:wrap">
-        <span style="font-size:12px;color:#475569;">Cabang</span>
-        <select id="branchSelect" class="input" style="width:260px;max-width:100%">
-          <option value="">Memuat cabang…</option>
-        </select>
-        <button id="btnTambah" class="btn btn-primary">+ Tambah Transaksi</button>
-      </div>
+    <!-- ===== BAR CABANG (tidak diubah) ===== -->
+    <div id="branchTopBar" class="branchbar">
+      <select id="branchTopSelect" class="bb-select"><option value="">-- Pilih Toko --</option></select>
+      <button id="btnBranchApply" class="bb-btn">🏬 Pindah</button>
+      <span class="bb-now">TOKO SEKARANG: <strong id="bbNowName">-</strong></span>
+    </div>
 
-      <!-- Filter Jenis -->
-      <div class="chips">
+    <!-- ===== FILTER CHIP & TOMBOL TAMBAH ===== -->
+    <div class="topbar">
+      <button id="btnTambah" class="btn btn-primary">+ Tambah Transaksi</button>
+      <div class="chips" style="margin-top:10px">
         <div class="chip active" data-j="all">Semua</div>
         <div class="chip" data-j="tarik">Tarik Tunai</div>
         <div class="chip" data-j="transfer">Transfer</div>
@@ -126,7 +158,7 @@
       </div>
     </div>
 
-    <!-- FILTER TANGGAL + EXPORT -->
+    <!-- ===== FILTER TANGGAL + EXPORT ===== -->
     <div class="filters">
       <button class="btn-sm btn-ghost" id="presetToday">Hari ini</button>
       <button class="btn-sm btn-ghost" id="preset7">7H</button>
@@ -180,12 +212,10 @@
         <div id="kpiSaldoWrap" class="kpi-grid"></div>
       </div>
 
-      <!-- Riwayat -->
+      <!-- Riwayat + Pagination -->
       <div class="card">
         <h3>Riwayat Transaksi</h3>
-        <div id="totalTransaksi" style="margin:6px 0; font-weight:bold;">
-          Jumlah Total Transaksi = 0
-        </div>
+        <div id="totalTransaksi" style="margin:6px 0; font-weight:bold;">Jumlah Total Transaksi = 0</div>
         <table>
           <thead>
             <tr>
@@ -218,7 +248,7 @@
 
 <button id="fabAdd" class="fab" title="Tambah">+</button>
 
-<!-- MODAL PILIH JENIS -->
+<!-- ===== MODAL PILIH JENIS ===== -->
 <div class="modal" id="modalJenis">
   <div class="dialog">
     <div class="dlg-hd">
@@ -232,12 +262,12 @@
       <button class="btn btn-blue" data-pilih="jasa">Jasa</button>
     </div>
     <div class="dlg-ft">
-      <button class="btn btn-gray" id="batalJenis">Batal</button>
+      <button class="btn btn-ghost" id="batalJenis">Batal</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL FORM TRANSAKSI -->
+<!-- ===== MODAL FORM TRANSAKSI ===== -->
 <div class="modal" id="modalForm">
   <div class="dialog">
     <div class="dlg-hd">
@@ -250,149 +280,121 @@
       <div class="row">
         <div>
           <label>Jenis</label>
-          <div class="icon-input"><span>📂</span>
-            <input id="f_jenis" readonly />
-          </div>
+          <div class="icon-input"><span>📂</span><input id="f_jenis" readonly /></div>
         </div>
         <div>
           <label>Cabang</label>
-          <div class="icon-input"><span>🏬</span>
-            <input id="f_branch" readonly />
-          </div>
+          <div class="icon-input"><span>🏬</span><input id="f_branch" readonly /></div>
         </div>
       </div>
 
       <div class="row" id="rowSumber">
         <div>
           <label>Sumber Dana</label>
-          <div class="icon-input"><span>↗️</span>
-            <select id="f_sumber"></select>
-          </div>
+          <div class="icon-input"><span>↗️</span><select id="f_sumber"></select></div>
         </div>
         <div>
           <label>Terima Dana</label>
-          <div class="icon-input"><span>↘️</span>
-            <select id="f_terima"></select>
-          </div>
+          <div class="icon-input"><span>↘️</span><select id="f_terima"></select></div>
         </div>
       </div>
 
-      <!-- ROW NOMINAL -->
       <div class="row" id="rowNominal">
         <div>
           <label id="labelNominal">Nominal (Rp)</label>
-          <div class="icon-input"><span>Rp</span>
-            <input id="f_nom" inputmode="numeric" placeholder="0" />
-          </div>
+          <div class="icon-input"><span>Rp</span><input id="f_nom" inputmode="numeric" placeholder="0" /></div>
         </div>
       </div>
 
-      <!-- ROW ADMIN DALAM & LUAR -->
       <div class="row" id="rowAdminDua">
         <div>
           <label>Admin Dalam</label>
-          <div class="icon-input"><span>💸</span>
-            <input id="f_admin_dalam" inputmode="numeric" placeholder="0" />
-          </div>
+          <div class="icon-input"><span>💸</span><input id="f_admin_dalam" inputmode="numeric" placeholder="0" /></div>
         </div>
         <div>
           <label>Admin Luar</label>
-          <div class="icon-input"><span>💸</span>
-            <input id="f_admin_luar" inputmode="numeric" placeholder="0" />
-          </div>
+          <div class="icon-input"><span>💸</span><input id="f_admin_luar" inputmode="numeric" placeholder="0" /></div>
         </div>
       </div>
 
-      <!-- ROW ADMIN LUAR SAJA -->
       <div class="row" id="rowAdminLuarOnly" style="display:none">
         <div>
           <label>Admin Luar</label>
-          <div class="icon-input"><span>💸</span>
-            <input id="f_admin_luar_only" inputmode="numeric" placeholder="0" />
-          </div>
+          <div class="icon-input"><span>💸</span><input id="f_admin_luar_only" inputmode="numeric" placeholder="0" /></div>
         </div>
       </div>
 
-      <!-- ROW FEE BANK -->
       <div class="row" id="rowFeeBank" style="display:none">
         <div>
           <label>Fee Bank (Transfer)</label>
-          <div class="icon-input"><span>🏦</span>
-            <input id="f_fee_bank" inputmode="numeric" placeholder="0" />
-          </div>
+          <div class="icon-input"><span>🏦</span><input id="f_fee_bank" inputmode="numeric" placeholder="0" /></div>
         </div>
       </div>
 
-      <!-- ROW PULSA -->
       <div class="row" id="rowPulsa" style="display:none">
         <div>
           <label>Modal (harga modal)</label>
-          <div class="icon-input"><span>Rp</span>
-            <input id="f_modal" inputmode="numeric" placeholder="0" />
-          </div>
+          <div class="icon-input"><span>Rp</span><input id="f_modal" inputmode="numeric" placeholder="0" /></div>
         </div>
         <div>
           <label>Jual (harga jual)</label>
-          <div class="icon-input"><span>Rp</span>
-            <input id="f_jual" inputmode="numeric" placeholder="0" />
-          </div>
+          <div class="icon-input"><span>Rp</span><input id="f_jual" inputmode="numeric" placeholder="0" /></div>
         </div>
       </div>
 
       <div>
         <label>Keterangan (wajib diisi, mis. No HP / No Ref)</label>
-        <div class="icon-input">
-          <input id="f_ket" type="text" maxlength="50" placeholder="contoh: 081234567890" required />
-        </div>
+        <div class="icon-input"><input id="f_ket" type="text" maxlength="50" placeholder="contoh: 081234567890" required /></div>
       </div>
     </div>
     <div class="dlg-ft">
-      <button class="btn btn-gray" id="batalForm">Batal</button>
+      <button class="btn btn-ghost" id="batalForm">Batal</button>
       <button class="btn btn-primary" id="simpanForm">Simpan</button>
     </div>
   </div>
 </div>
 
+<!-- ===== SCRIPT APP ===== -->
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-  const supabaseUrl = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
-  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
-  const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: true, autoRefreshToken: true } });
+  const supabase = createClient(
+    "https://kfqcdcvcnyhisbmwftzb.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y",
+    { auth:{ persistSession:true, autoRefreshToken:true } }
+  );
 
-  const $ = (id)=>document.getElementById(id)
-  const fmtRp = n => "Rp " + new Intl.NumberFormat('id-ID').format(Number(n||0))
+  const $ = id=>document.getElementById(id)
+  const fmtRp  = n => "Rp " + new Intl.NumberFormat('id-ID').format(Number(n||0))
   const fmtNum = n => new Intl.NumberFormat('id-ID').format(Number(n||0))
   const parseNum = v => Number(String(v||'').replace(/[^0-9]/g,''))||0
+
+  // ===== helper cabang aktif (sinkron dengan BAR CABANG) =====
+  const getActive = ()=>({ code: localStorage.getItem('current_branch_code')||'', name: localStorage.getItem('current_branch_name')||'' })
+  const setActive = (code,name)=>{ localStorage.setItem('current_branch_code',code||''); localStorage.setItem('current_branch_name',name||'') }
 
   let gRole=null, gBranch=null, viewBranch=null
   let cacheAcc={ cash:[], rekening:[], server_pulsa:[] }
   let filterJenis='all'
-  let lastRiwayatRows = []
-  let editMode=false, editId=null, editIdTrx=null
-  const isOwner = ()=> gRole==='owner'
+  let lastRiwayatRows=[]
+  let editMode=false, editId=null
 
-  // Pagination state
-  let page = 0
-  const pageSize = 25
-  let totalRows = 0
+  // Pagination
+  let page=0, pageSize=25, totalRows=0
 
-  function toastErr(t){ const m=$('msgErr'); m.textContent=t; m.style.display='block'; setTimeout(()=>m.style.display='none',3000) }
+  // Range tanggal
+  let range={from:null,to:null}
+  const toISODate = d => new Date(d).toISOString().slice(0,10)
+  const startOfDayISO = d=>{const x=new Date(d);x.setHours(0,0,0,0);return x.toISOString()}
+  const endOfDayISO   = d=>{const x=new Date(d);x.setHours(23,59,59,999);return x.toISOString()}
+  const fmtHuman = d=> new Date(d).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+  const fmtHumanDateOnly = d => new Date(d).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
 
-  // Tanggal helpers
-  const fmtHuman = (d)=> d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric', hour:'2-digit', minute:'2-digit'})
-  const fmtHumanDateOnly = (d)=> d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
-  const toISODate = (d)=> d.toISOString().slice(0,10)
-  function startOfDayISO(d){ const x=new Date(d); x.setHours(0,0,0,0); return x.toISOString() }
-  function endOfDayISO(d){ const x=new Date(d); x.setHours(23,59,59,999); return x.toISOString() }
   function setPreset(days){
     const end = new Date()
     const start = new Date(); start.setHours(0,0,0,0); start.setDate(end.getDate()-(days-1))
     range.from = toISODate(start); range.to = toISODate(end)
-    $('dateFrom').value = range.from
-    $('dateTo').value = range.to
-    updateRangeLabel()
+    $('dateFrom').value = range.from; $('dateTo').value = range.to; updateRangeLabel()
   }
-  let range = { from: null, to: null }
   function getRangeISO(){
     if(!range.from || !range.to){
       const t=new Date(); const s=new Date(); s.setHours(0,0,0,0)
@@ -401,177 +403,115 @@
     return { tmin: startOfDayISO(new Date(range.from)), tmax: endOfDayISO(new Date(range.to)) }
   }
   function updateRangeLabel(){
-    const f = range.from ? fmtHumanDateOnly(new Date(range.from)) : '-'
-    const t = range.to ? fmtHumanDateOnly(new Date(range.to)) : '-'
+    const f = range.from ? fmtHumanDateOnly(range.from) : '-'
+    const t = range.to   ? fmtHumanDateOnly(range.to)   : '-'
     const same = range.from===range.to
     $('activeRangeLabel').textContent = `Rentang: ${f} ${same?'':'– '+t}`
     $('kpiTglLabel').textContent = same? 'Hari ini' : `${f} – ${t}`
   }
 
-  // mask input numeric
-  ;(()=>{ const ids=['f_nom','f_admin_dalam','f_admin_luar','f_fee_bank','f_admin_luar_only','f_modal','f_jual']
-    ids.forEach(id=>{ const el=$(id); if(!el) return
-      el.addEventListener('input', e=>{
-        const raw=e.target.value.replace(/\D/g,'')
-        e.target.value = raw? new Intl.NumberFormat('id-ID').format(Number(raw)) : ''
-      })
-    })
-  })()
+  // mask input angka
+  ;(()=>{['f_nom','f_admin_dalam','f_admin_luar','f_admin_luar_only','f_fee_bank','f_modal','f_jual'].forEach(id=>{
+    const el=$(id); if(!el) return; el.addEventListener('input',e=>{const raw=e.target.value.replace(/\D/g,''); e.target.value = raw? new Intl.NumberFormat('id-ID').format(Number(raw)) : ''})
+  })})()
 
   async function boot(){
-    // default preset: Hari ini
-    setPreset(1)
+    setPreset(1) // default Hari ini
 
     const { data:{ session } } = await supabase.auth.getSession()
     if(!session){ location.href='login.html'; return }
-    const { data: prof, error } = await supabase.from('profiles').select('role,branch_code,full_name,email').eq('id', session.user.id).single()
-    if(error){ alert('Gagal ambil profil: '+error.message); return }
+    const { data: prof } = await supabase.from('profiles').select('role,branch_code,full_name,email').eq('id', session.user.id).single()
 
-    gRole = (prof.role||'').toString().trim().toLowerCase()
-    gBranch = (prof.branch_code||'').toString().trim()
-    viewBranch = gBranch
+    gRole = (prof?.role||'').toLowerCase()
+    gBranch = (prof?.branch_code||'').trim()
+    const saved = getActive()
+    viewBranch = saved.code || gBranch
+    if(!saved.code){ setActive(viewBranch, viewBranch) }
 
-    $('me').textContent = `${prof.full_name || prof.email}`
+    $('me').textContent = prof?.full_name || prof?.email || '-'
     $('roleBadge').textContent = `role: ${gRole}`
-    $('branchBadge').textContent = `branch: ${viewBranch || '-'}`
+    $('branchBadge').textContent = `branch: ${viewBranch||'-'}`
 
-    $('kpi_profit_wrap').style.display = isOwner()? 'block':'none'
+    $('kpi_profit_wrap').style.display = gRole==='owner' ? 'block':'none'
+    $('fabAdd').style.display = 'flex'
 
-    if(isOwner()){
-      $('branchRow').style.display='flex'
-      $('fabAdd').style.display='flex'
-      await loadBranches()
-    }else{
-      $('branchRow').style.display='grid'
-      $('btnTambah').style.display='inline-block'
-    }
-
+    await initBranchBar()   // isi dropdown & label bar cabang
     await loadAccounts()
     await refreshByRange()
   }
 
   async function refreshByRange(){
-    page = 0 // reset ke halaman 1 saat ganti rentang
+    page=0
     await loadKPITransaksi()
     await loadKPISaldo()
     await loadRiwayat()
   }
 
-  async function loadBranches(){
-    const sel=$('branchSelect')
-    sel.innerHTML='<option value="">Memuat cabang…</option>'
-    let list=[]
-    const { data: br, error: ebr } = await supabase.from('branches').select('code,name').order('name')
-    if(!ebr && br && br.length){
-      list = br.map(b=>({code:(b.code||'').trim(), name:b.name||b.code}))
-    }else{
-      const { data: accs } = await supabase.from('accounts').select('branch_code').order('branch_code')
-      const set = new Set((accs||[]).map(a=>(a.branch_code||'').trim()).filter(Boolean))
-      list = Array.from(set).map(code=>({code,name:code}))
-      if(list.length===0 && gBranch){ list=[{code:gBranch,name:gBranch}] }
-    }
-    if(list.length===0){ sel.innerHTML='<option>(Belum ada cabang)</option>'; return }
-    sel.innerHTML = list.map(b=>`<option value="${b.code}">${b.code} — ${b.name}</option>`).join('')
-    sel.value = viewBranch || list[0].code
-    if(!viewBranch) viewBranch = sel.value
-    sel.onchange = async ()=>{
-      viewBranch = sel.value;
-      $('branchBadge').textContent = `branch: ${viewBranch}`;
-      await loadAccounts();
-      await refreshByRange();
-    }
-  }
-
   async function loadAccounts(){
-    const cab = viewBranch || gBranch
-    const { data, error } = await supabase
-      .from('accounts')
-      .select('id,name,account_type,branch_code,saldo')
-      .eq('branch_code', cab)
-      .order('name')
-    if(error){ alert('Gagal ambil akun: '+error.message); return }
+    const cab = viewBranch
+    const { data } = await supabase.from('accounts').select('id,name,account_type,branch_code,saldo').eq('branch_code', cab).order('name')
     cacheAcc={ cash:[], rekening:[], server_pulsa:[] }
     ;(data||[]).forEach(a=>{ if(cacheAcc[a.account_type]) cacheAcc[a.account_type].push(a) })
   }
 
-  // ====== KPI TRANSAKSI ======
+  // ===== KPI transaksi =====
   async function loadKPITransaksi(){
-    const cab = viewBranch || gBranch
     const { tmin, tmax } = getRangeISO()
-
-    const { data, error } = await supabase
-      .from('transactions')
+    const { data } = await supabase.from('transactions')
       .select('jenis, nominal, admin_dalam, admin_luar, fee_bank, branch_code, created_at')
-      .eq('branch_code', cab).gte('created_at', tmin).lte('created_at', tmax)
+      .eq('branch_code', viewBranch).gte('created_at', tmin).lte('created_at', tmax)
 
     let omset=0, tarik=0, transfer=0, fee=0, profit=0
-    if(!error){
-      for(const r of (data||[])){
-        const n = Number(r.nominal||0), ad=Number(r.admin_dalam||0), al=Number(r.admin_luar||0), fb=Number(r.fee_bank||0)
-        omset += n; fee += fb
-        if((r.jenis||'')==='tarik') tarik += n
-        if((r.jenis||'')==='transfer') transfer += n
-        profit += (ad + al - fb)
-      }
+    for(const r of (data||[])){
+      const n=+r.nominal||0, ad=+r.admin_dalam||0, al=+r.admin_luar||0, fb=+r.fee_bank||0
+      omset+=n; fee+=fb; if(r.jenis==='tarik') tarik+=n; if(r.jenis==='transfer') transfer+=n; profit += (ad+al-fb)
     }
-    $('kpi_omset').textContent = fmtRp(omset)
-    $('kpi_tarik').textContent = fmtRp(tarik)
-    $('kpi_transfer').textContent = fmtRp(transfer)
-    $('kpi_fee').textContent = fmtRp(fee)
-    if(gRole==='owner') $('kpi_profit').textContent = fmtRp(profit)
+    $('kpi_omset').textContent=fmtRp(omset)
+    $('kpi_tarik').textContent=fmtRp(tarik)
+    $('kpi_transfer').textContent=fmtRp(transfer)
+    $('kpi_fee').textContent=fmtRp(fee)
+    if(gRole==='owner') $('kpi_profit').textContent=fmtRp(profit)
   }
 
-  // ====== KPI MASTER SALDO ======
-  function renderKPISaldoCards(accounts){
-    const wrap = $('kpiSaldoWrap')
-    const list = Array.isArray(accounts) ? accounts : []
-    const totalAsset = list.reduce((s,a)=> s + Number(a.saldo||0), 0)
-
-    const laci = list.filter(a=> a.account_type==='cash' && /laci/i.test(a.name||''))
-    const rek  = list.filter(a=> a.account_type==='rekening').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
-    const srv  = list.filter(a=> a.account_type==='server_pulsa').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
+  // ===== KPI saldo akun =====
+  function renderKPISaldoCards(list){
+    const wrap=$('kpiSaldoWrap')
+    const totalAsset = (list||[]).reduce((s,a)=> s + Number(a.saldo||0), 0)
+    const laci=(list||[]).filter(a=> a.account_type==='cash' && /laci/i.test(a.name||''))
+    const rek=(list||[]).filter(a=> a.account_type==='rekening').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
+    const srv=(list||[]).filter(a=> a.account_type==='server_pulsa').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
 
     let html = `
-      <div class="kpi-card kpi-asset" title="Σ semua akun (cash + rekening + server)">
+      <div class="kpi-card kpi-asset">
         <div class="kpi-title">Total Asset</div>
         <div class="kpi-value">${fmtRp(totalAsset)}</div>
         <div class="kpi-sub">Σ semua akun (cash + rekening + server)</div>
       </div>
     `
-    const pushCard = (a)=> {
-      html += `
-        <div class="kpi-card" title="ID: ${a.id}">
-          <div class="kpi-title">${a.name || (a.account_type||'').toUpperCase()}</div>
-          <div class="kpi-value">${fmtRp(a.saldo||0)}</div>
-          <div class="kpi-sub">${a.account_type}</div>
-        </div>
-      `
-    }
-    laci.forEach(pushCard); rek.forEach(pushCard); srv.forEach(pushCard)
-
-    if(list.length===0){
+    const card = a => `
+      <div class="kpi-card" title="ID: ${a.id}">
+        <div class="kpi-title">${a.name || (a.account_type||'').toUpperCase()}</div>
+        <div class="kpi-value">${fmtRp(a.saldo||0)}</div>
+        <div class="kpi-sub">${a.account_type}</div>
+      </div>
+    `
+    laci.forEach(a=> html+=card(a)); rek.forEach(a=> html+=card(a)); srv.forEach(a=> html+=card(a))
+    if((list||[]).length===0){
       html = `
         <div class="kpi-card kpi-asset">
           <div class="kpi-title">Total Asset</div>
           <div class="kpi-value">Rp 0</div>
           <div class="kpi-sub">Belum ada akun</div>
-        </div>
-      `
+        </div>`
     }
     wrap.innerHTML = html
   }
   async function loadKPISaldo(){
-    const cab = viewBranch || gBranch
-    const { data, error } = await supabase
-      .from('accounts')
-      .select('id,name,account_type,branch_code,saldo')
-      .eq('branch_code', cab)
-      .order('name')
-    if(error){ renderKPISaldoCards([]); return }
+    const { data } = await supabase.from('accounts').select('id,name,account_type,branch_code,saldo').eq('branch_code', viewBranch).order('name')
     renderKPISaldoCards(data||[])
   }
 
-  // ====== RIWAYAT + PAGINATION ======
+  // ===== Riwayat + Pagination =====
   const saldoBlock = (srcName, srcVal, dstName, dstVal) => {
     const fmt = v => (v ?? null) !== null ? fmtNum(v) : '-'
     let html = ''
@@ -581,65 +521,32 @@
   }
 
   async function loadRiwayat(){
-    const cab = viewBranch || gBranch
     const { tmin, tmax } = getRangeISO()
 
-    // 1) total count (respect range + jenis)
-    let totalFilter = supabase.from('v_tx_summary')
-      .select('*', { count:'exact', head:true })
-      .eq('branch_code', cab)
-      .gte('created_at', tmin)
-      .lte('created_at', tmax)
-
-    if(filterJenis!=='all'){ totalFilter = totalFilter.eq('jenis', filterJenis) }
-    const { count: cnt } = await totalFilter
+    // count
+    let qCount = supabase.from('v_tx_summary').select('*',{ count:'exact', head:true })
+      .eq('branch_code', viewBranch).gte('created_at', tmin).lte('created_at', tmax)
+    if(filterJenis!=='all') qCount = qCount.eq('jenis', filterJenis)
+    const { count:cnt } = await qCount
     totalRows = cnt || 0
     $('totalTransaksi').textContent = 'Jumlah Total Transaksi = ' + totalRows
 
-    // 2) data page (respect range + jenis)
-    let dataQuery = supabase.from('v_tx_summary')
-      .select(`
-        id,
-        id_trx,
-        jenis,
-        src_account_id,
-        src_account_name,
-        dst_account_id,
-        dst_account_name,
-        nominal,
-        admin_dalam,
-        admin_luar,
-        fee_bank,
-        saldo_awal,
-        saldo_akhir,
-        src_saldo_awal,
-        src_saldo_akhir,
-        dst_saldo_awal,
-        dst_saldo_akhir,
-        note,
-        created_by_name,
-        created_at,
-        branch_code
-      `)
-      .eq('branch_code', cab)
-      .gte('created_at', tmin)
-      .lte('created_at', tmax)
+    // data
+    let dataQuery = supabase.from('v_tx_summary').select(`
+      id, id_trx, jenis, src_account_id, src_account_name, dst_account_id, dst_account_name,
+      nominal, admin_dalam, admin_luar, fee_bank, saldo_awal, saldo_akhir,
+      src_saldo_awal, src_saldo_akhir, dst_saldo_awal, dst_saldo_akhir,
+      note, created_by_name, created_at, branch_code
+    `).eq('branch_code', viewBranch).gte('created_at', tmin).lte('created_at', tmax)
+    if(filterJenis!=='all') dataQuery = dataQuery.eq('jenis', filterJenis)
 
-    if(filterJenis!=='all'){ dataQuery = dataQuery.eq('jenis', filterJenis) }
-
-    const { data, error } = await dataQuery
-      .order('created_at', { ascending:false })
-      .range(page*pageSize, (page+1)*pageSize - 1)
-
+    const { data, error } = await dataQuery.order('created_at',{ascending:false}).range(page*pageSize,(page+1)*pageSize-1)
     if(error){
       $('tb').innerHTML = `<tr><td colspan="13" style="color:#991b1b">Gagal memuat riwayat: ${error.message}</td></tr>`
-      $('btnPrev').disabled = true; $('btnNext').disabled = true; $('pageInfo').textContent = 'Hal -'
+      $('btnPrev').disabled=true; $('btnNext').disabled=true; $('pageInfo').textContent='Hal -'
       return
     }
-
-    const rows = data || []
-    lastRiwayatRows = rows
-
+    const rows=data||[]; lastRiwayatRows=rows
     if(rows.length===0){
       $('tb').innerHTML = `<tr><td colspan="13" style="color:#64748b">Belum ada transaksi dalam rentang ini.</td></tr>`
       $('btnPrev').disabled = page===0
@@ -650,21 +557,17 @@
 
     let i = 1 + page*pageSize
     $('tb').innerHTML = rows.map(r=>{
+      const tgl = fmtHuman(r.created_at)
       const user = r.created_by_name || '-'
-      const tgl = fmtHuman(new Date(r.created_at))
       const src = r.src_account_name || '-'
       const dst = r.dst_account_name || ''
-      const sumberDana = dst
-        ? `<span title="${src} • ${r.src_account_id}">${src}</span> → <span title="${dst} • ${r.dst_account_id}">${dst}</span>`
-        : `<span title="${src} • ${r.src_account_id}">${src}</span>`
-      const userTanggal = `(<span style="color:#1d4ed8">${user}</span>, ${tgl})`
-
+      const sumberDana = dst ? `${src} → ${dst}` : src
       const saldoAwalCell  = saldoBlock(r.src_account_name, r.src_saldo_awal,  r.dst_account_name, r.dst_saldo_awal)
       const saldoAkhirCell = saldoBlock(r.src_account_name, r.src_saldo_akhir, r.dst_account_name, r.dst_saldo_akhir)
 
       return `<tr data-id="${r.id}">
         <td>${i++}</td>
-        <td>${userTanggal}</td>
+        <td>(<span style="color:#1d4ed8">${user}</span>, ${tgl})</td>
         <td><code>${r.id_trx || r.id}</code></td>
         <td>${sumberDana}</td>
         <td style="text-transform:capitalize">${r.jenis}</td>
@@ -682,312 +585,226 @@
       </tr>`
     }).join('')
 
-    // update tombol
     $('btnPrev').disabled = page===0
     $('btnNext').disabled = (page+1)*pageSize >= totalRows
     $('pageInfo').textContent = `Hal ${page+1}`
   }
 
-  // ====== Export CSV ======
-  function csvEscape(value){
-    if(value==null) return ''
-    const s = String(value).replace(/\r?\n/g,' ').replace(/\s+/g,' ').trim()
-    if(/[",;]/.test(s)) return `"${s.replace(/"/g,'""')}"`
-    return s
-  }
+  // ===== Export CSV (page current) =====
+  function csvEscape(v){ if(v==null) return ''; const s=String(v).replace(/\r?\n/g,' ').replace(/\s+/g,' ').trim(); return /[",;]/.test(s)?`"${s.replace(/"/g,'""')}"`:s }
   function exportCSV(){
-    const rows = lastRiwayatRows || []
-    const header = [
-      'No urut','User','Tanggal','ID Trx','Sumber Dana','Jenis',
-      'SRC Saldo Awal','DST Saldo Awal',
-      'Nominal','Admin Dalam','Admin Luar','Fee Bank',
-      'SRC Saldo Akhir','DST Saldo Akhir',
-      'Keterangan'
-    ]
-    const lines = [header.join(',')]
+    const rows=lastRiwayatRows||[]
+    const header=['No urut','User','Tanggal','ID Trx','Sumber Dana','Jenis','SRC Saldo Awal','DST Saldo Awal','Nominal','Admin Dalam','Admin Luar','Fee Bank','SRC Saldo Akhir','DST Saldo Akhir','Keterangan']
+    const lines=[header.join(',')]
     let i=1 + page*pageSize
     for(const r of rows){
-      const user = r.created_by_name || ''
-      const tgl  = fmtHuman(new Date(r.created_at))
-      const sumber = `${r.src_account_name || ''}${r.dst_account_name ? ' → '+r.dst_account_name : ''}`
-      const rec = [
-        i++,
-        user,
-        tgl,
-        (r.id_trx || r.id),
-        sumber,
-        r.jenis || '',
-        (r.src_saldo_awal ?? ''),
-        (r.dst_saldo_awal ?? ''),
-        (r.nominal ?? 0),
-        (r.admin_dalam ?? 0),
-        (r.admin_luar ?? 0),
-        (r.fee_bank ?? 0),
-        (r.src_saldo_akhir ?? ''),
-        (r.dst_saldo_akhir ?? ''),
-        r.note || ''
-      ].map(csvEscape)
+      const rec=[i++,r.created_by_name||'',fmtHuman(r.created_at),(r.id_trx||r.id),
+        `${r.src_account_name||''}${r.dst_account_name?` → ${r.dst_account_name}`:''}`, r.jenis||'',
+        (r.src_saldo_awal??''),(r.dst_saldo_awal??''),(r.nominal??0),(r.admin_dalam??0),(r.admin_luar??0),(r.fee_bank??0),(r.src_saldo_akhir??''),(r.dst_saldo_akhir??''), r.note||''].map(csvEscape)
       lines.push(rec.join(','))
     }
-    const csv = lines.join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const f = range.from || toISODate(new Date())
-    const t = range.to   || toISODate(new Date())
-    const same = f===t
-    const fname = same ? `riwayat_${f}_p${page+1}.csv` : `riwayat_${f}_sampai_${t}_p${page+1}.csv`
-    const link = document.createElement('a')
-    const url = URL.createObjectURL(blob)
-    link.href = url; link.download = fname; link.style.display='none'
-    document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url)
+    const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'})
+    const f=range.from||toISODate(new Date()), t=range.to||toISODate(new Date()); const same=f===t
+    const fname = same?`riwayat_${f}_p${page+1}.csv`:`riwayat_${f}_sampai_${t}_p${page+1}.csv`
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fname; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500)
   }
 
-  // ====== Delegasi tombol Aksi ======
-  document.addEventListener('click', async (e)=>{
-    const btn = e.target.closest('button[data-act]')
-    if(!btn) return
-    const tr = btn.closest('tr[data-id]')
-    if(!tr) return
-    const id = tr.getAttribute('data-id')
-    const act = btn.getAttribute('data-act')
+  // ===== Events umum =====
+  document.querySelectorAll('.chip').forEach(ch=>ch.addEventListener('click',async()=>{document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); ch.classList.add('active'); filterJenis=ch.dataset.j; page=0; await loadRiwayat()}))
+  $('presetToday').onclick=async()=>{setPreset(1); await refreshByRange()}
+  $('preset7').onclick=async()=>{setPreset(7); await refreshByRange()}
+  $('preset30').onclick=async()=>{setPreset(30); await refreshByRange()}
+  $('applyRange').onclick=async()=>{const f=$('dateFrom').value,t=$('dateTo').value; if(!f||!t) return alert('Pilih tanggal Dari & Sampai.'); if(new Date(f)>new Date(t)) return alert('Tanggal Dari tidak boleh melewati Sampai.'); range.from=f; range.to=t; updateRangeLabel(); await refreshByRange()}
+  $('btnPrev').onclick=async()=>{ if(page>0){ page--; await loadRiwayat() } }
+  $('btnNext').onclick=async()=>{ if((page+1)*pageSize < totalRows){ page++; await loadRiwayat() } }
+  $('btnExport').onclick=()=>exportCSV()
 
+  // ===== Modal helpers =====
+  const openJenis=()=>$('modalJenis').classList.add('show')
+  const closeJenis=()=>$('modalJenis').classList.remove('show')
+  const openForm =()=>$('modalForm').classList.add('show')
+  const closeForm =()=>$('modalForm').classList.remove('show')
+  $('btnTambah').onclick=$('fabAdd').onclick=openJenis
+  $('xJenis').onclick=$('batalJenis').onclick=closeJenis
+  $('xForm').onclick=$('batalForm').onclick=()=>{ closeForm(); editMode=false; editId=null; }
+  document.querySelectorAll('#modalJenis [data-pilih]').forEach(b=>b.addEventListener('click',()=>{ const j=b.getAttribute('data-pilih'); closeJenis(); setupForm(j); openForm() }))
+
+  function fillSelect(sel, items){ sel.innerHTML=(items||[]).map(i=>`<option value="${i.id}">${i.name}</option>`).join('') || '<option value="">(Tidak ada opsi)</option>' }
+  const findLaci = ()=> (cacheAcc.cash||[]).find(a=>/laci/i.test(a.name||'')) || null
+
+  function setupForm(jenis){
+    $('dlgTitle').textContent=`Form ${jenis.toUpperCase()}`
+    $('f_jenis').value=jenis; $('f_branch').value=viewBranch
+    ;['f_nom','f_admin_dalam','f_admin_luar','f_admin_luar_only','f_fee_bank','f_ket','f_modal','f_jual'].forEach(id=>{const el=$(id); if(el) el.value=''})
+
+    const sumber=$('f_sumber'), terima=$('f_terima'), laci=findLaci()
+    $('rowNominal').style.display='none'; $('rowAdminDua').style.display='none'; $('rowAdminLuarOnly').style.display='none'; $('rowFeeBank').style.display='none'; $('rowPulsa').style.display='none'; $('rowSumber').style.display='grid'; $('labelNominal').textContent='Nominal (Rp)'
+
+    if(jenis==='tarik'){
+      fillSelect(sumber, laci?[laci]:[]); sumber.disabled=true
+      fillSelect(terima, cacheAcc.rekening||[]); terima.disabled=false
+      $('rowNominal').style.display='grid'; $('rowAdminDua').style.display='grid'
+    }else if(jenis==='transfer'){
+      const sumberList=[...(cacheAcc.rekening||[]), ...(cacheAcc.server_pulsa||[])]
+      fillSelect(sumber, sumberList); sumber.disabled=false
+      fillSelect(terima, laci?[laci]:[]); terima.disabled=true
+      $('rowNominal').style.display='grid'; $('rowAdminLuarOnly').style.display='grid'; $('rowFeeBank').style.display='grid'
+    }else if(jenis==='pulsa'){
+      const sumberList=[...(cacheAcc.rekening||[]), ...(cacheAcc.server_pulsa||[])]
+      fillSelect(sumber, sumberList); sumber.disabled=false
+      fillSelect(terima, laci?[laci]:[]); terima.disabled=true
+      $('rowPulsa').style.display='grid'
+    }else if(jenis==='jasa'){
+      $('rowSumber').style.display='none'
+      if(laci){ terima.innerHTML=`<option value="${laci.id}">${laci.name}</option>` }
+      $('rowAdminLuarOnly').style.display='grid'
+    }
+  }
+
+  // enforce TARIK: salah satu admin terisi
+  $('f_admin_dalam').addEventListener('input',()=>{ if(parseNum($('f_admin_dalam').value)>0) $('f_admin_luar').value='' })
+  $('f_admin_luar').addEventListener('input',()=>{ if(parseNum($('f_admin_luar').value)>0) $('f_admin_dalam').value='' })
+
+  // Simpan transaksi (insert; jika editMode, hapus dulu id lama)
+  document.addEventListener('click', async (e)=>{
+    const actBtn = e.target.closest('button[data-act]')
+    if(!actBtn) return
+    const tr = actBtn.closest('tr[data-id]'); const id = tr?.getAttribute('data-id'); const act = actBtn.getAttribute('data-act')
     if(act==='del'){
       if(!confirm('Hapus transaksi ini?')) return
       const { error } = await supabase.from('transactions').delete().eq('id', id)
-      if(error){ alert('Gagal hapus: '+error.message); return }
+      if(error) return alert('Gagal hapus: '+error.message)
       await refreshByRange()
-    } else if(act==='edit'){
-      const row = lastRiwayatRows.find(r => r.id === id)
-      if(!row){ alert('Data transaksi tidak ditemukan'); return }
-      editMode = true
-      editId = id
-      editIdTrx = row.id_trx
-
+    }else if(act==='edit'){
+      const row = (lastRiwayatRows||[]).find(r=>r.id===id); if(!row) return alert('Data tidak ditemukan')
+      editMode=true; editId=id
       setupForm(row.jenis)
-
-      $('f_jenis').value = row.jenis
-      $('f_branch').value = row.branch_code
-      if(row.src_account_id) $('f_sumber').value = row.src_account_id
-      if(row.dst_account_id) $('f_terima').value = row.dst_account_id
-      $('f_nom').value = fmtNum(row.nominal || 0)
-      $('f_admin_dalam').value = fmtNum(row.admin_dalam || 0)
-      $('f_admin_luar').value  = fmtNum(row.admin_luar || 0)
-      $('f_fee_bank').value    = fmtNum(row.fee_bank || 0)
-      $('f_ket').value         = row.note || ''
-      if(row.jenis==='pulsa'){
-        $('f_modal').value = fmtNum(row.nominal || 0)
-        $('f_jual').value  = fmtNum((row.nominal||0) + (row.admin_luar||0))
-      }
-      if(row.jenis==='jasa'){
-        $('f_admin_luar_only').value = fmtNum(row.admin_luar || 0)
-      }
-      openForm()
+      $('f_jenis').value=row.jenis; $('f_branch').value=row.branch_code
+      if(row.src_account_id) $('f_sumber').value=row.src_account_id
+      if(row.dst_account_id) $('f_terima').value=row.dst_account_id
+      $('f_nom').value=fmtNum(row.nominal||0); $('f_admin_dalam').value=fmtNum(row.admin_dalam||0); $('f_admin_luar').value=fmtNum(row.admin_luar||0); $('f_fee_bank').value=fmtNum(row.fee_bank||0); $('f_ket').value=row.note||''
+      if(row.jenis==='pulsa'){ $('f_modal').value=fmtNum(row.nominal||0); $('f_jual').value=fmtNum((row.nominal||0)+(row.admin_luar||0)) }
+      if(row.jenis==='jasa'){ $('f_admin_luar_only').value=fmtNum(row.admin_luar||0) }
+      $('modalForm').classList.add('show')
     }
   })
-
-  // ====== Chips Jenis ======
-  document.querySelectorAll('.chip').forEach(ch=>{
-    ch.addEventListener('click', async ()=>{
-      document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'))
-      ch.classList.add('active')
-      filterJenis = ch.dataset.j
-      page = 0
-      await loadRiwayat()
-    })
-  })
-
-  // ====== Date preset & apply ======
-  $('presetToday').onclick = async ()=>{ setPreset(1); await refreshByRange() }
-  $('preset7').onclick     = async ()=>{ setPreset(7); await refreshByRange() }
-  $('preset30').onclick    = async ()=>{ setPreset(30); await refreshByRange() }
-  $('applyRange').onclick  = async ()=>{
-    const f = $('dateFrom').value, t = $('dateTo').value
-    if(!f || !t){ alert('Pilih tanggal Dari dan Sampai.'); return }
-    if(new Date(f) > new Date(t)){ alert('Tanggal Dari tidak boleh melewati Sampai.'); return }
-    range.from = f; range.to = t; updateRangeLabel()
-    await refreshByRange()
-  }
-
-  // ====== Pagination buttons ======
-  $('btnPrev').onclick = async ()=>{ if(page>0){ page--; await loadRiwayat() } }
-  $('btnNext').onclick = async ()=>{ if((page+1)*pageSize < totalRows){ page++; await loadRiwayat() } }
-
-  // ====== Export ======
-  $('btnExport').onclick = ()=> exportCSV()
-
-  // ====== Modal helpers ======
-  function openJenis(){ $('modalJenis').classList.add('show') }
-  function closeJenis(){ $('modalJenis').classList.remove('show') }
-  function openForm(){ $('modalForm').classList.add('show') }
-  function closeForm(){ $('modalForm').classList.remove('show') }
-
-  $('btnTambah').onclick = openJenis
-  $('fabAdd').onclick = openJenis
-  $('xJenis').onclick = $('batalJenis').onclick = closeJenis
-  $('xForm').onclick = $('batalForm').onclick = ()=>{ closeForm(); editMode=false; editId=null; }
-
-  function fillSelect(sel, items){
-    sel.innerHTML = (items||[]).map(i=>`<option value="${i.id}">${i.name}</option>`).join('')
-    if(!items || !items.length){ sel.innerHTML = '<option value="">(Tidak ada opsi)</option>' }
-  }
-  function findLaci(){ return (cacheAcc.cash||[]).find(a=>/laci/i.test(a.name||'')) || null }
-
-  document.querySelectorAll('#modalJenis [data-pilih]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const jenis = btn.getAttribute('data-pilih')
-      closeJenis()
-      setupForm(jenis)
-      openForm()
-    })
-  })
-
-  function setupForm(jenis){
-    // reset
-    $('dlgTitle').textContent = `Form ${jenis.toUpperCase()}`
-    $('f_jenis').value = jenis
-    $('f_branch').value = viewBranch || gBranch
-    ;['f_nom','f_admin_dalam','f_admin_luar','f_admin_luar_only','f_fee_bank','f_ket','f_modal','f_jual']
-      .forEach(id=>{ const el=$(id); if(el) el.value='' })
-
-    const sumber=$('f_sumber'), terima=$('f_terima')
-    const laci = findLaci()
-
-    // default hide
-    $('rowNominal').style.display='none'
-    $('rowAdminDua').style.display='none'
-    $('rowAdminLuarOnly').style.display='none'
-    $('rowFeeBank').style.display='none'
-    $('rowPulsa').style.display='none'
-    $('rowSumber').style.display='grid'
-    $('labelNominal').textContent = 'Nominal (Rp)'
-
-    if(jenis==='tarik'){
-      fillSelect(sumber, laci? [laci] : []); sumber.disabled=true
-      fillSelect(terima, cacheAcc.rekening||[]); terima.disabled=false
-      $('rowNominal').style.display='grid'
-      $('rowAdminDua').style.display='grid'
-    }
-    else if(jenis==='transfer'){
-      const sumberList = [...(cacheAcc.rekening||[]), ...(cacheAcc.server_pulsa||[])]
-      fillSelect(sumber, sumberList); sumber.disabled=false
-      fillSelect(terima, laci? [laci] : []); terima.disabled=true
-      $('rowNominal').style.display='grid'
-      $('rowAdminLuarOnly').style.display='grid'
-      $('rowFeeBank').style.display='grid'
-    }
-    else if(jenis==='pulsa'){
-      const sumberList = [...(cacheAcc.rekening||[]), ...(cacheAcc.server_pulsa||[])]
-      fillSelect(sumber, sumberList); sumber.disabled=false
-      fillSelect(terima, laci? [laci] : []); terima.disabled=true
-      $('rowPulsa').style.display='grid'
-    }
-    else if(jenis==='jasa'){
-      $('rowSumber').style.display='none'
-      if(laci){ terima.innerHTML = `<option value="${laci.id}">${laci.name}</option>`; }
-      $('rowAdminLuarOnly').style.display='grid'
-    }
-  }
-
-  // enforce TARIK: hanya salah satu admin terisi
-  $('f_admin_dalam').addEventListener('input', ()=>{ if(parseNum($('f_admin_dalam').value)>0){ $('f_admin_luar').value='' } })
-  $('f_admin_luar').addEventListener('input',  ()=>{ if(parseNum($('f_admin_luar').value)>0){ $('f_admin_dalam').value='' } })
 
   $('simpanForm').onclick = async ()=>{
-    const jenis = $('f_jenis').value
-    const branch = viewBranch || gBranch
-    const sumber = $('f_sumber').value || null
-    const terima = $('f_terima').value || null
-    const note = $('f_ket').value.trim()
-
+    const jenis=$('f_jenis').value, branch=viewBranch, sumber=$('f_sumber').value||null, terima=$('f_terima').value||null, note=$('f_ket').value.trim()
+    const findLaci=()=> (cacheAcc.cash||[]).find(a=>/laci/i.test(a.name||''))||null
     try{
       if(!note) throw new Error('Keterangan wajib diisi (mis. No HP / No Ref).')
-
-      let row = { branch_code: branch, jenis, src_account_id: sumber, dst_account_id: terima, nominal: 0, admin_dalam: 0, admin_luar: 0, fee_bank: 0, note }
+      let row={ branch_code:branch, jenis, src_account_id:sumber, dst_account_id:terima, nominal:0, admin_dalam:0, admin_luar:0, fee_bank:0, note }
 
       if(jenis==='tarik'){
         if(!terima) throw new Error('Terima Dana (rekening) wajib diisi.')
-        const laci = findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai di cabang ini.')
-        row.src_account_id = laci.id
-
-        const nominal = parseNum($('f_nom').value)
-        const ad = parseNum($('f_admin_dalam').value)
-        const al = parseNum($('f_admin_luar').value)
+        const laci=findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai.')
+        row.src_account_id=laci.id
+        const nominal=parseNum($('f_nom').value), ad=parseNum($('f_admin_dalam').value), al=parseNum($('f_admin_luar').value)
         if(nominal<=0) throw new Error('Nominal harus > 0.')
         if(ad>0 && al>0) throw new Error('Isi salah satu: Admin Dalam ATAU Admin Luar.')
-        row.nominal = nominal
-        row.admin_dalam = ad>0 ? ad : 0
-        row.admin_luar  = al>0 ? al : 0
-        row.fee_bank = 0
+        row.nominal=nominal; row.admin_dalam=ad>0?ad:0; row.admin_luar=al>0?al:0; row.fee_bank=0
       }
       else if(jenis==='transfer'){
         if(!sumber) throw new Error('Sumber Dana (rekening/server) wajib diisi.')
-        const laci = findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai di cabang ini.')
-        row.dst_account_id = laci.id
-
-        const nominal = parseNum($('f_nom').value)
-        const al = parseNum($('f_admin_luar_only').value)
-        const fb = parseNum($('f_fee_bank').value)
+        const laci=findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai.')
+        row.dst_account_id=laci.id
+        const nominal=parseNum($('f_nom').value), al=parseNum($('f_admin_luar_only').value), fb=parseNum($('f_fee_bank').value)
         if(nominal<=0) throw new Error('Nominal harus > 0.')
-        row.nominal = nominal
-        row.admin_dalam = 0
-        row.admin_luar  = al
-        row.fee_bank    = fb
+        row.nominal=nominal; row.admin_dalam=0; row.admin_luar=al; row.fee_bank=fb
       }
       else if(jenis==='pulsa'){
         if(!sumber) throw new Error('Sumber Dana (rekening/server) wajib diisi.')
-        const laci = findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai di cabang ini.')
-        row.dst_account_id = laci.id
-
-        const modal = parseNum($('f_modal').value)
-        const jual  = parseNum($('f_jual').value)
+        const laci=findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai.')
+        row.dst_account_id=laci.id
+        const modal=parseNum($('f_modal').value), jual=parseNum($('f_jual').value)
         if(modal<=0) throw new Error('Modal harus > 0.')
         if(jual<modal) throw new Error('Jual tidak boleh kurang dari Modal.')
-        const margin = Math.max(jual - modal, 0)
-        row.nominal = modal
-        row.admin_dalam = 0
-        row.admin_luar  = margin
-        row.fee_bank    = 0
-        row.note = note
+        const margin=Math.max(jual-modal,0)
+        row.nominal=modal; row.admin_dalam=0; row.admin_luar=margin; row.fee_bank=0
       }
       else if(jenis==='jasa'){
-        const laci = findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai di cabang ini.')
-        row.src_account_id = null
-        row.dst_account_id = laci.id
-        const al = parseNum($('f_admin_luar_only').value)
+        const laci=findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai.')
+        row.src_account_id=null; row.dst_account_id=laci.id
+        const al=parseNum($('f_admin_luar_only').value)
         if(al<=0) throw new Error('Fee Admin (Admin Luar) harus > 0.')
-        row.nominal    = 0           // jasa tidak memindah pokok
-        row.admin_luar = al
-        row.admin_dalam = 0
-        row.fee_bank = 0
+        row.nominal=0; row.admin_luar=al; row.admin_dalam=0; row.fee_bank=0
       }
 
-      // EDIT MODE: hapus transaksi lama dulu
-      if(editMode && editId){
-        const { error:delErr } = await supabase.from('transactions').delete().eq('id', editId)
-        if(delErr) throw new Error('Gagal hapus transaksi lama: '+delErr.message)
-      }
+      if(editMode && editId){ const { error:delErr } = await supabase.from('transactions').delete().eq('id',editId); if(delErr) throw new Error('Gagal hapus data lama: '+delErr.message) }
 
-      const { error } = await supabase.from('transactions').insert(row)
-      if(error) throw error
-
-      $('modalForm').classList.remove('show')
-      editMode=false; editId=null; editIdTrx=null
-
-      // Refresh berurut + jeda
-      await new Promise(r => setTimeout(r, 150))
-      await loadKPISaldo()
-      await loadKPITransaksi()
-      await loadRiwayat()
-    }catch(e){ toastErr('Gagal simpan: '+(e.message||e)) }
+      const { error } = await supabase.from('transactions').insert(row); if(error) throw error
+      $('modalForm').classList.remove('show'); editMode=false; editId=null
+      await new Promise(r=>setTimeout(r,150)); await loadKPISaldo(); await loadKPITransaksi(); await loadRiwayat()
+    }catch(e){ const m=$('msgErr'); m.textContent='Gagal simpan: '+(e.message||e); m.style.display='block'; setTimeout(()=>m.style.display='none',3000) }
   }
 
-  $('lnk-logout').addEventListener('click', async ()=>{ await supabase.auth.signOut(); location.href='login.html' })
+  // ====== Integrasi BAR CABANG ======
+  // Isi dropdown + label (owner bisa ganti; non-owner tersembunyi)
+  async function initBranchBar(){
+    const sel=$('branchTopSelect'), btn=$('btnBranchApply'), lbl=$('bbNowName')
+    const { data:{ session } } = await supabase.auth.getSession()
+    let role=(localStorage.getItem('user_role')||'').toLowerCase(), prof=null
+    if(session){ const { data } = await supabase.from('profiles').select('role,branch_code').eq('id',session.user.id).maybeSingle(); prof=data||null; if(prof?.role) role=prof.role.toLowerCase() }
 
-  // Pagination buttons already wired above
+    let list=[]
+    if(role==='owner'){ const { data } = await supabase.from('branches').select('code,name').order('name'); list=(data||[]).map(b=>({code:b.code,name:b.name||b.code})) }
+    else if(prof?.branch_code){ list=[{code:prof.branch_code,name:prof.branch_code}] }
 
-  // Export button
-  $('btnExport').onclick = ()=> exportCSV()
+    const saved=getActive(); if(!list.length && saved.code){ list=[{code:saved.code,name:saved.name||saved.code}] }
+    sel.innerHTML='<option value="">-- Pilih Toko --</option>'+list.map(b=>`<option value="${b.code}">${b.name}</option>`).join('')
+    let active=saved.code?saved:(list[0]||{code:'',name:''})
+    if(active.code){ sel.value=active.code; lbl.textContent=active.name||active.code; setActive(active.code,active.name||active.code) } else { lbl.textContent='-' }
+    if(role!=='owner'){ sel.style.display='none'; btn.style.display='none' }
 
-  // Start
+    btn.onclick=async()=>{ const code=sel.value; const name=sel.options[sel.selectedIndex]?.text||code; if(!code) return; setActive(code,name); lbl.textContent=name; viewBranch=code; $('branchBadge').textContent=`branch: ${code}`; await loadAccounts(); await refreshByRange() }
+  }
+
+  // ===== Sidebar renderer (tetap) =====
+  const roleLS=(localStorage.getItem("user_role")||"kasir").toLowerCase();
+  const menuModel=[
+    { type:"item", label:"Dashboard", icon:"📊", link:"./dashboard.html" },
+    { type:"item", label:"Transaksi Mini ATM", icon:"🧮", link:"./transaksi-mini-atm.html" },
+    { type:"group", key:"grp_master", title:"Master Data", icon:"📂",
+      items:[ {type:"item",label:"Master Saldo Akun",icon:"💰",link:"./master-saldo-akun.html"},
+              {type:"item",label:"Mutasi Saldo",icon:"🔄",link:"./mutasi-saldo.html"},
+              {type:"item",label:"Saldo Real",icon:"📑",link:"./saldo-real.html"} ] },
+    { type:"item", label:"Laporan", icon:"📘", link:"./laporan.html", ownerOnly:true },
+    { type:"group", key:"grp_pengaturan", title:"Pengaturan", icon:"⚙️",
+      items:[ {type:"item",label:"Manajemen Pengguna",icon:"👥",link:"./manajemen-pengguna.html",ownerOnly:true},
+              {type:"item",label:"Hak Akses",icon:"🔑",link:"./hak-akses.html",ownerOnly:true} ], ownerOnly:true },
+    { type:"item", label:"Logout", icon:"🚪", link:"#", id:"lnk-logout" }
+  ];
+  function isActive(link){ const here=location.pathname.split("/").pop()||"transaksi-mini-atm.html"; return (link||"").endsWith(here) }
+  function getGroupState(k){ const st=JSON.parse(localStorage.getItem("sidebar_groups_state")||"{}"); return st[k]!==false }
+  function setGroupState(k,o){ const st=JSON.parse(localStorage.getItem("sidebar_groups_state")||"{}"); st[k]=!!o; localStorage.setItem("sidebar_groups_state",JSON.stringify(st)) }
+  function renderSidebar(){
+    const nav=document.getElementById("menuList"); nav.innerHTML="";
+    menuModel.forEach(n=>{
+      if(n.ownerOnly && roleLS!=="owner") return;
+      if(n.type==="item"){
+        const a=document.createElement("a"); a.href=n.link;
+        a.innerHTML=`<span class="ico">${n.icon}</span><span class="label">${n.label}</span>`;
+        if(n.id) a.id=n.id; if(isActive(n.link)) a.classList.add("active"); nav.appendChild(a);
+      }else{
+        const g=document.createElement("div"); g.className="group"; if(!getGroupState(n.key)) g.classList.add("collapsed");
+        const h=document.createElement("div"); h.className="group-header"; h.innerHTML=`<div class="title">${n.icon} ${n.title}</div><div class="chev">▾</div>`;
+        h.addEventListener("click",()=>{ const open=!g.classList.contains("collapsed"); if(open) g.classList.add("collapsed"); else g.classList.remove("collapsed"); setGroupState(n.key,!open) });
+        const b=document.createElement("div"); b.className="group-body";
+        (n.items||[]).forEach(it=>{ if(it.ownerOnly && roleLS!=="owner") return; const a=document.createElement("a"); a.href=it.link; a.innerHTML=`<span class="ico">${it.icon}</span><span class="label">${it.label}</span>`; if(isActive(it.link)) a.classList.add("active"); b.appendChild(a) });
+        g.appendChild(h); g.appendChild(b); nav.appendChild(g);
+      }
+    })
+  }
+  renderSidebar();
+
+  // Logout
+  document.addEventListener('click', async (e)=>{
+    const a=e.target.closest('#lnk-logout'); if(!a) return; e.preventDefault();
+    await supabase.auth.signOut(); location.href='login.html'
+  })
+
+  // start
   boot()
 </script>
 </body>
