@@ -1,129 +1,871 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login • AMKO MiniLink</title>
-  <link rel="icon" type="image/x-icon" href="./assets/favicon.ico" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Transaksi Mini-ATM | AMKO</title>
   <style>
     :root{
-      --primary:#1f7cc5;--primary-700:#1769aa;--ring:#cbd5e1;
-      --bg:#0b3a66;--bg-deep:#0a2542;--card:#fff;--muted:#6b7280;
-      --accent-red:#dc2626;
+      --bg:#f6f8fb; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#0b63f3;
+      --card:#fff; --bd:#e2e8f0; --muted:#64748b; --txt:#0f172a;
+      --shadow:0 6px 18px rgba(15,23,42,.08);
+      --touch:50px; --radius:16px;
+      --H_HDR:54px; --H_BAR:46px;
+      --blueA:#dbeafe; --greenA:#f0fdf4; --orangeA:#fff7ed;
     }
-    *{box-sizing:border-box} html,body{height:100%}
-    body{
-      margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial;
-      background:radial-gradient(80% 120% at 50% 0%,var(--bg) 0%,var(--bg-deep) 70%);
-      display:flex;align-items:center;justify-content:center;padding:24px;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt)}
+    .layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+
+    /* Sidebar */
+    .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px}
+    .brand{color:#fff;font-weight:800;font-size:20px;margin-bottom:12px}
+    .nav{display:flex;flex-direction:column;gap:6px}
+    .nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;text-decoration:none;color:var(--sbfg)}
+    .nav a:hover{background:rgba(255,255,255,.10)}
+    .nav a.active{background:var(--pri);color:#fff}
+
+    /* Header */
+    header{position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;min-height:var(--H_HDR)}
+    .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px}
+
+    /* Branch bar */
+    .branchbar{position:sticky;top:var(--H_HDR);z-index:55;display:flex;gap:10px;align-items:center;padding:10px 12px;background:#eef2f7;border-bottom:1px solid #dbe0e6;min-height:var(--H_BAR)}
+    .bb-select{min-width:260px;height:36px;border:1px solid #cfd6de;border-radius:8px;padding:0 10px;background:#fff;outline:none;font-size:14px}
+    .bb-now{font-size:14px;color:#1f2a37}
+    @media (max-width:720px){ .branchbar{flex-wrap:wrap;gap:8px} }
+
+    /* Grid & cards */
+    .grid{display:grid;grid-template-columns:1fr;gap:12px;margin:12px 16px}
+    .card{background:var(--card);border:1px solid var(--bd);border-radius:16px;box-shadow:var(--shadow);padding:14px}
+    .card h3{margin:0 0 6px 0}
+
+    /* KPI */
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;align-items:stretch}
+    .kpi-card{background:#fff;border:1px solid var(--bd);border-radius:14px;box-shadow:var(--shadow);padding:10px;display:flex;flex-direction:column;gap:2px}
+    .kpi-title{font-size:11px;color:#475569}
+    .kpi-value{font-size:16px;font-weight:800;line-height:1.1}
+    .kpi-card.kpi-omset{border-left:4px solid #2563eb;background:linear-gradient(180deg,var(--blueA),#fff 58%)}
+    .kpi-card.kpi-profit{border-left:4px solid #16a34a;background:linear-gradient(180deg,var(--greenA),#fff 58%)}
+
+    /* Asset bar */
+    .asset-card{margin-bottom:0}
+    .asset-main{display:flex;align-items:center;justify-content:space-between;background:#f8fafc;border:1px solid var(--bd);border-radius:12px;padding:10px 12px}
+    .asset-label{font-size:12px;font-weight:800;color:#334155}
+    .asset-value{font-size:18px;font-weight:900;color:#16a34a}
+
+    .kpi-saldo-card{margin-top:-6px}
+
+    /* Table */
+    table{width:100%;border-collapse:collapse;background:#fff}
+    th,td{padding:10px;border:1px solid var(--bd);font-size:14px;text-align:left;vertical-align:top}
+    th{background:#f8fafc}
+
+    /* Filters */
+    .filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0 10px 0}
+    .sel{height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:#fff;min-width:170px}
+    .btn-sm{height:36px;padding:6px 10px;border-radius:10px;font-weight:700;cursor:pointer}
+    .btn-primary{background:#0b63f3;color:#fff}
+    .btn-ghost{background:#f1f5f9}
+    .btn-danger{background:#fee2e2;color:#991b1b}
+    .btn-sm:disabled{opacity:.5;cursor:not-allowed}
+    .date-input{height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:#fff;font:inherit}
+
+    /* Modal */
+    .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:100}
+    .modal.show{display:flex}
+    .dialog{width:min(1024px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:92vh}
+    .dlg-hd{background:#0ea5e9;color:#fff;padding:12px 16px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+    .dlg-bd{padding:14px;display:grid;gap:12px;overflow:auto}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    label{font-size:12px;color:#475569;margin-bottom:6px;display:block}
+    .icon-input{display:flex;gap:8px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:12px;background:#fff;min-height:var(--touch)}
+    .icon-input input,.icon-input select,.icon-input textarea{border:none;outline:none;flex:1;font-size:16px;background:transparent}
+    .icon-input textarea{min-height:96px;resize:vertical}
+    .dlg-ft{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--bd);padding:12px 16px;display:flex;gap:8px;justify-content:flex-end}
+
+    @media (max-width:900px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:65}
+      .brand{margin:0}
+      .row{grid-template-columns:1fr}
     }
-    .card{
-      width:100%;max-width:440px;background:var(--card);border:1px solid #e6e8ee;border-radius:22px;
-      box-shadow:0 20px 60px rgba(16,24,40,.25);overflow:hidden;
+
+    /* Modal Pilih Jenis (sesuai screenshot) */
+    #modalJenis .dlg-hd{background:#0b63f3;color:#fff;font-weight:700;font-size:15px}
+    #modalJenis .dlg-bd{padding:0}
+    .pilih-jenis{display:flex;flex-direction:column;gap:10px;padding:16px}
+    .jenis-btn{background:#fff;color:#0b63f3;border:2px solid #0b63f3;border-radius:8px;padding:12px;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;text-align:center}
+    .jenis-btn:hover{background:#0b63f3;color:#fff}
+
+    /* WARNA KONDISI: Laci Tunai */
+    .kpi-card.laci-low{
+      border-left:4px solid #ef4444;
+      background:linear-gradient(180deg,#fee2e2,#ffffff 58%);
     }
-    .card-h{
-      background:linear-gradient(180deg,var(--primary),var(--primary-700));
-      color:#fff;
-      padding:22px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
+    .kpi-card.laci-mid{
+      border-left:4px solid #f59e0b;
+      background:linear-gradient(180deg,#fef3c7,#ffffff 58%);
     }
-    .brand .title{font-weight:800;font-size:22px;}
-    .brand .title .link-red{color:var(--accent-red);font-weight:900;}
-    .brand .tagline{font-size:13px;font-weight:500;opacity:.9;margin-top:4px;}
-    .card-b{padding:22px}
-    label{font-size:14px;color:#111827;margin-bottom:6px;display:block}
-    .input{width:100%;height:44px;border:1px solid var(--ring);border-radius:12px;padding:0 12px;font-size:14px;background:#f8fafc;}
-    .input-wrap{position:relative}
-    .toggle-pass{position:absolute;right:12px;top:50%;transform:translateY(-50%);
-      font-size:13px;font-weight:600;color:#2563eb;cursor:pointer;user-select:none;}
-    .row-between{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:13px;}
-    .link{color:#2563eb;text-decoration:none;font-weight:600}
-    .btn{
-      width:100%;height:46px;margin-top:14px;border:none;cursor:pointer;font-weight:800;border-radius:12px;
-      background:linear-gradient(180deg,var(--primary),var(--primary-700));color:#fff;transition:opacity .2s;
-      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    .kpi-card.laci-high{
+      border-left:4px solid #16a34a;
+      background:linear-gradient(180deg,#dcfce7,#ffffff 58%);
     }
-    .btn[disabled]{opacity:.7;cursor:not-allowed}
-    .brand-mini{font-size:12px;color:#6b7280;text-align:center;margin:18px 0 4px}
-    .msg{margin-top:10px;font-size:13px}
-    .msg.error{color:#b91c1c}
-    .msg.info{color:#0369a1}
-    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
   </style>
 </head>
 <body>
-  <div class="card" role="main" aria-label="Kartu login AMKO">
-    <div class="card-h">
-      <div class="brand">
-        <div class="title">AMKO Mini<span class="link-red">Link</span></div>
-        <div class="tagline">Solusi Cepat Tarik &amp; Transfer Dana</div>
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">AMKO</div>
+    <nav class="nav" id="menuList"></nav>
+  </aside>
+
+  <div>
+    <!-- Header -->
+    <header>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <h2 style="margin:0;font-size:18px">Transaksi Mini-ATM</h2>
+        <span class="pill" style="font-size:11px">Owner bisa pilih cabang • Non-owner terkunci cabang profil</span>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <div id="me" class="pill">memuat…</div>
+        <div id="roleBadge" class="pill">role: …</div>
+        <div id="branchBadge" class="pill">branch: …</div>
+      </div>
+    </header>
+
+    <!-- Branch bar -->
+    <div id="branchTopBar" class="branchbar">
+      <select id="branchTopSelect" class="bb-select"><option value="">-- Pilih Toko --</option></select>
+      <span class="bb-now">TOKO SEKARANG: <strong id="bbNowName">-</strong></span>
+    </div>
+
+    <!-- Content -->
+    <div class="grid">
+      <!-- KPI -->
+      <div class="card">
+        <h3 style="margin-bottom:8px">KPI Transaksi <span id="kpiTglLabel" class="pill" style="margin-left:8px">Hari ini</span></h3>
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-omset"><div class="kpi-title">Omset</div><div id="kpi_omset" class="kpi-value">Rp 0</div></div>
+          <div class="kpi-card"><div class="kpi-title">Tarik</div><div id="kpi_tarik" class="kpi-value">Rp 0</div></div>
+          <div class="kpi-card"><div class="kpi-title">Transfer</div><div id="kpi_transfer" class="kpi-value">Rp 0</div></div>
+          <div class="kpi-card"><div class="kpi-title">Fee Bank</div><div id="kpi_fee" class="kpi-value">Rp 0</div></div>
+          <div class="kpi-card kpi-profit" id="kpi_profit_wrap" style="display:none"><div class="kpi-title">Profit</div><div id="kpi_profit" class="kpi-value">Rp 0</div></div>
+        </div>
+      </div>
+
+      <!-- Asset bar -->
+      <div class="card asset-card">
+        <div class="asset-main">
+          <div class="asset-label">TOTAL ASSET</div>
+          <div class="asset-value" id="assetTotalValue">Rp 0</div>
+        </div>
+      </div>
+
+      <!-- KPI Saldo akun -->
+      <div class="card kpi-saldo-card">
+        <h3 style="margin-bottom:8px">KPI Master Saldo Akun</h3>
+        <div id="kpiSaldoWrap" class="kpi-grid"></div>
+      </div>
+
+      <!-- Riwayat -->
+      <div class="card">
+        <h3 style="margin-bottom:8px">Riwayat Transaksi</h3>
+
+        <!-- Filters -->
+        <div class="filters">
+          <!-- Badge diganti jadi filter tanggal -->
+          <input id="fltDate" type="date" class="date-input" />
+
+          <select id="fltUser" class="sel">
+            <option value="">Semua User</option>
+          </select>
+
+          <select id="fltJenis" class="sel">
+            <option value="">Semua Jenis</option>
+            <option value="tarik">Tarik Tunai</option>
+            <option value="transfer">Transfer</option>
+            <option value="pulsa">Pulsa / Kuota</option>
+            <option value="jasa">Jasa ATM</option>
+          </select>
+
+          <select id="fltRek" class="sel">
+            <option value="">Semua Rek/Server</option>
+          </select>
+
+          <div style="flex:1"></div>
+          <button id="btnTambah" class="btn-sm btn-primary">+ Tambah Transaksi</button>
+          <button class="btn-sm btn-primary" id="btnExport" disabled>Export Excel</button>
+        </div>
+
+        <div id="totalTransaksi" style="margin:6px 0;font-weight:bold;">Jumlah Total Transaksi = 0</div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>No urut</th>
+              <th>User & Tanggal</th>
+              <th>ID Trx</th>
+              <th>Sumber Dana</th>
+              <th>Jenis</th>
+              <th>Saldo Awal</th>
+              <th>Nominal</th>
+              <th>Admin Dalam</th>
+              <th>Admin Luar</th>
+              <th>Fee Bank</th>
+              <th>Saldo Akhir</th>
+              <th>Keterangan</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tb"></tbody>
+        </table>
+
+        <div style="margin-top:10px;display:flex;gap:8px;align-items:center;justify-content:center;">
+          <button class="btn-sm btn-ghost" id="btnPrev">⟨ Prev</button>
+          <span class="pill" id="pageInfo">Hal 1</span>
+          <button class="btn-sm btn-ghost" id="btnNext">Next ⟩</button>
+        </div>
       </div>
     </div>
-    <div class="card-b">
-      <form id="loginForm" novalidate>
-        <div class="field" style="margin-bottom:12px">
-          <label for="email">Email</label>
-          <input id="email" type="email" class="input" placeholder="owner@contoh.com" autocomplete="username" required />
-        </div>
-        <div class="field" style="margin-bottom:8px">
-          <label for="password">Kata Sandi</label>
-          <div class="input-wrap">
-            <input id="password" type="password" class="input" placeholder="••••••••" autocomplete="current-password" required />
-            <span id="togglePass" class="toggle-pass" aria-label="Tampilkan kata sandi">Lihat</span>
-          </div>
-        </div>
-        <div class="row-between">
-          <label><input id="rememberChk" type="checkbox" checked /> Ingat saya</label>
-          <a href="#" id="forgotLink" class="link">Lupa sandi?</a>
-        </div>
+  </div>
+</div>
 
-        <button id="submitBtn" class="btn" type="submit">
-          <span id="btnText">Masuk</span>
-          <span id="btnSpinner" class="sr-only" aria-hidden="true">⏳</span>
-        </button>
-
-        <div id="msgBox" class="msg" aria-live="polite"></div>
-      </form>
-      <div class="brand-mini">© AMKO MiniLink • v1</div>
+<!-- Modal Pilih Jenis -->
+<div class="modal" id="modalJenis">
+  <div class="dialog">
+    <div class="dlg-hd">
+      <span>Pilih Jenis Transaksi</span>
+      <button class="btn btn-ghost" id="xJenis" style="height:40px">✖</button>
+    </div>
+    <div class="pilih-jenis">
+      <button class="jenis-btn" data-pilih="tarik">Tarik Tunai</button>
+      <button class="jenis-btn" data-pilih="transfer">Transfer</button>
+      <button class="jenis-btn" data-pilih="pulsa">Pulsa / Kuota</button>
+      <button class="jenis-btn" data-pilih="jasa">Jasa ATM</button>
+    </div>
+    <div class="dlg-ft">
+      <button class="btn btn-ghost" id="batalJenis">Batal</button>
     </div>
   </div>
+</div>
 
-  <!-- Supabase JS -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script>
-    const el=(id)=>document.getElementById(id);const msgBox=el("msgBox");
-    function setMsg(t,type="info"){msgBox.textContent=t||"";msgBox.className="msg "+(type?type:"");}
-    function setLoading(l){el("submitBtn").disabled=l;el("btnSpinner").className=l?"":"sr-only";el("btnText").textContent=l?"Memproses...":"Masuk";}
+<!-- Modal Form -->
+<div class="modal" id="modalForm">
+  <div class="dialog">
+    <div class="dlg-hd">
+      <span id="dlgTitle">Form Transaksi</span>
+      <button class="btn btn-ghost" id="xForm" style="height:40px">✖</button>
+    </div>
+    <div class="dlg-bd">
+      <div id="msgErr" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:10px;border-radius:10px"></div>
 
-    const passEl=el("password"),togglePass=el("togglePass"),forgotLink=el("forgotLink");
-    togglePass.addEventListener("click",()=>{const isPwd=passEl.type==="password";passEl.type=isPwd?"text":"password";togglePass.textContent=isPwd?"Sembunyikan":"Lihat";});
-    forgotLink.addEventListener("click",e=>{e.preventDefault();alert("Reset sandi hanya oleh Admin/Owner. Hubungi Admin.");});
+      <div class="row">
+        <div>
+          <label>Jenis</label>
+          <div class="icon-input"><span>📂</span><input id="f_jenis" readonly /></div>
+        </div>
+        <div>
+          <label>Cabang</label>
+          <div class="icon-input"><span>🏬</span><input id="f_branch" readonly /></div>
+        </div>
+      </div>
 
-    const supabaseUrl="https://kfqcdcvcnyhisbmwftzb.supabase.co";
-    const supabaseKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
-    let supabase=null;
-    function initSupabase(){const storage=!el("rememberChk").checked?window.sessionStorage:window.localStorage;
-      supabase=window.supabase.createClient(supabaseUrl,supabaseKey,{auth:{persistSession:true,storage,autoRefreshToken:true,detectSessionInUrl:true}});}
-    initSupabase();
+      <div class="row" id="rowSumber">
+        <div>
+          <label>Sumber Dana</label>
+          <div class="icon-input"><span>↗️</span><select id="f_sumber"></select></div>
+        </div>
+        <div>
+          <label>Terima Dana</label>
+          <div class="icon-input"><span>↘️</span><select id="f_terima"></select></div>
+        </div>
+      </div>
 
-    async function fetchUserRole(uid){const {data,error}=await supabase.from("profiles").select("role").eq("id",uid).maybeSingle();if(error){setMsg("Gagal ambil role: "+error.message,"error");return null;}return data?data.role:null;}
-    function redirectByRole(r){if(String(r).toLowerCase()==="owner"){window.location.href="dashboard.html";}else{window.location.href="master-saldo-akun.html";}}
+      <div class="row" id="rowNominal">
+        <div>
+          <label id="labelNominal">Nominal (Rp)</label>
+          <div class="icon-input"><span>Rp</span><input id="f_nom" inputmode="numeric" placeholder="0" /></div>
+        </div>
+      </div>
 
-    async function redirectIfLoggedIn(){const {data:{session}}=await supabase.auth.getSession();if(session&&session.user){const r=await fetchUserRole(session.user.id);if(r)redirectByRole(r);}}
-    redirectIfLoggedIn();
+      <div class="row" id="rowAdminDua">
+        <div>
+          <label>Admin Dalam</label>
+          <div class="icon-input"><span>💸</span><input id="f_admin_dalam" inputmode="numeric" placeholder="0" /></div>
+        </div>
+        <div>
+          <label>Admin Luar</label>
+          <div class="icon-input"><span>💸</span><input id="f_admin_luar" inputmode="numeric" placeholder="0" /></div>
+        </div>
+      </div>
 
-    el("loginForm").addEventListener("submit",async e=>{
-      e.preventDefault();setMsg("");setLoading(true);initSupabase();
-      const email=el("email").value.trim(),password=el("password").value;
-      if(!email||!password){setMsg("Email & sandi wajib diisi","error");setLoading(false);return;}
-      const {data,error}=await supabase.auth.signInWithPassword({email,password});
-      if(error){setMsg("Login gagal: "+error.message,"error");setLoading(false);return;}
-      const role=await fetchUserRole(data.user.id);if(!role){setLoading(false);return;}
-      setMsg("Login berhasil. Mengarahkan...","info");redirectByRole(role);
-    });
-  </script>
+      <div class="row" id="rowAdminLuarOnly" style="display:none">
+        <div>
+          <label>Admin Luar</label>
+          <div class="icon-input"><span>💸</span><input id="f_admin_luar_only" inputmode="numeric" placeholder="0" /></div>
+        </div>
+      </div>
+
+      <div class="row" id="rowFeeBank" style="display:none">
+        <div>
+          <label>Fee Bank (Transfer)</label>
+          <div class="icon-input"><span>🏦</span><input id="f_fee_bank" inputmode="numeric" placeholder="0" /></div>
+        </div>
+      </div>
+
+      <div class="row" id="rowPulsa" style="display:none">
+        <div>
+          <label>Modal (harga modal)</label>
+          <div class="icon-input"><span>Rp</span><input id="f_modal" inputmode="numeric" placeholder="0" /></div>
+        </div>
+        <div>
+          <label>Jual (harga jual)</label>
+          <div class="icon-input"><span>Rp</span><input id="f_jual" inputmode="numeric" placeholder="0" /></div>
+        </div>
+      </div>
+
+      <div>
+        <label>Keterangan (wajib diisi, mis. No HP / No Ref)</label>
+        <div class="icon-input"><input id="f_ket" type="text" maxlength="50" placeholder="contoh: 081234567890" required /></div>
+      </div>
+    </div>
+    <div class="dlg-ft">
+      <button class="btn btn-ghost" id="batalForm">Batal</button>
+      <button class="btn btn-primary" id="simpanForm">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+  const supabase = createClient(
+    "https://kfqcdcvcnyhisbmwftzb.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y",
+    { auth:{ persistSession:true, autoRefreshToken:true } }
+  );
+
+  const $ = id=>document.getElementById(id)
+  const fmtRp  = n => "Rp " + new Intl.NumberFormat('id-ID').format(Number(n||0))
+  const fmtNum = n => new Intl.NumberFormat('id-ID').format(Number(n||0))
+  const parseNum = v => Number(String(v||'').replace(/[^0-9]/g,''))||0
+
+  // Active branch helpers
+  const getActive = ()=>({ code: localStorage.getItem('current_branch_code')||'', name: localStorage.getItem('current_branch_name')||'' })
+  const setActive = (code,name)=>{ localStorage.setItem('current_branch_code',code||''); localStorage.setItem('current_branch_name',name||'') }
+
+  let gRole=null, gBranch=null, viewBranch=null
+  let cacheAcc={ cash:[], rekening:[], server_pulsa:[] }
+  let lastRiwayatRows=[]
+  let editMode=false, editId=null
+
+  // Pagination
+  let page=0, pageSize=25, totalRows=0
+
+  // Range tanggal (default hari ini; single date)
+  let range={from:null,to:null}
+  const toISODate = d => new Date(d).toISOString().slice(0,10)
+  const startOfDayISO = d=>{const x=new Date(d);x.setHours(0,0,0,0);return x.toISOString()}
+  const endOfDayISO   = d=>{const x=new Date(d);x.setHours(23,59,59,999);return x.toISOString()}
+  const fmtHuman = d=> new Date(d).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+  const fmtHumanDateOnly = d => new Date(d).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
+
+  // Filters model
+  const flt = { user:'', jenis:'', acc:'' }
+
+  function setPresetToday(){
+    const today = new Date()
+    const iso = toISODate(today)
+    range.from = iso
+    range.to   = iso
+    const fDate = $('fltDate')
+    if(fDate){ fDate.value = iso }
+    $('kpiTglLabel').textContent = fmtHumanDateOnly(today)
+  }
+  function setDateRange(dateISO){
+    range.from = dateISO
+    range.to   = dateISO
+    $('kpiTglLabel').textContent = fmtHumanDateOnly(dateISO)
+  }
+  function getRangeISO(){
+    const pick = range.from || toISODate(new Date())
+    return { tmin: startOfDayISO(new Date(pick)), tmax: endOfDayISO(new Date(pick)) }
+  }
+
+  // mask angka
+  ;(()=>{['f_nom','f_admin_dalam','f_admin_luar','f_admin_luar_only','f_fee_bank','f_modal','f_jual'].forEach(id=>{
+    const el=$(id); if(!el) return; el.addEventListener('input',e=>{const raw=e.target.value.replace(/\D/g,''); e.target.value = raw? new Intl.NumberFormat('id-ID').format(Number(raw)) : ''})
+  })})()
+
+  async function boot(){
+    // default date (today)
+    setPresetToday()
+
+    const { data:{ session } } = await supabase.auth.getSession()
+    if(!session){ location.href='login.html'; return }
+    const { data: prof } = await supabase.from('profiles').select('role,branch_code,full_name,email').eq('id', session.user.id).single()
+
+    gRole = (prof?.role||'').toLowerCase() || (localStorage.getItem('user_role')||'kasir')
+    gBranch = (prof?.branch_code||'').trim()
+    const saved = getActive()
+    viewBranch = saved.code || gBranch || ''
+    if(!saved.code && viewBranch){ setActive(viewBranch, viewBranch) }
+
+    // user info
+    $('me').textContent = prof?.full_name || prof?.email || '-'
+    $('roleBadge').textContent = `role: ${gRole}`
+    $('branchBadge').textContent = `branch: ${viewBranch||'-'}`
+
+    // profit only owner
+    $('kpi_profit_wrap').style.display = (String(gRole).toLowerCase()==='owner') ? 'block':'none'
+
+    await initSidebar()
+    await initBranchBar()
+    await loadAccounts()
+    await populateFilterOptions()
+
+    // listener date filter (auto apply)
+    const fDate = $('fltDate')
+    if(fDate){
+      fDate.addEventListener('change', async ()=>{
+        const val = fDate.value || toISODate(new Date())
+        setDateRange(val)
+        $('btnExport').disabled = true
+        await refreshByRange()
+      })
+    }
+
+    await refreshByRange()
+  }
+
+  async function refreshByRange(){
+    page=0
+    await loadKPITransaksi()
+    await loadKPISaldo()
+    await loadRiwayat()
+  }
+
+  async function loadAccounts(){
+    const cab = viewBranch
+    if(!cab) return
+    const { data } = await supabase.from('accounts').select('id,name,account_type,branch_code,saldo').eq('branch_code', cab).order('name')
+    cacheAcc={ cash:[], rekening:[], server_pulsa:[] }
+    ;(data||[]).forEach(a=>{ if(cacheAcc[a.account_type]) cacheAcc[a.account_type].push(a) })
+  }
+
+  // Isi pilihan filter
+  async function populateFilterOptions(){
+    // USER
+    const { data: users } = await supabase.from('profiles').select('full_name').order('full_name')
+    const uSel = $('fltUser')
+    uSel.innerHTML = '<option value="">Semua User</option>' + (users||[])
+      .filter(u=>u.full_name && u.full_name.trim().length>0)
+      .map(u=>`<option value="${u.full_name}">${u.full_name}</option>`).join('')
+
+    // REK/SERVER
+    const list=[...(cacheAcc.rekening||[]), ...(cacheAcc.server_pulsa||[])]
+    const rSel = $('fltRek')
+    rSel.innerHTML = '<option value="">Semua Rek/Server</option>' + list.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')
+
+    // On change → reload (disable export dulu biar konsisten)
+    uSel.onchange = ()=>{ flt.user = uSel.value||''; $('btnExport').disabled=true; refreshByRange() }
+    $('fltJenis').onchange = ()=>{ flt.jenis = $('fltJenis').value||''; $('btnExport').disabled=true; refreshByRange() }
+    rSel.onchange = ()=>{ flt.acc = rSel.value||''; $('btnExport').disabled=true; refreshByRange() }
+  }
+
+  // KPI transaksi
+  async function loadKPITransaksi(){
+    const { tmin, tmax } = getRangeISO()
+    const { data } = await supabase.from('transactions')
+      .select('jenis, nominal, admin_dalam, admin_luar, fee_bank, branch_code, created_at')
+      .eq('branch_code', viewBranch).gte('created_at', tmin).lte('created_at', tmax)
+
+    let omset=0, tarik=0, transfer=0, fee=0, profit=0
+    for(const r of (data||[])){
+      const n=+r.nominal||0, ad=+r.admin_dalam||0, al=+r.admin_luar||0, fb=+r.fee_bank||0
+      omset+=n; fee+=fb; if(r.jenis==='tarik') tarik+=n; if(r.jenis==='transfer') transfer+=n; profit += (ad+al-fb)
+    }
+    $('kpi_omset').textContent=fmtRp(omset)
+    $('kpi_tarik').textContent=fmtRp(tarik)
+    $('kpi_transfer').textContent=fmtRp(transfer)
+    $('kpi_fee').textContent=fmtRp(fee)
+    if(String(gRole).toLowerCase()==='owner') $('kpi_profit').textContent=fmtRp(profit)
+  }
+
+  // Asset bar & KPI saldo
+  function updateAssetBar(list){
+    const totalAsset = (list||[]).reduce((s,a)=> s + Number(a.saldo||0), 0)
+    $('assetTotalValue').textContent = fmtRp(totalAsset)
+  }
+
+  function renderKPISaldoCards(list){
+    const wrap=$('kpiSaldoWrap')
+    const laci=(list||[]).filter(a=> a.account_type==='cash' && /laci/i.test(a.name||''))   // << batasi ke "laci"
+    const rek=(list||[]).filter(a=> a.account_type==='rekening').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
+    const srv=(list||[]).filter(a=> a.account_type==='server_pulsa').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
+
+    // Tentukan kelas warna untuk Laci Tunai
+    const laciClass = (a)=>{
+      const s = Number(a.saldo||0)
+      if (s < 10_000_000) return 'laci-low'      // < 10jt -> merah
+      if (s < 20_000_000) return 'laci-mid'      // 10–19,99jt -> kuning
+      return 'laci-high'                          // >= 20jt -> hijau
+    }
+
+    const card = a => {
+      const isLaci = (a.account_type==='cash' && /laci/i.test(a.name||'')) // << hapus /laci/i kalau mau semua cash diwarnai
+      const extraClass = isLaci ? (' ' + laciClass(a)) : ''
+      return `
+        <div class="kpi-card${extraClass}" title="ID: ${a.id}">
+          <div class="kpi-title">${a.name|| (a.account_type||'').toUpperCase()}</div>
+          <div class="kpi-value">${fmtRp(a.saldo||0)}</div>
+        </div>
+      `
+    }
+
+    let html=''
+    laci.forEach(a=> html+=card(a))  // laci duluan
+    rek.forEach(a=> html+=card(a))
+    srv.forEach(a=> html+=card(a))
+
+    if(!html) html = `<div class="kpi-card"><div class="kpi-title">Tidak ada akun</div><div class="kpi-value">Rp 0</div></div>`
+    wrap.innerHTML=html
+  }
+
+  async function loadKPISaldo(){
+    const { data } = await supabase.from('accounts').select('id,name,account_type,branch_code,saldo').eq('branch_code', viewBranch).order('name')
+    updateAssetBar(data||[])
+    renderKPISaldoCards(data||[])
+  }
+
+  // ===== Export helpers =====
+  function csvEscape(v){ if(v==null) return ''; const s=String(v).replace(/\r?\n/g,' ').replace(/\s+/g,' ').trim(); return /[",;]/.test(s)?`"${s.replace(/"/g,'""')}"`:s }
+  function updateExportState(){
+    const hasData = (lastRiwayatRows||[]).length > 0
+    const btn = $('btnExport')
+    if(btn) btn.disabled = !hasData
+  }
+  function exportCSV(){
+    const rows=lastRiwayatRows||[]
+    if(rows.length===0) return // silent
+    const header=['No urut','User','Tanggal','ID Trx','Sumber Dana','Jenis','SRC Saldo Awal','DST Saldo Awal','Nominal','Admin Dalam','Admin Luar','Fee Bank','SRC Saldo Akhir','DST Saldo Akhir','Keterangan']
+    const lines=[header.join(',')]
+    let i=1 + page*pageSize
+    for(const r of rows){
+      const rec=[i++,r.created_by_name||'',fmtHuman(r.created_at),(r.id_trx||r.id),
+        `${r.src_account_name||''}${r.dst_account_name?` → ${r.dst_account_name}`:''}`, r.jenis||'',
+        (r.src_saldo_awal??''),(r.dst_saldo_awal??''),(r.nominal??0),(r.admin_dalam??0),(r.admin_luar??0),(r.fee_bank??0),(r.src_saldo_akhir??''),(r.dst_saldo_akhir??''), r.note||''].map(csvEscape)
+      lines.push(rec.join(','))
+    }
+    const f=range.from||toISODate(new Date()), t=range.to||toISODate(new Date()); const same=f===t
+    const fname = same?`riwayat_${f}_p${page+1}.csv`:`riwayat_${f}_sampai_${t}_p${page+1}.csv`
+    const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'})
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fname; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500)
+  }
+
+  // ===== Riwayat + Pagination =====
+  const saldoBlock = (srcName, srcVal, dstName, dstVal) => {
+    const fmt = v => (v ?? null) !== null ? fmtNum(v) : '-'
+    let html = ''
+    if (srcName || srcVal !== undefined) html += `<div>${(srcName || 'SRC')}: <b>${fmt(srcVal)}</b></div>`
+    if (dstName || dstVal !== undefined) html += `<div>${(dstName || 'DST')}: <b>${fmt(dstVal)}</b></div>`
+    return html || '-'
+  }
+
+  async function loadRiwayat(){
+    const { tmin, tmax } = getRangeISO()
+    if(!viewBranch){
+      $('tb').innerHTML=`<tr><td colspan="13">Pilih cabang terlebih dahulu.</td></tr>`
+      $('btnPrev').disabled=true; $('btnNext').disabled=true; $('pageInfo').textContent='Hal -'
+      lastRiwayatRows=[]; updateExportState(); return
+    }
+
+    // COUNT
+    let qCount = supabase.from('v_tx_summary').select('*',{ count:'exact', head:true })
+      .eq('branch_code', viewBranch).gte('created_at', tmin).lte('created_at', tmax)
+    if(flt.jenis) qCount = qCount.eq('jenis', flt.jenis)
+    if(flt.user)  qCount = qCount.eq('created_by_name', flt.user)
+    if(flt.acc)   qCount = qCount.or(`src_account_id.eq.${flt.acc},dst_account_id.eq.${flt.acc}`)
+    const { count:cnt } = await qCount
+    totalRows = cnt || 0
+    $('totalTransaksi').textContent = 'Jumlah Total Transaksi = ' + totalRows
+
+    // DATA
+    let dataQuery = supabase.from('v_tx_summary').select(`
+      id, id_trx, jenis, src_account_id, src_account_name, dst_account_id, dst_account_name,
+      nominal, admin_dalam, admin_luar, fee_bank,
+      src_saldo_awal, src_saldo_akhir, dst_saldo_awal, dst_saldo_akhir,
+      note, created_by_name, created_at, branch_code
+    `).eq('branch_code', viewBranch).gte('created_at', tmin).lte('created_at', tmax)
+    if(flt.jenis) dataQuery = dataQuery.eq('jenis', flt.jenis)
+    if(flt.user)  dataQuery = dataQuery.eq('created_by_name', flt.user)
+    if(flt.acc)   dataQuery = dataQuery.or(`src_account_id.eq.${flt.acc},dst_account_id.eq.${flt.acc}`)
+
+    const { data, error } = await dataQuery.order('created_at',{ascending:false}).range(page*pageSize,(page+1)*pageSize-1)
+    if(error){
+      $('tb').innerHTML = `<tr><td colspan="13" style="color:#991b1b">Gagal memuat riwayat: ${error.message}</td></tr>`
+      $('btnPrev').disabled=true; $('btnNext').disabled=true; $('pageInfo').textContent='Hal -'
+      lastRiwayatRows=[]; updateExportState(); return
+    }
+    const rows=data||[]; lastRiwayatRows=rows
+    if(rows.length===0){
+      $('tb').innerHTML = `<tr><td colspan="13" style="color:#64748b">Belum ada transaksi pada tanggal ini.</td></tr>`
+      $('btnPrev').disabled = page===0
+      $('btnNext').disabled = (page+1)*pageSize >= totalRows
+      $('pageInfo').textContent = `Hal ${page+1}`
+      updateExportState(); return
+    }
+
+    let i = 1 + page*pageSize
+    $('tb').innerHTML = rows.map(r=>{
+      const tgl = fmtHuman(r.created_at)
+      const user = r.created_by_name || '-'
+      const src = r.src_account_name || '-'
+      const dst = r.dst_account_name || ''
+      const sumberDana = dst ? `${src} → ${dst}` : src
+      const saldoAwalCell  = saldoBlock(r.src_account_name, r.src_saldo_awal,  r.dst_account_name, r.dst_saldo_awal)
+      const saldoAkhirCell = saldoBlock(r.src_account_name, r.src_saldo_akhir, r.dst_account_name, r.dst_saldo_akhir)
+
+      return `<tr data-id="${r.id}">
+        <td>${i++}</td>
+        <td>(<span style="color:#1d4ed8">${user}</span>, ${tgl})</td>
+        <td><code>${r.id_trx || r.id}</code></td>
+        <td>${sumberDana}</td>
+        <td style="text-transform:capitalize">${r.jenis}</td>
+        <td>${saldoAwalCell}</td>
+        <td>${fmtNum(r.nominal || 0)}</td>
+        <td>${r.admin_dalam ? fmtNum(r.admin_dalam) : '-'}</td>
+        <td>${r.admin_luar ? fmtNum(r.admin_luar) : '-'}</td>
+        <td>${r.fee_bank ? fmtNum(r.fee_bank) : '-'}</td>
+        <td>${saldoAkhirCell}</td>
+        <td>${r.note || '-'}</td>
+        <td>
+          <button class="btn-sm btn-ghost" data-act="edit" title="Edit">✏️</button>
+          <button class="btn-sm btn-danger" data-act="del" title="Hapus">🗑️</button>
+        </td>
+      </tr>`
+    }).join('')
+
+    $('btnPrev').disabled = page===0
+    $('btnNext').disabled = (page+1)*pageSize >= totalRows
+    $('pageInfo').textContent = `Hal ${page+1}`
+    updateExportState()
+  }
+
+  // Events: export & pagination
+  $('btnExport').onclick=()=>exportCSV()
+  $('btnPrev').onclick=async()=>{ if(page>0){ page--; await loadRiwayat() } }
+  $('btnNext').onclick=async()=>{ if((page+1)*pageSize < totalRows){ page++; await loadRiwayat() } }
+
+  // Modal jenis
+  $('btnTambah').onclick=()=>$('modalJenis').classList.add('show')
+  $('xJenis').onclick=$('batalJenis').onclick=()=>$('modalJenis').classList.remove('show')
+
+  // Modal form
+  $('xForm').onclick=$('batalForm').onclick=()=>{ $('modalForm').classList.remove('show'); editMode=false; editId=null; }
+  document.querySelectorAll('#modalJenis [data-pilih]').forEach(b=>b.addEventListener('click',()=>{ const j=b.getAttribute('data-pilih'); $('modalJenis').classList.remove('show'); setupForm(j); $('modalForm').classList.add('show') }))
+
+  // Helpers form
+  function fillSelect(sel, items){ sel.innerHTML=(items||[]).map(i=>`<option value="${i.id}">${i.name}</option>`).join('') || '<option value="">(Tidak ada opsi)</option>' }
+  const findLaci = ()=> (cacheAcc.cash||[]).find(a=>/laci/i.test(a.name||'')) || null
+
+  function setupForm(jenis){
+    $('dlgTitle').textContent=`Form ${jenis.toUpperCase()}`
+    $('f_jenis').value=jenis; $('f_branch').value=viewBranch
+    ;['f_nom','f_admin_dalam','f_admin_luar','f_admin_luar_only','f_fee_bank','f_ket','f_modal','f_jual'].forEach(id=>{const el=$(id); if(el) el.value=''})
+
+    const sumber=$('f_sumber'), terima=$('f_terima'), laci=findLaci()
+    $('rowNominal').style.display='none'; $('rowAdminDua').style.display='none'; $('rowAdminLuarOnly').style.display='none'; $('rowFeeBank').style.display='none'; $('rowPulsa').style.display='none'; $('rowSumber').style.display='grid'; $('labelNominal').textContent='Nominal (Rp)'
+
+    if(jenis==='tarik'){
+      fillSelect(sumber, laci?[laci]:[]); sumber.disabled=true
+      fillSelect(terima, cacheAcc.rekening||[]); terima.disabled=false
+      $('rowNominal').style.display='grid'; $('rowAdminDua').style.display='grid'
+    }else if(jenis==='transfer'){
+      const sumberList=[...(cacheAcc.rekening||[]), ...(cacheAcc.server_pulsa||[])]
+      fillSelect(sumber, sumberList); sumber.disabled=false
+      fillSelect(terima, laci?[laci]:[]); terima.disabled=true
+      $('rowNominal').style.display='grid'; $('rowAdminLuarOnly').style.display='grid'; $('rowFeeBank').style.display='grid'
+    }else if(jenis==='pulsa'){
+      const sumberList=[...(cacheAcc.rekening||[]), ...(cacheAcc.server_pulsa||[])]
+      fillSelect(sumber, sumberList); sumber.disabled=false
+      fillSelect(terima, laci?[laci]:[]); terima.disabled=true
+      $('rowPulsa').style.display='grid'
+    }else if(jenis==='jasa'){
+      $('rowSumber').style.display='none'
+      if(laci){ terima.innerHTML=`<option value="${laci.id}">${laci.name}</option>` }
+      $('rowAdminLuarOnly').style.display='grid'
+    }
+  }
+
+  // Admin dalam/luar eksklusif untuk TARIK
+  $('f_admin_dalam').addEventListener('input',()=>{ if(parseNum($('f_admin_dalam').value)>0) $('f_admin_luar').value='' })
+  $('f_admin_luar').addEventListener('input',()=>{ if(parseNum($('f_admin_luar').value)>0) $('f_admin_dalam').value='' })
+
+  // Simpan transaksi
+  document.addEventListener('click', async (e)=>{
+    const actBtn = e.target.closest('button[data-act]')
+    if(!actBtn) return
+    const tr = actBtn.closest('tr[data-id]'); const id = tr?.getAttribute('data-id'); const act = actBtn.getAttribute('data-act')
+    if(act==='del'){
+      if(!confirm('Hapus transaksi ini?')) return
+      const { error } = await supabase.from('transactions').delete().eq('id', id)
+      if(error) return alert('Gagal hapus: '+error.message)
+      await refreshByRange()
+    }else if(act==='edit'){
+      const row = (lastRiwayatRows||[]).find(r=>r.id===id); if(!row) return alert('Data tidak ditemukan')
+      editMode=true; editId=id
+      setupForm(row.jenis)
+      $('f_jenis').value=row.jenis; $('f_branch').value=row.branch_code
+      if(row.src_account_id) $('f_sumber').value=row.src_account_id
+      if(row.dst_account_id) $('f_terima').value=row.dst_account_id
+      $('f_nom').value=fmtNum(row.nominal||0); $('f_admin_dalam').value=fmtNum(row.admin_dalam||0); $('f_admin_luar').value=fmtNum(row.admin_luar||0); $('f_fee_bank').value=fmtNum(row.fee_bank||0); $('f_ket').value=row.note||''
+      if(row.jenis==='pulsa'){ $('f_modal').value=fmtNum(row.nominal||0); $('f_jual').value=fmtNum((row.nominal||0)+(row.admin_luar||0)) }
+      if(row.jenis==='jasa'){ $('f_admin_luar_only').value=fmtNum(row.admin_luar||0) }
+      $('modalForm').classList.add('show')
+    }
+  })
+
+  $('simpanForm').onclick = async ()=>{
+    const jenis=$('f_jenis').value, branch=viewBranch, sumber=$('f_sumber').value||null, terima=$('f_terima').value||null, note=$('f_ket').value.trim()
+    const findLaci=()=> (cacheAcc.cash||[]).find(a=>/laci/i.test(a.name||''))||null
+    try{
+      if(!note) throw new Error('Keterangan wajib diisi (mis. No HP / No Ref).')
+      let row={ branch_code:branch, jenis, src_account_id:sumber, dst_account_id:terima, nominal:0, admin_dalam:0, admin_luar:0, fee_bank:0, note }
+
+      if(jenis==='tarik'){
+        if(!terima) throw new Error('Terima Dana (rekening) wajib diisi.')
+        const laci=findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai.')
+        row.src_account_id=laci.id
+        const nominal=parseNum($('f_nom').value), ad=parseNum($('f_admin_dalam').value), al=parseNum($('f_admin_luar').value)
+        if(nominal<=0) throw new Error('Nominal harus > 0.')
+        if(ad>0 && al>0) throw new Error('Isi salah satu: Admin Dalam ATAU Admin Luar.')
+        row.nominal=nominal; row.admin_dalam=ad>0?ad:0; row.admin_luar=al>0?al:0; row.fee_bank=0
+      }
+      else if(jenis==='transfer'){
+        if(!sumber) throw new Error('Sumber Dana (rekening/server) wajib diisi.')
+        const laci=findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai.')
+        row.dst_account_id=laci.id
+        const nominal=parseNum($('f_nom').value), al=parseNum($('f_admin_luar_only').value), fb=parseNum($('f_fee_bank').value)
+        if(nominal<=0) throw new Error('Nominal harus > 0.')
+        row.nominal=nominal; row.admin_dalam=0; row.admin_luar=al; row.fee_bank=fb
+      }
+      else if(jenis==='pulsa'){
+        if(!sumber) throw new Error('Sumber Dana (rekening/server) wajib diisi.')
+        const laci=findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai.')
+        row.dst_account_id=laci.id
+        const modal=parseNum($('f_modal').value), jual=parseNum($('f_jual').value)
+        if(modal<=0) throw new Error('Modal harus > 0.')
+        if(jual<modal) throw new Error('Jual tidak boleh kurang dari Modal.')
+        const margin=Math.max(jual-modal,0)
+        row.nominal=modal; row.admin_dalam=0; row.admin_luar=margin; row.fee_bank=0
+      }
+      else if(jenis==='jasa'){
+        const laci=findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai.')
+        row.src_account_id=null; row.dst_account_id=laci.id
+        const al=parseNum($('f_admin_luar_only').value)
+        if(al<=0) throw new Error('Fee Admin (Admin Luar) harus > 0.')
+        row.nominal=0; row.admin_luar=al; row.admin_dalam=0; row.fee_bank=0
+      }
+
+      if(editMode && editId){ const { error:delErr } = await supabase.from('transactions').delete().eq('id',editId); if(delErr) throw new Error('Gagal hapus data lama: '+delErr.message) }
+
+      const { error } = await supabase.from('transactions').insert(row); if(error) throw error
+      $('modalForm').classList.remove('show'); editMode=false; editId=null
+      await new Promise(r=>setTimeout(r,150)); await loadKPISaldo(); await loadKPITransaksi(); await loadRiwayat()
+    }catch(e){ const m=$('msgErr'); m.textContent='Gagal simpan: '+(e.message||e); m.style.display='block'; setTimeout(()=>m.style.display='none',3000) }
+  }
+
+  // Branch bar
+  async function initBranchBar(){
+    const sel=$('branchTopSelect'), lbl=$('bbNowName')
+    const { data:{ session } } = await supabase.auth.getSession()
+    let role=(localStorage.getItem('user_role')||'').toLowerCase(), prof=null
+    if(session){ const { data } = await supabase.from('profiles').select('role,branch_code').eq('id',session.user.id).maybeSingle(); prof=data||null; if(prof?.role) role=prof.role.toLowerCase() }
+    if(!role) role='kasir'
+
+    let list=[]
+    if(role==='owner'){
+      const { data } = await supabase.from('branches').select('code,name').order('name')
+      list=(data||[]).map(b=>({code:b.code,name:b.name||b.code}))
+    } else if(prof?.branch_code){
+      list=[{code:prof.branch_code,name:prof.branch_code}]
+    }
+
+    const saved=getActive()
+    if(!list.length && saved.code){ list=[{code:saved.code,name:saved.name||saved.code}] }
+
+    sel.innerHTML='<option value="">-- Pilih Toko --</option>'+list.map(b=>`<option value="${b.code}">${b.name}</option>`).join('')
+    let active=saved.code?saved:(list[0]||{code:'',name:''})
+    if(active.code){
+      sel.value=active.code; lbl.textContent=active.name||active.code; setActive(active.code,active.name||active.code); viewBranch=active.code
+    } else {
+      lbl.textContent='-'
+    }
+
+    if(role!=='owner'){ sel.style.display='none' }
+
+    sel.onchange = async ()=>{
+      const code = sel.value
+      const name = sel.options[sel.selectedIndex]?.text || code
+      if(!code) return
+      setActive(code, name)
+      lbl.textContent = name
+      viewBranch = code
+      $('branchBadge').textContent = `branch: ${code}`
+      await loadAccounts()
+      await populateFilterOptions()
+      await refreshByRange()
+    }
+  }
+
+  // Sidebar
+  async function initSidebar(){
+    const roleLS=(localStorage.getItem("user_role")||gRole||"kasir").toLowerCase();
+    const menuModel=[
+      { type:"item", label:"Dashboard", icon:"📊", link:"./dashboard.html" },
+      { type:"item", label:"Transaksi Mini ATM", icon:"🧮", link:"./transaksi-mini-atm.html" },
+      { type:"group", key:"grp_master", title:"Master Data", icon:"📂",
+        items:[ {type:"item",label:"Master Saldo Akun",icon:"💰",link:"./master-saldo-akun.html"},
+                {type:"item",label:"Mutasi Saldo",icon:"🔄",link:"./mutasi-saldo.html"},
+                {type:"item",label:"Saldo Real",icon:"📑",link:"./saldo-real.html"} ] },
+      { type:"item", label:"Laporan", icon:"📘", link:"./laporan.html", ownerOnly:true },
+      { type:"group", key:"grp_pengaturan", title:"Pengaturan", icon:"⚙️",
+        items:[ {type:"item",label:"Manajemen Pengguna",icon:"👥",link:"./manajemen-pengguna.html",ownerOnly:true},
+                {type:"item",label:"Hak Akses",icon:"🔑",link:"./hak-akses.html",ownerOnly:true} ], ownerOnly:true },
+      { type:"item", label:"Logout", icon:"🚪", link:"#", id:"lnk-logout" }
+    ];
+    function isActive(link){ const here=location.pathname.split("/").pop()||"transaksi-mini-atm.html"; return (link||"").endsWith(here) }
+    function getGroupState(k){ const st=JSON.parse(localStorage.getItem("sidebar_groups_state")||"{}"); return st[k]!==false }
+    function setGroupState(k,o){ const st=JSON.parse(localStorage.getItem("sidebar_groups_state")||"{}"); st[k]=!!o; localStorage.setItem("sidebar_groups_state",JSON.stringify(st)) }
+    const nav=document.getElementById("menuList"); nav.innerHTML="";
+    menuModel.forEach(n=>{
+      if(n.ownerOnly && roleLS!=="owner") return;
+      if(n.type==="item"){
+        const a=document.createElement("a"); a.href=n.link;
+        a.innerHTML=`<span class="ico">${n.icon}</span><span class="label">${n.label}</span>`;
+        if(n.id) a.id=n.id; if(isActive(n.link)) a.classList.add("active"); nav.appendChild(a);
+      }else{
+        const g=document.createElement("div"); g.className="group"; if(!getGroupState(n.key)) g.classList.add("collapsed");
+        const h=document.createElement("div"); h.className="group-header"; h.innerHTML=`<div class="title">${n.icon} ${n.title}</div><div class="chev">▾</div>`;
+        h.addEventListener("click",()=>{ const open=!g.classList.contains("collapsed"); if(open) g.classList.add("collapsed"); else g.classList.remove("collapsed"); setGroupState(n.key,!open) });
+        const b=document.createElement("div"); b.className="group-body";
+        (n.items||[]).forEach(it=>{ if(it.ownerOnly && roleLS!=="owner") return; const a=document.createElement("a"); a.href=it.link; a.innerHTML=`<span class="ico">${it.icon}</span><span class="label">${it.label}</span>`; if(isActive(it.link)) a.classList.add("active"); b.appendChild(a) });
+        g.appendChild(h); g.appendChild(b); nav.appendChild(g);
+      }
+    })
+
+    // Logout
+    document.addEventListener('click', async (e)=>{
+      const a=e.target.closest('#lnk-logout'); if(!a) return; e.preventDefault();
+      await supabase.auth.signOut(); location.href='login.html'
+    })
+  }
+
+  // Start
+  boot()
+</script>
 </body>
 </html>
