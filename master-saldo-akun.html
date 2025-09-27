@@ -18,12 +18,25 @@
     button,input,select,textarea{font-family:inherit}
 
     .layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
-    .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px}
+
+    /* ===== Sidebar (disesuaikan) ===== */
+    .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px;display:flex;flex-direction:column}
     .brand{color:#fff;font-weight:800;font-size:20px;margin-bottom:12px}
     .nav{display:flex;flex-direction:column;gap:6px}
-    .nav a{color:var(--sbfg);text-decoration:none;padding:10px 12px;border-radius:10px;line-height:1.2}
+    .nav a{color:var(--sbfg);text-decoration:none;padding:10px 12px;border-radius:10px;line-height:1.2;display:block}
     .nav a:hover{background:rgba(255,255,255,.10)}
     .nav a.active{background:var(--pri);color:#fff}
+
+    /* Grup sidebar */
+    .group{margin-top:10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden}
+    .group-hd{padding:8px 10px;background:#0f2238;color:#cfe0f3;font-size:12px;font-weight:800;display:flex;justify-content:space-between;align-items:center;letter-spacing:.2px;text-transform:uppercase}
+    .group-bd{padding:6px;background:#0f253f}
+
+    /* Footer sidebar */
+    .sidebar-footer{margin-top:auto;padding-top:10px;font-size:11px;color:#93a3b8}
+    .logout{display:block;margin-top:8px;background:#fecdd3;color:#7f1d1d;text-align:center;border-radius:10px;padding:9px 10px;font-weight:800;text-decoration:none}
+
+    /* ===== Header / konten (ori) ===== */
     header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
     .content{padding:16px;max-width:1100px;margin:0 auto}
     .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px}
@@ -50,7 +63,7 @@
     .badge-laci{background:var(--amber)}
     .badge-server{background:var(--yellow);color:#1f2937}
     .kv{margin:6px 0;font-size:15px}
-    .kv b{color:var(--red)}
+    .kv b{color:#991b1b}
     .muted{color:var(--muted);font-size:12px}
     .actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
 
@@ -98,15 +111,50 @@
 
 <div class="layout">
   <aside class="sidebar">
-    <div class="brand">AMKO</div>
-    <nav class="nav" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-      <a href="dashboard.html">🏠 Dashboard</a>
-      <a class="active" href="master-saldo-akun.html">💳 Master Akun</a>
-      <a href="transaksi-mini-atm.html">🏧 Mini ATM</a>
-      <a href="#" id="lnk-logout">🚪 Logout</a>
+    <div class="brand">Amko MiniLink</div>
+
+    <!-- ===== NAV: sesuai struktur yang kamu minta ===== -->
+    <nav class="nav">
+      <!-- Menu utama -->
+      <a href="dashboard.html">📊 Dashboard</a>
+      <a href="transaksi-mini-atm.html">🧮 Transaksi Mini ATM</a>
+
+      <!-- Grup MASTER DATA -->
+      <div class="group">
+        <div class="group-hd"><span>MASTER DATA</span><span>▾</span></div>
+        <div class="group-bd">
+          <a class="active" href="master-saldo-akun.html">💰 Master Saldo Akun</a>
+          <a href="mutasi-saldo.html">🔄 Mutasi Saldo</a>
+          <a href="saldo-real.html">📑 Saldo Real</a>
+        </div>
+      </div>
+
+      <!-- Grup LAPORAN -->
+      <div class="group">
+        <div class="group-hd"><span>LAPORAN</span><span>▾</span></div>
+        <div class="group-bd">
+          <a href="laporan.html">📘 Laporan MiniLink</a>
+        </div>
+      </div>
+
+      <!-- Grup PENGATURAN -->
+      <div class="group">
+        <div class="group-hd"><span>PENGATURAN</span><span>▾</span></div>
+        <div class="group-bd">
+          <a href="manajemen-pengguna.html">👥 Manajemen Pengguna</a>
+          <a href="hak-akses.html">🔑 Hak Akses</a>
+          <a href="absensi.html">🕒 Absensi</a>
+        </div>
+      </div>
     </nav>
+
+    <div class="sidebar-footer">
+      © Amko MiniLink • v1
+      <a href="#" id="lnk-logout" class="logout">🚪 Logout</a>
+    </div>
   </aside>
 
+  <!-- ====== BAGIAN LAIN TETAP ORI (TIDAK DIUBAH) ====== -->
   <div>
     <header>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
