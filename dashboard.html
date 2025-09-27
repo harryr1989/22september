@@ -33,6 +33,7 @@
     .group-body{padding:6px;background:#0f253f}
     .group-body a{background:transparent}
     .sidebar-footer{margin-top:auto;padding:8px;font-size:11px;color:#93a3b8}
+    .logout-btn{display:block;margin-top:6px;padding:8px 10px;background:#e11d48;color:#fff;text-align:center;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none}
 
     /* ===== Main ===== */
     .main{margin-left:var(--sidebar-w);flex:1;min-width:0;display:flex;flex-direction:column}
@@ -94,7 +95,10 @@
   <aside class="sidebar" id="sidebar">
     <div class="brand">Amko MiniLink</div>
     <nav class="nav" id="menuList"><!-- di-render via JS --></nav>
-    <div class="sidebar-footer">© Amko MiniLink • v1</div>
+    <div class="sidebar-footer">
+      © Amko MiniLink • v1
+      <a href="#" class="logout-btn" id="btnLogout">🚪 Logout</a>
+    </div>
   </aside>
 
   <!-- Main -->
@@ -146,7 +150,7 @@
     // ====== Supabase Init ======
     const SUPABASE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); // struktur mengikuti file dasbor sebelumnya
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ====== Auth Guard ======
     async function guard(){
@@ -157,6 +161,14 @@
     }
     guard();
     sb.auth.onAuthStateChange(ev=>{ if(ev==="SIGNED_OUT") window.location.replace("./login.html"); });
+
+    // ====== Logout ======
+    document.getElementById("btnLogout").addEventListener("click", async (e)=>{
+      e.preventDefault();
+      await sb.auth.signOut();
+      localStorage.clear();
+      window.location.replace("./login.html");
+    });
 
     // ====== Toggle Sidebar ======
     const sidebar=document.getElementById("sidebar");
