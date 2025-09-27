@@ -10,7 +10,8 @@
       --card:#fff; --bd:#e2e8f0; --muted:#64748b; --txt:#0f172a;
       --shadow:0 6px 18px rgba(15,23,42,.08);
       --touch:50px; --radius:16px;
-      --H_HDR:54px; --H_BAR:46px;
+      --H_HDR:0px;           /* header utama dihapus */
+      --H_BAR:46px;
       --blueA:#dbeafe; --greenA:#f0fdf4; --orangeA:#fff7ed;
     }
     *{box-sizing:border-box}
@@ -26,14 +27,18 @@
     .nav a:hover{background:rgba(255,255,255,.10)}
     .nav a.active{background:var(--pri);color:#fff}
 
-    /* Header */
-    header{position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;min-height:var(--H_HDR)}
-    .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px}
-
-    /* Branch bar */
-    .branchbar{position:sticky;top:var(--H_HDR);z-index:55;display:flex;gap:10px;align-items:center;padding:10px 12px;background:#eef2f7;border-bottom:1px solid #dbe0e6;min-height:var(--H_BAR)}
+    /* Branch bar (sekarang menggantikan header) */
+    .branchbar{
+      position:sticky; top:0; z-index:55;
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      padding:10px 12px; background:#eef2f7; border-bottom:1px solid #dbe0e6;
+      min-height:var(--H_BAR);
+    }
+    .bb-left{ display:flex; gap:10px; align-items:center; flex-wrap:wrap }
+    .bb-right{ display:flex; gap:6px; align-items:center; flex-wrap:wrap }
     .bb-select{min-width:260px;height:36px;border:1px solid #cfd6de;border-radius:8px;padding:0 10px;background:#fff;outline:none;font-size:14px}
     .bb-now{font-size:14px;color:#1f2a37}
+    .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px}
     @media (max-width:720px){ .branchbar{flex-wrap:wrap;gap:8px} }
 
     /* Grid & cards */
@@ -62,56 +67,27 @@
     th,td{padding:10px;border:1px solid var(--bd);font-size:14px;text-align:left;vertical-align:top}
     th{background:#f8fafc}
 
-    /* Filters */
-    .filters{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:4px 0 8px 0}
+    /* Filters & buttons */
+    .filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0 10px 0}
     .sel{height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:#fff;min-width:170px}
     .btn-sm{height:36px;padding:6px 10px;border-radius:10px;font-weight:700;cursor:pointer}
     .btn-primary{background:#0b63f3;color:#fff}
     .btn-ghost{background:#f1f5f9}
     .btn-danger{background:#fee2e2;color:#991b1b}
     .btn-wa{background:#22c55e;color:#fff}
+    .btn-excel{background:#0ea5e9;color:#fff}
     .btn-sm:disabled{opacity:.5;cursor:not-allowed}
-    .date-input{height:40px;padding:6px 8px;border:1px solid var(--bd);border-radius:8px;background:#fff;font:inherit}
-/* === Tombol aksi di kanan + gaya ikon === */
-.action-buttons{ display:flex; gap:6px; align-items:center; }
-.btn-icon{ display:flex; align-items:center; gap:6px; }
-.btn-icon .ico{ font-size:16px; line-height:1; }
+    .date-input{height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:#fff;font:inherit}
+    .action-buttons{ display:flex; gap:6px; align-items:center }
+    .btn-icon{ display:flex; align-items:center; gap:6px }
+    .btn-icon .ico{ font-size:16px; line-height:1 }
 
-/* variasi warna agar konsisten */
-.btn-wa{ background:#22c55e; color:#fff; }
-.btn-excel{ background:#0ea5e9; color:#fff; }  /* beda dengan primary biar mudah dibedakan */
-
-/* responsive: rapatkan pada layar kecil */
-@media (max-width: 720px){
-  .filters{ gap:6px; }
-  #fltUser,#fltJenis,#fltRek{ min-width:130px; }
-}
-
-/* Persempit kolom filter riwayat */
-#fltDate{
-  width:160px; min-width:120px;
-  height:36px; padding:6px 8px;
-}
-
-#fltUser{
-  width:140px; min-width:140px;
-  height:36px; padding:6px 28px 6px 10px;
-  white-space:nowrap; text-overflow:ellipsis; overflow:hidden;
-}
-
-#fltJenis{
-  width:140px; min-width:120px;
-  height:36px; padding:6px 28px 6px 10px;
-}
-
-#fltRek{
-  width:140px; min-width:150px;
-  height:36px; padding:6px 28px 6px 10px;
-  white-space:nowrap; text-overflow:ellipsis; overflow:hidden;
-}
-
-.filters{ gap:6px; } /* rapatkan jarak antar filter */
-
+    /* Persempit 4 filter */
+    #fltDate{ width:120px; min-width:120px; height:36px; padding:6px 8px }
+    #fltUser{ width:160px; min-width:140px; height:36px; padding:6px 28px 6px 10px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden }
+    #fltJenis{ width:140px; min-width:120px; height:36px; padding:6px 28px 6px 10px }
+    #fltRek{ width:170px; min-width:150px; height:36px; padding:6px 28px 6px 10px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden }
+    .filters{ gap:6px }
 
     /* Modal */
     .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:100}
@@ -155,23 +131,16 @@
   </aside>
 
   <div>
-    <!-- Header -->
-    <header>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <h2 style="margin:0;font-size:18px">Transaksi Mini-ATM</h2>
-        <span class="pill" style="font-size:11px">Owner bisa pilih cabang • Non-owner terkunci cabang profil</span>
-      </div>
-      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-        <div id="me" class="pill">memuat…</div>
-        <div id="roleBadge" class="pill">role: …</div>
-        <div id="branchBadge" class="pill">branch: …</div>
-      </div>
-    </header>
-
-    <!-- Branch bar -->
+    <!-- BRANCH BAR -->
     <div id="branchTopBar" class="branchbar">
-      <select id="branchTopSelect" class="bb-select"><option value="">-- Pilih Toko --</option></select>
-      <span class="bb-now">TOKO SEKARANG: <strong id="bbNowName">-</strong></span>
+      <div class="bb-left">
+        <select id="branchTopSelect" class="bb-select"><option value="">-- Pilih Toko --</option></select>
+        <span class="bb-now">TOKO SEKARANG: <strong id="bbNowName">-</strong></span>
+      </div>
+      <div class="bb-right">
+        <span id="me" class="pill">memuat…</span>
+        <span id="roleBadge" class="pill">role: …</span>
+      </div>
     </div>
 
     <!-- Content -->
@@ -206,37 +175,33 @@
       <div class="card">
         <h3 style="margin-bottom:8px">Riwayat Transaksi</h3>
 
-        <!-- FILTERS (urutan: +Tambah → tanggal → user → jenis → rek → WA → Export) -->
+        <!-- FILTERS kiri + tombol kanan -->
         <div class="filters">
-  <!-- FILTERS kiri -->
-  <input id="fltDate" type="date" class="date-input" />
-  <select id="fltUser" class="sel"><option value="">Semua User</option></select>
-  <select id="fltJenis" class="sel">
-    <option value="">Semua Jenis</option>
-    <option value="tarik">Tarik Tunai</option>
-    <option value="transfer">Transfer</option>
-    <option value="pulsa">Pulsa / Kuota</option>
-    <option value="jasa">Jasa ATM</option>
-  </select>
-  <select id="fltRek" class="sel"><option value="">Semua Rek/Server</option></select>
+          <input id="fltDate" type="date" class="date-input" />
+          <select id="fltUser" class="sel"><option value="">Semua User</option></select>
+          <select id="fltJenis" class="sel">
+            <option value="">Semua Jenis</option>
+            <option value="tarik">Tarik Tunai</option>
+            <option value="transfer">Transfer</option>
+            <option value="pulsa">Pulsa / Kuota</option>
+            <option value="jasa">Jasa ATM</option>
+          </select>
+          <select id="fltRek" class="sel"><option value="">Semua Rek/Server</option></select>
 
-  <!-- spacer -->
-  <div style="flex:1"></div>
+          <div style="flex:1"></div>
 
-  <!-- TOMBOL kanan (ikon + warna) -->
-  <div class="action-buttons">
-    <button id="btnTambah" class="btn-sm btn-primary btn-icon" title="Tambah Transaksi">
-      <span class="ico">➕</span><span>Transaksi</span>
-    </button>
-    <button id="btnWA" class="btn-sm btn-wa btn-icon" title="Kirim WhatsApp">
-      <span class="ico">📲</span><span>WhatsApp</span>
-    </button>
-    <button id="btnExport" class="btn-sm btn-excel btn-icon" title="Export Excel" disabled>
-      <span class="ico">📊</span><span>Excel</span>
-    </button>
-  </div>
-</div>
-
+          <div class="action-buttons">
+            <button id="btnTambah" class="btn-sm btn-primary btn-icon" title="Tambah Transaksi">
+              <span class="ico">➕</span><span>Transaksi</span>
+            </button>
+            <button class="btn-sm btn-wa btn-icon" id="btnWA" title="Kirim WhatsApp">
+              <span class="ico">📲</span><span>WhatsApp</span>
+            </button>
+            <button class="btn-sm btn-excel btn-icon" id="btnExport" title="Export Excel" disabled>
+              <span class="ico">📊</span><span>Excel</span>
+            </button>
+          </div>
+        </div>
 
         <div id="totalTransaksi" style="margin:6px 0;font-weight:bold;">Jumlah Total Transaksi = 0</div>
 
@@ -422,7 +387,7 @@
   let waServerList   = []   // SERVER PULSA
   let waCashList     = []   // LACI / CASH
 
-  // ==== Helpers waktu Asia/Makassar dd-MM-yyyy HH:mm:ss ====
+  // ==== Waktu Asia/Makassar dd-MM-yyyy HH:mm:ss ====
   function fmtMakassar(dt=new Date()){
     const tz='Asia/Makassar'
     const pad = n => String(n).padStart(2,'0')
@@ -464,18 +429,24 @@
     if(!session){ location.href='login.html'; return }
     const { data: prof } = await supabase.from('profiles').select('role,branch_code,full_name,email').eq('id', session.user.id).single()
 
+    // Role & branch dari profil
     gRole = (prof?.role||'').toLowerCase() || (localStorage.getItem('user_role')||'kasir')
     gBranch = (prof?.branch_code||'').trim()
-    const saved = getActive()
-    viewBranch = saved.code || gBranch || ''
-    if(!saved.code && viewBranch){ setActive(viewBranch, viewBranch) }
 
-    // user info
-    $('me').textContent = prof?.full_name || prof?.email || '-'
+    // === FIX: Non-owner wajib ikut cabang profil (abaikan saved) ===
+    if ((gRole || '').toLowerCase() !== 'owner') {
+      setActive(gBranch, gBranch)        // sinkronkan localStorage ke cabang user ini
+      viewBranch = gBranch               // pakai cabang profil
+    } else {
+      const saved = getActive()
+      viewBranch = saved.code || gBranch || ''
+    }
+
+    // Info user di branchbar
+    $('me').textContent   = prof?.full_name || prof?.email || '-'
     $('roleBadge').textContent = `role: ${gRole}`
-    $('branchBadge').textContent = `branch: ${viewBranch||'-'}`
 
-    // profit only owner
+    // Profit hanya owner
     $('kpi_profit_wrap').style.display = (String(gRole).toLowerCase()==='owner') ? 'block':'none'
 
     await initSidebar()
@@ -537,7 +508,7 @@
     const rSel = $('fltRek')
     rSel.innerHTML = '<option value="">Semua Rek/Server</option>' + list.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')
 
-    // On change → reload (disable export dulu biar konsisten)
+    // On change → reload
     uSel.onchange = ()=>{ flt.user = uSel.value||''; $('btnExport').disabled=true; refreshByRange() }
     $('fltJenis').onchange = ()=>{ flt.jenis = $('fltJenis').value||''; $('btnExport').disabled=true; refreshByRange() }
     rSel.onchange = ()=>{ flt.acc = rSel.value||''; $('btnExport').disabled=true; refreshByRange() }
@@ -784,7 +755,7 @@
   $('btnNext').onclick=async()=>{ if((page+1)*pageSize < totalRows){ page++; await loadRiwayat() } }
 
   // Modal jenis
-  $('btnTambah').onclick=()=>$('modalJenis').classList.add('show')
+  document.getElementById('btnTambah').onclick=()=>$('modalJenis').classList.add('show')
   $('xJenis').onclick=$('batalJenis').onclick=()=>$('modalJenis').classList.remove('show')
 
   // Modal form
@@ -907,40 +878,52 @@
     const sel=$('branchTopSelect'), lbl=$('bbNowName')
     const { data:{ session } } = await supabase.auth.getSession()
     let role=(localStorage.getItem('user_role')||'').toLowerCase(), prof=null
-    if(session){ const { data } = await supabase.from('profiles').select('role,branch_code').eq('id',session.user.id).maybeSingle(); prof=data||null; if(prof?.role) role=prof.role.toLowerCase() }
+    if(session){
+      const { data } = await supabase.from('profiles').select('role,branch_code').eq('id',session.user.id).maybeSingle()
+      prof=data||null; if(prof?.role) role=prof.role.toLowerCase()
+    }
     if(!role) role='kasir'
 
     let list=[]
     if(role==='owner'){
       const { data } = await supabase.from('branches').select('code,name').order('name')
       list=(data||[]).map(b=>({code:b.code,name:b.name||b.code}))
-    } else if(prof?.branch_code){
-      list=[{code:prof.branch_code,name:prof.branch_code}]
+    } else {
+      // Non-owner: hanya cabang profil
+      list = prof?.branch_code ? [{code:prof.branch_code,name:prof.branch_code}] : []
     }
 
-    const saved=getActive()
-    if(!list.length && saved.code){ list=[{code:saved.code,name:saved.name||saved.code}] }
-
     sel.innerHTML='<option value="">-- Pilih Toko --</option>'+list.map(b=>`<option value="${b.code}">${b.name}</option>`).join('')
-    let active=saved.code?saved:(list[0]||{code:'',name:''})
+
+    // Tentukan active
+    let active
+    if(role==='owner'){
+      const saved=getActive()
+      active = saved.code ? saved : (list[0] || {code:'',name:''})
+    }else{
+      active = list[0] || {code:'',name:''}
+      setActive(active.code, active.name)   // sinkronkan localStorage untuk user ini
+      sel.style.display='none'              // non-owner tidak bisa ganti
+    }
+
     if(active.code){
-      sel.value=active.code; lbl.textContent=active.name||active.code; setActive(active.code,active.name||active.code); viewBranch=active.code
+      sel.value=active.code
+      lbl.textContent=active.name||active.code
+      viewBranch=active.code
     } else {
       lbl.textContent='-'
     }
 
-    if(role!=='owner'){ sel.style.display='none' }
-
     sel.onchange = async ()=>{
+      if(role!=='owner') return;     // guard
       const code = sel.value
       const name = sel.options[sel.selectedIndex]?.text || code
       if(!code) return
       setActive(code, name)
       lbl.textContent = name
       viewBranch = code
-      $('branchBadge').textContent = `branch: ${code}`
       await loadAccounts()
-      await populateFilterOptions()  // penting: user filter ikut berubah sesuai cabang
+      await populateFilterOptions()
       await refreshByRange()
     }
   }
@@ -981,10 +964,13 @@
       }
     })
 
-    // Logout
+    // Logout → bersihkan branch agar tidak nempel ke user berikutnya
     document.addEventListener('click', async (e)=>{
       const a=e.target.closest('#lnk-logout'); if(!a) return; e.preventDefault();
-      await supabase.auth.signOut(); location.href='login.html'
+      await supabase.auth.signOut();
+      localStorage.removeItem('current_branch_code');
+      localStorage.removeItem('current_branch_name');
+      location.href='login.html';
     })
   }
 
