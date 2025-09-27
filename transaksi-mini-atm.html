@@ -69,6 +69,7 @@
     .btn-primary{background:#0b63f3;color:#fff}
     .btn-ghost{background:#f1f5f9}
     .btn-danger{background:#fee2e2;color:#991b1b}
+    .btn-wa{background:#22c55e;color:#fff}
     .btn-sm:disabled{opacity:.5;cursor:not-allowed}
     .date-input{height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:#fff;font:inherit}
 
@@ -92,7 +93,7 @@
       .row{grid-template-columns:1fr}
     }
 
-    /* Modal Pilih Jenis (sesuai screenshot) */
+    /* Modal Pilih Jenis */
     #modalJenis .dlg-hd{background:#0b63f3;color:#fff;font-weight:700;font-size:15px}
     #modalJenis .dlg-bd{padding:0}
     .pilih-jenis{display:flex;flex-direction:column;gap:10px;padding:16px}
@@ -100,18 +101,9 @@
     .jenis-btn:hover{background:#0b63f3;color:#fff}
 
     /* WARNA KONDISI: Laci Tunai */
-    .kpi-card.laci-low{
-      border-left:4px solid #ef4444;
-      background:linear-gradient(180deg,#fee2e2,#ffffff 58%);
-    }
-    .kpi-card.laci-mid{
-      border-left:4px solid #f59e0b;
-      background:linear-gradient(180deg,#fef3c7,#ffffff 58%);
-    }
-    .kpi-card.laci-high{
-      border-left:4px solid #16a34a;
-      background:linear-gradient(180deg,#dcfce7,#ffffff 58%);
-    }
+    .kpi-card.laci-low{border-left:4px solid #ef4444;background:linear-gradient(180deg,#fee2e2,#ffffff 58%)}
+    .kpi-card.laci-mid{border-left:4px solid #f59e0b;background:linear-gradient(180deg,#fef3c7,#ffffff 58%)}
+    .kpi-card.laci-high{border-left:4px solid #16a34a;background:linear-gradient(180deg,#dcfce7,#ffffff 58%)}
   </style>
 </head>
 <body>
@@ -174,15 +166,12 @@
       <div class="card">
         <h3 style="margin-bottom:8px">Riwayat Transaksi</h3>
 
-        <!-- Filters -->
+        <!-- FILTERS (urutan: +Tambah → tanggal → user → jenis → rek → WA → Export) -->
         <div class="filters">
-          <!-- Badge diganti jadi filter tanggal -->
+          <button id="btnTambah" class="btn-sm btn-primary">+ Tambah Transaksi</button>
+
           <input id="fltDate" type="date" class="date-input" />
-
-          <select id="fltUser" class="sel">
-            <option value="">Semua User</option>
-          </select>
-
+          <select id="fltUser" class="sel"><option value="">Semua User</option></select>
           <select id="fltJenis" class="sel">
             <option value="">Semua Jenis</option>
             <option value="tarik">Tarik Tunai</option>
@@ -190,13 +179,10 @@
             <option value="pulsa">Pulsa / Kuota</option>
             <option value="jasa">Jasa ATM</option>
           </select>
-
-          <select id="fltRek" class="sel">
-            <option value="">Semua Rek/Server</option>
-          </select>
+          <select id="fltRek" class="sel"><option value="">Semua Rek/Server</option></select>
 
           <div style="flex:1"></div>
-          <button id="btnTambah" class="btn-sm btn-primary">+ Tambah Transaksi</button>
+          <button class="btn-sm btn-wa" id="btnWA">Kirim WhatsApp</button>
           <button class="btn-sm btn-primary" id="btnExport" disabled>Export Excel</button>
         </div>
 
@@ -364,7 +350,7 @@
   // Pagination
   let page=0, pageSize=25, totalRows=0
 
-  // Range tanggal (default hari ini; single date)
+  // Range tanggal (single date)
   let range={from:null,to:null}
   const toISODate = d => new Date(d).toISOString().slice(0,10)
   const startOfDayISO = d=>{const x=new Date(d);x.setHours(0,0,0,0);return x.toISOString()}
@@ -374,6 +360,25 @@
 
   // Filters model
   const flt = { user:'', jenis:'', acc:'' }
+
+  // KPI transaksi (untuk tampilan)
+  const kpi = { omset:0, tarik:0, transfer:0, fee:0, profit:0 }
+
+  // Rekap saldo & detail rekening untuk WhatsApp
+  const saldoSum = { cash:0, rek:0, asset:0, server:0 }
+  let waRekeningList = []   // BANK
+  let waServerList   = []   // SERVER PULSA
+  let waCashList     = []   // LACI / CASH
+
+  // ==== Helpers waktu Asia/Makassar dd-MM-yyyy HH:mm:ss ====
+  function fmtMakassar(dt=new Date()){
+    const tz='Asia/Makassar'
+    const pad = n => String(n).padStart(2,'0')
+    const z = new Date(dt.toLocaleString('en-US', { timeZone: tz }))
+    const dd = pad(z.getDate()), MM = pad(z.getMonth()+1), yyyy=z.getFullYear()
+    const HH = pad(z.getHours()), mm=pad(z.getMinutes()), ss=pad(z.getSeconds())
+    return `${dd}-${MM}-${yyyy} ${HH}:${mm}:${ss}`
+  }
 
   function setPresetToday(){
     const today = new Date()
@@ -437,6 +442,9 @@
       })
     }
 
+    // WA button
+    $('btnWA').addEventListener('click', sendWhatsAppSummary)
+
     await refreshByRange()
   }
 
@@ -457,12 +465,20 @@
 
   // Isi pilihan filter
   async function populateFilterOptions(){
-    // USER
-    const { data: users } = await supabase.from('profiles').select('full_name').order('full_name')
-    const uSel = $('fltUser')
-    uSel.innerHTML = '<option value="">Semua User</option>' + (users||[])
-      .filter(u=>u.full_name && u.full_name.trim().length>0)
-      .map(u=>`<option value="${u.full_name}">${u.full_name}</option>`).join('')
+    // USER → hanya yang terdaftar di cabang aktif
+    let uSel = $('fltUser')
+    if(viewBranch){
+      const { data: users } = await supabase
+        .from('profiles')
+        .select('full_name,branch_code')
+        .eq('branch_code', viewBranch)
+        .order('full_name')
+      uSel.innerHTML = '<option value="">Semua User</option>' + (users||[])
+        .filter(u=>u.full_name && u.full_name.trim().length>0)
+        .map(u=>`<option value="${u.full_name}">${u.full_name}</option>`).join('')
+    } else {
+      uSel.innerHTML = '<option value="">Semua User</option>'
+    }
 
     // REK/SERVER
     const list=[...(cacheAcc.rekening||[]), ...(cacheAcc.server_pulsa||[])]
@@ -487,6 +503,8 @@
       const n=+r.nominal||0, ad=+r.admin_dalam||0, al=+r.admin_luar||0, fb=+r.fee_bank||0
       omset+=n; fee+=fb; if(r.jenis==='tarik') tarik+=n; if(r.jenis==='transfer') transfer+=n; profit += (ad+al-fb)
     }
+    kpi.omset=omset; kpi.tarik=tarik; kpi.transfer=transfer; kpi.fee=fee; kpi.profit=profit
+
     $('kpi_omset').textContent=fmtRp(omset)
     $('kpi_tarik').textContent=fmtRp(tarik)
     $('kpi_transfer').textContent=fmtRp(transfer)
@@ -497,25 +515,43 @@
   // Asset bar & KPI saldo
   function updateAssetBar(list){
     const totalAsset = (list||[]).reduce((s,a)=> s + Number(a.saldo||0), 0)
+    saldoSum.asset = totalAsset
     $('assetTotalValue').textContent = fmtRp(totalAsset)
   }
+  async function loadKPISaldo(){
+    const { data } = await supabase.from('accounts').select('id,name,account_type,branch_code,saldo').eq('branch_code', viewBranch).order('name')
 
+    // rekap untuk WA
+    const cashArr = (data||[]).filter(a=>a.account_type==='cash')
+    const rekArr  = (data||[]).filter(a=>a.account_type==='rekening')
+    const srvArr  = (data||[]).filter(a=>a.account_type==='server_pulsa')
+
+    saldoSum.cash = cashArr.reduce((s,a)=>s + Number(a.saldo||0), 0)
+    saldoSum.rek  = rekArr.reduce((s,a)=>s + Number(a.saldo||0), 0)
+    saldoSum.server = srvArr.reduce((s,a)=>s + Number(a.saldo||0), 0)
+    saldoSum.asset = saldoSum.cash + saldoSum.rek + saldoSum.server
+
+    waCashList     = cashArr.map(a=>({ name: a.name||'Cash', saldo: Number(a.saldo||0) }))
+    waRekeningList = rekArr.map(a=>({ name: a.name||'Rekening', saldo: Number(a.saldo||0) }))
+    waServerList   = srvArr.map(a=>({ name: a.name||'Server', saldo: Number(a.saldo||0) }))
+
+    updateAssetBar(data||[])
+    renderKPISaldoCards(data||[])
+  }
   function renderKPISaldoCards(list){
     const wrap=$('kpiSaldoWrap')
-    const laci=(list||[]).filter(a=> a.account_type==='cash' && /laci/i.test(a.name||''))   // << batasi ke "laci"
+    const laci=(list||[]).filter(a=> a.account_type==='cash' && /laci/i.test(a.name||''))
     const rek=(list||[]).filter(a=> a.account_type==='rekening').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
     const srv=(list||[]).filter(a=> a.account_type==='server_pulsa').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
 
-    // Tentukan kelas warna untuk Laci Tunai
     const laciClass = (a)=>{
       const s = Number(a.saldo||0)
-      if (s < 10_000_000) return 'laci-low'      // < 10jt -> merah
-      if (s < 20_000_000) return 'laci-mid'      // 10–19,99jt -> kuning
-      return 'laci-high'                          // >= 20jt -> hijau
+      if (s < 10_000_000) return 'laci-low'
+      if (s < 20_000_000) return 'laci-mid'
+      return 'laci-high'
     }
-
     const card = a => {
-      const isLaci = (a.account_type==='cash' && /laci/i.test(a.name||'')) // << hapus /laci/i kalau mau semua cash diwarnai
+      const isLaci = (a.account_type==='cash' && /laci/i.test(a.name||''))
       const extraClass = isLaci ? (' ' + laciClass(a)) : ''
       return `
         <div class="kpi-card${extraClass}" title="ID: ${a.id}">
@@ -526,18 +562,12 @@
     }
 
     let html=''
-    laci.forEach(a=> html+=card(a))  // laci duluan
+    laci.forEach(a=> html+=card(a))
     rek.forEach(a=> html+=card(a))
     srv.forEach(a=> html+=card(a))
 
     if(!html) html = `<div class="kpi-card"><div class="kpi-title">Tidak ada akun</div><div class="kpi-value">Rp 0</div></div>`
     wrap.innerHTML=html
-  }
-
-  async function loadKPISaldo(){
-    const { data } = await supabase.from('accounts').select('id,name,account_type,branch_code,saldo').eq('branch_code', viewBranch).order('name')
-    updateAssetBar(data||[])
-    renderKPISaldoCards(data||[])
   }
 
   // ===== Export helpers =====
@@ -549,7 +579,7 @@
   }
   function exportCSV(){
     const rows=lastRiwayatRows||[]
-    if(rows.length===0) return // silent
+    if(rows.length===0) return
     const header=['No urut','User','Tanggal','ID Trx','Sumber Dana','Jenis','SRC Saldo Awal','DST Saldo Awal','Nominal','Admin Dalam','Admin Luar','Fee Bank','SRC Saldo Akhir','DST Saldo Akhir','Keterangan']
     const lines=[header.join(',')]
     let i=1 + page*pageSize
@@ -559,10 +589,52 @@
         (r.src_saldo_awal??''),(r.dst_saldo_awal??''),(r.nominal??0),(r.admin_dalam??0),(r.admin_luar??0),(r.fee_bank??0),(r.src_saldo_akhir??''),(r.dst_saldo_akhir??''), r.note||''].map(csvEscape)
       lines.push(rec.join(','))
     }
-    const f=range.from||toISODate(new Date()), t=range.to||toISODate(new Date()); const same=f===t
-    const fname = same?`riwayat_${f}_p${page+1}.csv`:`riwayat_${f}_sampai_${t}_p${page+1}.csv`
+    const f=range.from||toISODate(new Date())
+    const fname = `riwayat_${f}_p${page+1}.csv`
     const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'})
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fname; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500)
+  }
+
+  // ===== WhatsApp summary (format sesuai contoh) =====
+  function buildWhatsAppText(){
+    const cab = localStorage.getItem('current_branch_name') || viewBranch || '-'
+    // Header
+    const header = [
+      `*LAPORAN SUMBER DANA,*`,
+      ``,
+      `*CABANG : ${cab}*`,
+      ``,
+      `*Report By:* ${$('me').textContent || '-'}`,
+      `*Generated at:* ${fmtMakassar()}`
+    ].join('\n')
+
+    // Sections with numbering + subtotal
+    const section = (title, list) => {
+      if(!list || !list.length) return ''
+      let lines = list.map((a,i)=>`${i+1}. ${a.name}: ${fmtRp(a.saldo||0)}`).join('\n')
+      let subtotal = list.reduce((s,a)=> s + Number(a.saldo||0), 0)
+      return [
+        ``,
+        `*> ${title}*`,
+        lines,
+        ``,
+        `*Subtotal ${title}:* ${fmtRp(subtotal)}`,
+        ``
+      ].join('\n')
+    }
+
+    const bankTxt   = section('BANK', waRekeningList)
+    const serverTxt = section('SERVER PULSA', waServerList)
+    const cashTxt   = section('LACI / CASH', waCashList)
+    const totalTxt  = `*TOTAL ASSET:* ${fmtRp(saldoSum.asset)}`
+
+    // Gabung
+    return [header, bankTxt, serverTxt, cashTxt, totalTxt].filter(Boolean).join('\n')
+  }
+  function sendWhatsAppSummary(){
+    const txt = buildWhatsAppText()
+    const url = `https://wa.me/?text=${encodeURIComponent(txt)}`
+    window.open(url, '_blank')
   }
 
   // ===== Riwayat + Pagination =====
@@ -816,7 +888,7 @@
       viewBranch = code
       $('branchBadge').textContent = `branch: ${code}`
       await loadAccounts()
-      await populateFilterOptions()
+      await populateFilterOptions()  // penting: user filter ikut berubah sesuai cabang
       await refreshByRange()
     }
   }
