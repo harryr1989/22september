@@ -63,7 +63,7 @@
     th{background:#f8fafc}
 
     /* Filters */
-    .filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0 10px 0}
+    .filters{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:4px 0 8px 0}
     .sel{height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:#fff;min-width:170px}
     .btn-sm{height:36px;padding:6px 10px;border-radius:10px;font-weight:700;cursor:pointer}
     .btn-primary{background:#0b63f3;color:#fff}
@@ -71,7 +71,33 @@
     .btn-danger{background:#fee2e2;color:#991b1b}
     .btn-wa{background:#22c55e;color:#fff}
     .btn-sm:disabled{opacity:.5;cursor:not-allowed}
-    .date-input{height:40px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:#fff;font:inherit}
+    .date-input{height:40px;padding:6px 8px;border:1px solid var(--bd);border-radius:8px;background:#fff;font:inherit}
+
+/* Persempit kolom filter riwayat */
+#fltDate{
+  width:160px; min-width:120px;
+  height:36px; padding:6px 8px;
+}
+
+#fltUser{
+  width:140px; min-width:140px;
+  height:36px; padding:6px 28px 6px 10px;
+  white-space:nowrap; text-overflow:ellipsis; overflow:hidden;
+}
+
+#fltJenis{
+  width:140px; min-width:120px;
+  height:36px; padding:6px 28px 6px 10px;
+}
+
+#fltRek{
+  width:140px; min-width:150px;
+  height:36px; padding:6px 28px 6px 10px;
+  white-space:nowrap; text-overflow:ellipsis; overflow:hidden;
+}
+
+.filters{ gap:6px; } /* rapatkan jarak antar filter */
+
 
     /* Modal */
     .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:100}
