@@ -72,6 +72,20 @@
     .btn-wa{background:#22c55e;color:#fff}
     .btn-sm:disabled{opacity:.5;cursor:not-allowed}
     .date-input{height:40px;padding:6px 8px;border:1px solid var(--bd);border-radius:8px;background:#fff;font:inherit}
+/* === Tombol aksi di kanan + gaya ikon === */
+.action-buttons{ display:flex; gap:6px; align-items:center; }
+.btn-icon{ display:flex; align-items:center; gap:6px; }
+.btn-icon .ico{ font-size:16px; line-height:1; }
+
+/* variasi warna agar konsisten */
+.btn-wa{ background:#22c55e; color:#fff; }
+.btn-excel{ background:#0ea5e9; color:#fff; }  /* beda dengan primary biar mudah dibedakan */
+
+/* responsive: rapatkan pada layar kecil */
+@media (max-width: 720px){
+  .filters{ gap:6px; }
+  #fltUser,#fltJenis,#fltRek{ min-width:130px; }
+}
 
 /* Persempit kolom filter riwayat */
 #fltDate{
@@ -194,23 +208,35 @@
 
         <!-- FILTERS (urutan: +Tambah → tanggal → user → jenis → rek → WA → Export) -->
         <div class="filters">
-          <button id="btnTambah" class="btn-sm btn-primary">+ Tambah Transaksi</button>
+  <!-- FILTERS kiri -->
+  <input id="fltDate" type="date" class="date-input" />
+  <select id="fltUser" class="sel"><option value="">Semua User</option></select>
+  <select id="fltJenis" class="sel">
+    <option value="">Semua Jenis</option>
+    <option value="tarik">Tarik Tunai</option>
+    <option value="transfer">Transfer</option>
+    <option value="pulsa">Pulsa / Kuota</option>
+    <option value="jasa">Jasa ATM</option>
+  </select>
+  <select id="fltRek" class="sel"><option value="">Semua Rek/Server</option></select>
 
-          <input id="fltDate" type="date" class="date-input" />
-          <select id="fltUser" class="sel"><option value="">Semua User</option></select>
-          <select id="fltJenis" class="sel">
-            <option value="">Semua Jenis</option>
-            <option value="tarik">Tarik Tunai</option>
-            <option value="transfer">Transfer</option>
-            <option value="pulsa">Pulsa / Kuota</option>
-            <option value="jasa">Jasa ATM</option>
-          </select>
-          <select id="fltRek" class="sel"><option value="">Semua Rek/Server</option></select>
+  <!-- spacer -->
+  <div style="flex:1"></div>
 
-          <div style="flex:1"></div>
-          <button class="btn-sm btn-wa" id="btnWA">Kirim WhatsApp</button>
-          <button class="btn-sm btn-primary" id="btnExport" disabled>Export Excel</button>
-        </div>
+  <!-- TOMBOL kanan (ikon + warna) -->
+  <div class="action-buttons">
+    <button id="btnTambah" class="btn-sm btn-primary btn-icon" title="Tambah Transaksi">
+      <span class="ico">➕</span><span>Transaksi</span>
+    </button>
+    <button id="btnWA" class="btn-sm btn-wa btn-icon" title="Kirim WhatsApp">
+      <span class="ico">📲</span><span>WhatsApp</span>
+    </button>
+    <button id="btnExport" class="btn-sm btn-excel btn-icon" title="Export Excel" disabled>
+      <span class="ico">📊</span><span>Excel</span>
+    </button>
+  </div>
+</div>
+
 
         <div id="totalTransaksi" style="margin:6px 0;font-weight:bold;">Jumlah Total Transaksi = 0</div>
 
