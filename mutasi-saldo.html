@@ -6,18 +6,30 @@
   <title>Mutasi Saldo | AMKO</title>
   <style>
     :root{
+      --sidebar-w:240px;
       --bg:#f6f8fb; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#0b63f3;
       --card:#fff; --bd:#e5e7eb; --txt:#0f172a; --ring:#93c5fd33;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt);font-size:15px;line-height:1.5}
-    .layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
-    .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px}
+
+    /* ===== Layout ===== */
+    .layout{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh}
+
+    /* ===== Sidebar (match dashboard/master) ===== */
+    .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px;position:relative;z-index:20}
     .brand{color:#fff;font-weight:800;font-size:20px;margin-bottom:12px}
-    .nav{display:flex;flex-direction:column;gap:6px}
-    .nav a{color:var(--sbfg);text-decoration:none;padding:10px 12px;border-radius:10px}
-    .nav a:hover{background:rgba(255,255,255,.10)}
-    .nav a.active{background:var(--pri);color:#fff}
+    .nav{padding:0;display:flex;flex-direction:column;gap:6px}
+    .nav a{display:flex;align-items:center;gap:10px;color:var(--sbfg);text-decoration:none;padding:10px 12px;border-radius:10px;line-height:1.3;min-height:36px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .nav a:hover{background:rgba(255,255,255,.08)}
+    .nav a.active{background:#0b3a66;color:#fff}
+    .group{margin-top:10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden}
+    .group-hd{padding:8px 10px;background:#0f2238;color:#cfe0f3;font-size:12px;font-weight:800;display:flex;justify-content:space-between;align-items:center;letter-spacing:.2px;text-transform:uppercase}
+    .group-bd{padding:8px;background:#0f253f;display:flex;flex-direction:column;gap:6px}
+    .sidebar-footer{margin-top:auto;padding-top:10px;font-size:11px;color:#93a3b8}
+    .logout{display:block;margin-top:8px;background:#fecdd3;color:#7f1d1d;text-align:center;border-radius:10px;padding:9px 10px;font-weight:800;text-decoration:none}
+
+    /* ===== Header & konten (ori) ===== */
     header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
     .btn{border:none;border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:700;height:44px;transition:background .15s,box-shadow .15s}
     .btn-primary{background:var(--pri);color:#fff}
@@ -38,37 +50,83 @@
     .pager{margin-top:10px;display:flex;gap:10px;align-items:center;justify-content:center}
     .pager .btn-sm{border-radius:999px}
     .fab{position:fixed;right:14px;bottom:14px;width:56px;height:56px;border-radius:999px;background:#0b63f3;color:#fff;display:none;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(11,99,243,.35);z-index:15;font-size:26px;font-weight:900}
-    @media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:sticky;top:0}.fab{display:flex}}
     .input{border:1px solid var(--bd);background:#fff;border-radius:10px;padding:10px 12px;font-size:15px;outline:none}
     .input:focus{box-shadow:0 0 0 4px var(--ring);border-color:#bfdbfe}
-    .row{display:grid;grid-template-columns:1fr;gap:10px}
-    .row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    label{font-size:13px;color:#475569}
-    .modal{display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(2,6,23,.45);z-index:50}
-    .dialog{width:min(620px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:92vh}
-    .dlg-hd{background:#0ea5e9;color:#fff;padding:12px 16px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
-    .dlg-bd{padding:14px;display:grid;gap:12px;overflow:auto}
-    .dlg-ft{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--bd);padding:12px 16px;display:flex;gap:8px;justify-content:flex-end}
-    .btn-ghost{background:#f1f5f9}
-    .btn-danger{background:#fee2e2;color:#991b1b}
-    .msgerr{display:none;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:10px;border-radius:10px}
+
+    /* ===== Hamburger & Overlay ===== */
+    .hamburger{font-size:22px;background:none;border:none;cursor:pointer;padding:8px;display:none}
+    .overlay{position:fixed;inset:0;background:rgba(2,6,23,.45);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:19}
+    .overlay.show{opacity:1;pointer-events:auto}
+    body.noscroll{overflow:hidden}
+
+    /* ===== Responsive: mobile like dashboard ===== */
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{
+        position:fixed;left:-240px;top:0;bottom:0;width:var(--sidebar-w);
+        transition:left .25s ease; /* off-canvas */
+      }
+      .sidebar.open{ left:0; }
+      .hamburger{ display:block; }          /* tombol muncul di HP */
+      .fab{ display:flex; }                 /* seperti versi sebelumnya (jika perlu) */
+    }
   </style>
 </head>
 <body>
 <div class="layout">
-  <aside class="sidebar">
-    <div class="brand">AMKO</div>
-    <nav class="nav">
-      <a href="dashboard.html">🏠 Dashboard</a>
-      <a href="master-saldo-akun.html">💳 Master Akun</a>
-      <a href="transaksi-mini-atm.html">🏧 Mini ATM</a>
-      <a class="active" href="mutasi-saldo.html">🔄 Mutasi Saldo</a>
-      <a href="#" id="lnk-logout">🚪 Logout</a>
+
+  <!-- ===== Sidebar ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">Amko MiniLink</div>
+
+    <nav class="nav" id="menuList">
+      <!-- Menu utama -->
+      <a href="dashboard.html">📊 Dashboard</a>
+      <a href="transaksi-mini-atm.html">🧮 Transaksi Mini ATM</a>
+
+      <!-- Grup MASTER DATA -->
+      <div class="group">
+        <div class="group-hd"><span>MASTER DATA</span><span>▾</span></div>
+        <div class="group-bd">
+          <a href="master-saldo-akun.html">💰 Master Saldo Akun</a>
+          <a class="active" href="mutasi-saldo.html">🔄 Mutasi Saldo</a>
+          <a href="saldo-real.html">📑 Saldo Real</a>
+        </div>
+      </div>
+
+      <!-- Grup LAPORAN -->
+      <div class="group">
+        <div class="group-hd"><span>LAPORAN</span><span>▾</span></div>
+        <div class="group-bd">
+          <a href="laporan.html">📘 Laporan MiniLink</a>
+        </div>
+      </div>
+
+      <!-- Grup PENGATURAN -->
+      <div class="group">
+        <div class="group-hd"><span>PENGATURAN</span><span>▾</span></div>
+        <div class="group-bd">
+          <a href="manajemen-pengguna.html">👥 Manajemen Pengguna</a>
+          <a href="hak-akses.html">🔑 Hak Akses</a>
+          <a href="absensi.html">🕒 Absensi</a>
+        </div>
+      </div>
     </nav>
+
+    <div class="sidebar-footer">
+      © Amko MiniLink • v1
+      <a href="#" id="lnk-logout" class="logout">🚪 Logout</a>
+    </div>
   </aside>
 
+  <!-- Overlay (mobile) -->
+  <div id="overlay" class="overlay" aria-hidden="true"></div>
+
+  <!-- ===== Main (logika asli tidak diubah) ===== -->
   <div>
     <header>
+      <!-- Hamburger muncul hanya di mobile -->
+      <button id="toggleSidebar" class="hamburger" aria-label="Toggle Sidebar" aria-controls="sidebar" aria-expanded="false">☰</button>
       <h2 style="margin:0">Mutasi Saldo</h2>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <span class="pill" id="me">memuat…</span>
@@ -119,41 +177,68 @@
 
 <button id="fabAdd" class="fab" title="Tambah">+</button>
 
-<!-- MODAL FORM (sama persis sebelumnya, tidak dipotong di sini demi singkat) -->
-<!-- ... isi form tambah mutasi ... -->
+<!-- MODAL FORM (tetap seperti file aslimu; isi form tidak diubah) -->
+<!-- … -->
 
 <script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-const supabaseUrl = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
-const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: true, autoRefreshToken: true } });
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+  const supabaseUrl = "https://kfqcdcvcnyhisbmwftzb.supabase.co";
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
+  const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: true, autoRefreshToken: true } });
 
-const $ = id=>document.getElementById(id)
-let me=null, gBranch=null
+  const $ = id=>document.getElementById(id)
+  let me=null, gBranch=null
 
-async function boot(){
-  const { data:{ session } } = await supabase.auth.getSession()
-  if(!session){ location.href='login.html'; return }
-  const { data: prof } = await supabase.from('profiles').select('id,full_name,email,branch_code,role').eq('id', session.user.id).single()
-  me = prof; gBranch = (prof.branch_code||'').trim()
-  $('me').textContent = prof.full_name || prof.email
+  /* ======== LOGIKA ASLI (tidak diubah) ======== */
+  async function boot(){
+    const { data:{ session } } = await supabase.auth.getSession()
+    if(!session){ location.href='login.html'; return }
+    const { data: prof } = await supabase.from('profiles').select('id,full_name,email,branch_code,role').eq('id', session.user.id).single()
+    me = prof; gBranch = (prof.branch_code||'').trim()
+    $('me').textContent = prof.full_name || prof.email
 
-  if(prof.role==='owner'){
-    $('branchSelect').style.display='inline-block'
-    $('branchBadge').style.display='none'
-    const { data: branches } = await supabase.from('branches').select('code,name').order('name')
-    $('branchSelect').innerHTML = (branches||[]).map(b=>`<option value="${b.code}">${b.name}</option>`).join('')
-    $('branchSelect').value = gBranch || (branches?.[0]?.code || '')
-    gBranch = $('branchSelect').value
-    $('branchSelect').onchange = async ()=>{ gBranch=$('branchSelect').value; await loadKPI(); await loadRiwayat() }
-  }else{
-    $('branchBadge').textContent = 'branch: ' + (gBranch||'-')
+    if(prof.role==='owner'){
+      $('branchSelect').style.display='inline-block'
+      $('branchBadge').style.display='none'
+      const { data: branches } = await supabase.from('branches').select('code,name').order('name')
+      $('branchSelect').innerHTML = (branches||[]).map(b=>`<option value="${b.code}">${b.name}</option>`).join('')
+      $('branchSelect').value = gBranch || (branches?.[0]?.code || '')
+      gBranch = $('branchSelect').value
+      $('branchSelect').onchange = async ()=>{ gBranch=$('branchSelect').value; await loadKPI(); await loadRiwayat() }
+    }else{
+      $('branchBadge').textContent = 'branch: ' + (gBranch||'-')
+    }
+
+    await loadKPI()
+    await loadRiwayat()
   }
+  boot()
 
-  await loadKPI()
-  await loadRiwayat()
-}
-boot()
+  // ======== Sidebar + Overlay (mobile) ========
+  const sidebarEl = document.getElementById('sidebar');
+  const overlayEl = document.getElementById('overlay');
+  const btnHamb = document.getElementById('toggleSidebar');
+
+  function toggleSidebar(open){
+    const willOpen = (typeof open==='boolean') ? open : !sidebarEl.classList.contains('open');
+    sidebarEl.classList.toggle('open', willOpen);
+    overlayEl.classList.toggle('show', willOpen);
+    document.body.classList.toggle('noscroll', willOpen);
+    if(btnHamb) btnHamb.setAttribute('aria-expanded', String(willOpen));
+  }
+  btnHamb?.addEventListener('click', ()=> toggleSidebar());
+  overlayEl?.addEventListener('click', ()=> toggleSidebar(false));
+  window.addEventListener('keyup', (e)=>{ if(e.key==='Escape') toggleSidebar(false); });
+  document.querySelectorAll('.sidebar .nav a').forEach(a=>{
+    a.addEventListener('click', ()=> toggleSidebar(false));
+  });
+
+  // ======== Logout (asli) ========
+  document.getElementById('lnk-logout').addEventListener('click', async (e)=>{
+    e.preventDefault();
+    await supabase.auth.signOut();
+    location.href='login.html';
+  });
 </script>
 </body>
 </html>

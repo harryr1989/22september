@@ -19,27 +19,33 @@
 
     .layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
 
-    /* ===== Sidebar (disesuaikan) ===== */
-    .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px;display:flex;flex-direction:column}
+    /* ===== Sidebar (sesuai struktur diminta) ===== */
+    .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px;display:flex;flex-direction:column;transition:left .25s ease}
     .brand{color:#fff;font-weight:800;font-size:20px;margin-bottom:12px}
     .nav{display:flex;flex-direction:column;gap:6px}
     .nav a{color:var(--sbfg);text-decoration:none;padding:10px 12px;border-radius:10px;line-height:1.2;display:block}
     .nav a:hover{background:rgba(255,255,255,.10)}
     .nav a.active{background:var(--pri);color:#fff}
 
-    /* Grup sidebar */
     .group{margin-top:10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden}
     .group-hd{padding:8px 10px;background:#0f2238;color:#cfe0f3;font-size:12px;font-weight:800;display:flex;justify-content:space-between;align-items:center;letter-spacing:.2px;text-transform:uppercase}
     .group-bd{padding:6px;background:#0f253f}
 
-    /* Footer sidebar */
     .sidebar-footer{margin-top:auto;padding-top:10px;font-size:11px;color:#93a3b8}
     .logout{display:block;margin-top:8px;background:#fecdd3;color:#7f1d1d;text-align:center;border-radius:10px;padding:9px 10px;font-weight:800;text-decoration:none}
 
-    /* ===== Header / konten (ori) ===== */
+    /* ===== Header / Topbar (ori) ===== */
     header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-    .content{padding:16px;max-width:1100px;margin:0 auto}
+    .title{margin:0;font-size:18px}
     .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px}
+
+    /* Hamburger */
+    .hamburger{font-size:22px;background:none;border:none;cursor:pointer;padding:8px;display:none}
+
+    /* Overlay gelap (mobile) */
+    .overlay{position:fixed;inset:0;background:rgba(2,6,23,.45);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:19}
+    .overlay.show{opacity:1;pointer-events:auto}
+    body.noscroll{overflow:hidden}
 
     .topbar{position:sticky;top:54px;z-index:9;background:linear-gradient(#fff,#fff 75%,transparent);padding:12px 16px;border-bottom:1px solid var(--bd)}
     .searchbar{display:grid;grid-template-columns:1fr auto auto;gap:8px}
@@ -53,6 +59,7 @@
     .btn-ghost{background:#f1f5f9}
     .btn-danger{background:#fee2e2;color:#991b1b}
 
+    .content{padding:16px;max-width:1100px;margin:0 auto}
     .grid{display:grid;grid-template-columns:repeat(3,minmax(260px,1fr));gap:16px;margin-top:12px}
     .card{background:var(--card);border:1px solid var(--bd);border-radius:22px;box-shadow:var(--shadow);padding:16px}
     .row-head{display:flex;align-items:center;gap:12px;margin-bottom:8px}
@@ -84,8 +91,10 @@
 
     @media (max-width: 840px){
       .layout{grid-template-columns:1fr}
-      .sidebar{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:11}
-      .brand{margin:0}
+      .sidebar{position:fixed;left:-240px;top:0;bottom:0;width:240px;z-index:20}
+      .sidebar.open{left:0}
+      .hamburger{display:block}
+
       .content{padding:12px}
       .grid{grid-template-columns:1fr}
       .topbar{top:56px;padding:10px 12px}
@@ -95,25 +104,16 @@
       .dlg-bd{padding:12px;gap:10px}
       .row{grid-template-columns:1fr}
       .dlg-ft{padding-bottom:calc(12px + var(--safe-bottom))}
-      .fab{display:flex}
     }
-
-    .fab{
-      position:fixed;right:14px;bottom:calc(14px + var(--safe-bottom));
-      width:56px;height:56px;border-radius:999px;background:var(--pri);color:#fff;
-      display:none;align-items:center;justify-content:center;
-      box-shadow:0 10px 24px rgba(11,99,243,.35);z-index:15;font-size:26px;font-weight:900
-    }
-    .fab:active{transform:translateY(1px)}
   </style>
 </head>
 <body>
 
 <div class="layout">
-  <aside class="sidebar">
+  <!-- ===== Sidebar ===== -->
+  <aside class="sidebar" id="sidebar">
     <div class="brand">Amko MiniLink</div>
 
-    <!-- ===== NAV: sesuai struktur yang kamu minta ===== -->
     <nav class="nav">
       <!-- Menu utama -->
       <a href="dashboard.html">📊 Dashboard</a>
@@ -154,13 +154,14 @@
     </div>
   </aside>
 
-  <!-- ====== BAGIAN LAIN TETAP ORI (TIDAK DIUBAH) ====== -->
+  <!-- Overlay untuk mobile -->
+  <div id="overlay" class="overlay" aria-hidden="true"></div>
+
+  <!-- ===== Bagian lain (ORI) ===== -->
   <div>
     <header>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <h2 style="margin:0;font-size:18px">Master Akun Saldo</h2>
-        <span class="pill" style="font-size:11px">Owner: CRUD • Non-owner: edit Saldo/Saldo Awal/Keterangan</span>
-      </div>
+      <button id="toggleSidebar" class="hamburger" aria-label="Toggle Sidebar">☰</button>
+      <h2 class="title">Master Akun Saldo</h2>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <div id="me" class="pill">memuat…</div>
         <div id="roleBadge" class="pill">role: …</div>
@@ -177,7 +178,7 @@
         </select>
       </div>
 
-      <!-- 🔔 Badge info owner -->
+      <!-- Info Owner -->
       <div id="ownerNotice" class="pill" style="display:none; margin:6px 0 12px 0; background:#ecfeff; border-color:#a5f3fc; color:#0c4a6e;">
         Mode Owner: aksi <b>Tambah / Edit / Hapus</b> hanya untuk cabang <b id="ownerNoticeBranch">-</b>.
       </div>
@@ -198,8 +199,10 @@
   </div>
 </div>
 
-<button id="fabAdd" class="fab" title="Tambah">+</button>
+<!-- FAB (tetap ori; muncul untuk owner, diatur lewat JS) -->
+<button id="fabAdd" class="fab" title="Tambah" style="display:none;position:fixed;right:14px;bottom:calc(14px + var(--safe-bottom));width:56px;height:56px;border-radius:999px;background:var(--pri);color:#fff;box-shadow:0 10px 24px rgba(11,99,243,.35);z-index:15;font-size:26px;font-weight:900;align-items:center;justify-content:center;">+</button>
 
+<!-- Modal (ori) -->
 <div class="modal" id="modal">
   <div class="dialog">
     <div class="dlg-hd">
@@ -280,9 +283,8 @@
   let editId=null
   let cacheRows=[]
 
-  const isOwner = ()=> gRole === 'owner'  // setelah normalisasi
+  const isOwner = ()=> gRole === 'owner'
 
-  // ✅ Hanya boleh mutasi pada cabang yang sedang dipilih (owner)
   const canMutateBranch = (accBranch) => {
     if (!isOwner()) return false;
     const current = (viewBranch || gBranch || '').trim();
@@ -305,7 +307,8 @@
     $('m_name').disabled=false
   }
 
-  ;(()=>{ // format ribuan
+  // format ribuan input saldo
+  ;(()=>{ 
     const el = $('m_saldo')
     el.addEventListener('input', e=>{
       const raw = e.target.value.replace(/\D/g,'')
@@ -328,7 +331,6 @@
       .eq('id', session.user.id).single()
     if(error){ alert("Gagal ambil profil: "+error.message); return }
 
-    // 🔧 NORMALISASI ROLE
     gRole   = (prof.role || '').toString().trim().toLowerCase()
     gBranch = (prof.branch_code || '').toString().trim()
     viewBranch = gBranch
@@ -350,6 +352,11 @@
     }
 
     await loadAccounts()
+
+    // Realtime refresh
+    const ch = supabase.channel('realtime-msa');
+    ch.on('postgres_changes',{event:'*',schema:'public',table:'accounts'},()=>loadAccounts());
+    ch.subscribe();
   }
 
   async function loadBranches(){
@@ -357,13 +364,11 @@
     sel.innerHTML = `<option value="">Memuat cabang…</option>`
     let list = []
 
-    // Coba dari tabel branches
     const { data: br, error: ebr } = await supabase.from('branches').select('code,name').order('name')
     if(!ebr && br && br.length){
       list = br.map(b=>({code:(b.code||'').trim(), name:b.name || b.code}))
     }else{
-      // Fallback: distinct dari accounts.branch_code
-      const { data: accs, error: ea } = await supabase.from('accounts').select('branch_code').order('branch_code')
+      const { data: accs } = await supabase.from('accounts').select('branch_code').order('branch_code')
       const set = new Set((accs||[]).map(a=>(a.branch_code||'').trim()).filter(Boolean))
       list = Array.from(set).map(code=>({code, name: code}))
       if(list.length===0 && gBranch){ list = [{code:gBranch, name:gBranch}] }
@@ -398,7 +403,7 @@
     if(error){ alert("Gagal ambil akun: "+error.message); return }
     cacheRows = data || []
 
-    // PIN Laci Tunai ke atas
+    // pin Laci Tunai ke atas
     cacheRows.sort((a,b)=>{
       const aLaci = a.account_type==='cash' && (a.name||'').toLowerCase().includes('laci')
       const bLaci = b.account_type==='cash' && (b.name||'').toLowerCase().includes('laci')
@@ -421,7 +426,6 @@
       const updated  = a.updated_at ? new Date(a.updated_at).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '-'
       const isLaci   = a.account_type==='cash' && (a.name||'').toLowerCase().includes('laci')
 
-      // 🔒 Kontrol aksi berdasarkan cabang & role
       const canEdit = isOwner() ? canMutateBranch(a.branch_code) : true;
       const editBtn = canEdit
         ? `<button class="btn btn-ghost" onclick="editAccount('${a.id}')">Edit</button>`
@@ -477,7 +481,6 @@
     const { data, error } = await supabase.from('accounts').select('*').eq('id', id).single()
     if(error){ alert(error.message); return }
 
-    // 🔒 Guard menurut role & cabang
     if (isOwner()){
       if (!canMutateBranch(data.branch_code)) { alert('Hanya bisa mengedit akun pada cabang yang sedang dipilih.'); return }
     } else {
@@ -548,7 +551,6 @@
       }
       const row = { account_type:type, name, saldo, saldo_awal:(makeOpening?saldo:0), branch_code:cab, note }
       const { error } = await supabase.from('accounts').insert(row)
-      iferror:{}
       if(error){ showErr('Simpan gagal: '+error.message); return }
       showOk('Berhasil ditambahkan.')
     }
@@ -556,6 +558,25 @@
     loadAccounts()
   }
 
+  // ===== Sidebar + Overlay (Mobile) =====
+  const sidebarEl = document.getElementById('sidebar');
+  const overlayEl = document.getElementById('overlay');
+  const btnHamb = document.getElementById('toggleSidebar');
+
+  function toggleSidebar(open){
+    const willOpen = (typeof open==='boolean') ? open : !sidebarEl.classList.contains('open');
+    sidebarEl.classList.toggle('open', willOpen);
+    overlayEl.classList.toggle('show', willOpen);
+    document.body.classList.toggle('noscroll', willOpen);
+  }
+  btnHamb?.addEventListener('click', ()=> toggleSidebar());
+  overlayEl?.addEventListener('click', ()=> toggleSidebar(false));
+  window.addEventListener('keyup', (e)=>{ if(e.key==='Escape') toggleSidebar(false); });
+  document.querySelectorAll('.sidebar .nav a').forEach(a=>{
+    a.addEventListener('click', ()=> toggleSidebar(false));
+  });
+
+  // Logout (ori)
   document.getElementById('lnk-logout').addEventListener('click', async ()=>{
     await supabase.auth.signOut(); location.href="login.html"
   })
