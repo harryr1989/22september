@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Absensi Karyawan | Amko MiniLink</title>
+  <style>
+    :root{
+      --bg:#f6f8fb; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#0b63f3;
+      --card:#fff; --bd:#e5e7eb; --muted:#64748b; --txt:#0f172a;
+      --shadow:0 6px 18px rgba(15,23,42,.08);
+      --sidebar-w:240px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt);font-size:15px}
+    button,input,select,textarea{font-family:inherit}
+
+    /* Layout */
+    .layout{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh}
+
+    /* Sidebar */
+    .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px;z-index:20;position:relative}
+    .brand{color:#fff;font-weight:800;font-size:20px;margin-bottom:12px}
+    .nav{display:flex;flex-direction:column;gap:6px}
+    .nav a{display:flex;align-items:center;gap:10px;color:var(--sbfg);text-decoration:none;padding:10px 12px;border-radius:10px;line-height:1.3;min-height:36px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .nav a:hover{background:rgba(255,255,255,.10)}
+    .nav a.active{background:#0b3a66;color:#fff}
+    .group{margin-top:10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden}
+    .group-hd{padding:8px 10px;background:#0f2238;color:#cfe0f3;font-size:12px;font-weight:800;display:flex;justify-content:space-between;align-items:center;text-transform:uppercase}
+    .group-bd{padding:8px;background:#0f253f;display:flex;flex-direction:column;gap:6px}
+    .sidebar-footer{margin-top:auto;padding-top:10px;font-size:11px;color:#93a3b8}
+    .logout{display:block;margin-top:8px;background:#fecdd3;color:#7f1d1d;text-align:center;border-radius:10px;padding:9px 10px;font-weight:800;text-decoration:none}
+
+    /* Header & content */
+    header{position:sticky;top:0;z-index:9;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+    .content{padding:16px;max-width:1100px;margin:0 auto}
+    .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px;white-space:nowrap}
+    .btn{border:none;border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:700;height:44px;white-space:nowrap}
+    .btn-primary{background:var(--pri);color:#fff}
+    .btn-ghost{background:#f1f5f9}
+    .btn-danger{background:#fee2e2;color:#991b1b}
+    .btn-sm{height:36px;padding:6px 10px;border-radius:10px;font-weight:700;cursor:pointer}
+
+    .card{background:var(--card);border:1px solid var(--bd);border-radius:18px;box-shadow:var(--shadow);padding:14px}
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
+    .kpi-card{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:2px}
+    .kpi-title{font-size:11px;color:#475569}
+    .kpi-value{font-size:18px;font-weight:800}
+
+    .toolbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:6px 0 10px 0}
+    .input{border:1px solid var(--bd);background:#fff;border-radius:10px;padding:10px 12px;font-size:15px;height:44px;outline:none;min-width:0}
+    .date-input,.sel{height:36px;padding:6px 8px;border:1px solid var(--bd);border-radius:10px;background:#fff;font:inherit}
+
+    table{width:100%;border-collapse:collapse;background:#fff}
+    th,td{padding:10px;border:1px solid var(--bd);font-size:14px;text-align:left;vertical-align:top}
+    th{background:#f8fafc}
+
+    /* Hamburger & overlay */
+    .hamburger{font-size:22px;background:none;border:none;cursor:pointer;padding:8px;display:none}
+    .overlay{position:fixed;inset:0;background:rgba(2,6,23,.45);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:19}
+    .overlay.show{opacity:1;pointer-events:auto}
+    body.noscroll{overflow:hidden}
+
+    /* Responsive */
+    @media (max-width:980px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{position:fixed;left:calc(-1 * var(--sidebar-w));top:0;bottom:0;width:var(--sidebar-w);transition:left .25s ease}
+      .sidebar.open{left:0}
+      .hamburger{display:block}
+      .content{padding:12px}
+      table{font-size:13px}
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">Amko MiniLink</div>
+    <nav class="nav">
+      <a href="dashboard.html">📊 Dashboard</a>
+      <a href="transaksi-mini-atm.html">🧮 Transaksi Mini ATM</a>
+
+      <div class="group">
+        <div class="group-hd"><span>MASTER DATA</span><span>▾</span></div>
+        <div class="group-bd">
+          <a href="master-saldo-akun.html">💰 Master Saldo Akun</a>
+          <a href="mutasi-saldo.html">🔄 Mutasi Saldo</a>
+          <a href="saldo-real.html">📑 Saldo Real</a>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-hd"><span>LAPORAN</span><span>▾</span></div>
+        <div class="group-bd">
+          <a href="laporan.html">📘 Laporan MiniLink</a>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-hd"><span>PENGATURAN</span><span>▾</span></div>
+        <div class="group-bd">
+          <a href="manajemen-pengguna.html">👥 Manajemen Pengguna</a>
+          <a href="hak-akses.html">🔑 Hak Akses</a>
+          <a class="active" href="absensi.html">🕒 Absensi</a>
+        </div>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      © Amko MiniLink • v1
+      <a href="#" id="lnk-logout" class="logout">🚪 Logout</a>
+    </div>
+  </aside>
+
+  <!-- Overlay -->
+  <div id="overlay" class="overlay" aria-hidden="true"></div>
+
+  <!-- Main -->
+  <div>
+    <header>
+      <button id="toggleSidebar" class="hamburger" aria-label="Toggle Sidebar" aria-controls="sidebar" aria-expanded="false">☰</button>
+
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <h2 style="margin:0;font-size:18px">Absensi Karyawan</h2>
+        <span class="pill">Check in/out & rekap harian</span>
+      </div>
+
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <span id="me" class="pill">memuat…</span>
+        <span id="roleBadge" class="pill">role: …</span>
+        <span id="branchBadge" class="pill" style="display:none">branch: -</span>
+        <select id="branchSelect" class="input" style="display:none;height:36px"></select>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- KPI -->
+      <div class="card">
+        <h3 style="margin:0 0 8px 0">KPI Absensi (<span id="kpiDateLabel">Hari ini</span>)</h3>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-title">Total Hadir</div><div id="kpiHadir" class="kpi-value">0</div></div>
+          <div class="kpi-card"><div class="kpi-title">Terlambat (&gt; 09:00)</div><div id="kpiTelat" class="kpi-value">0</div></div>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="card">
+        <div class="toolbar">
+          <input id="fltDate" type="date" class="date-input"/>
+          <select id="fltUser" class="sel"><option value="">Semua User</option></select>
+          <select id="fltStatus" class="sel">
+            <option value="">Semua Status</option>
+            <option value="hadir">Hadir</option>
+            <option value="izin">Izin</option>
+            <option value="sakit">Sakit</option>
+            <option value="libur">Libur</option>
+          </select>
+
+          <div style="flex:1"></div>
+
+          <button id="btnCheckIn" class="btn-sm btn-primary">🟢 Check In</button>
+          <button id="btnCheckOut" class="btn-sm btn-ghost">🔵 Check Out</button>
+          <button id="btnExport" class="btn-sm btn-ghost" disabled>📊 Export CSV</button>
+        </div>
+
+        <div id="summary" style="margin:6px 0;font-weight:600">Total = 0</div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>User</th>
+              <th>Tanggal</th>
+              <th>Check-In</th>
+              <th>Check-Out</th>
+              <th>Durasi</th>
+              <th>Status</th>
+              <th>Keterangan</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tb"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal edit catatan/status -->
+<div class="modal" id="modalNote">
+  <div class="dialog" style="width:min(520px,100%)">
+    <div class="dlg-hd">
+      <span>Ubah Status/Keterangan</span>
+      <button class="btn btn-ghost" id="xNote" style="height:40px">✖</button>
+    </div>
+    <div class="dlg-bd">
+      <input type="hidden" id="note_id"/>
+      <div>
+        <label>Status</label>
+        <div class="icon-input">
+          <select id="e_status">
+            <option value="">(kosong)</option>
+            <option value="hadir">Hadir</option>
+            <option value="izin">Izin</option>
+            <option value="sakit">Sakit</option>
+            <option value="libur">Libur</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label>Keterangan</label>
+        <div class="icon-input">
+          <input id="e_note" placeholder="catatan (opsional)"/>
+        </div>
+      </div>
+      <div id="msgErr" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:10px;border-radius:10px"></div>
+    </div>
+    <div class="dlg-ft">
+      <button class="btn" id="batalNote">Batal</button>
+      <button class="btn btn-primary" id="simpanNote">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+  const supabase = createClient(
+    "https://kfqcdcvcnyhisbmwftzb.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y",
+    { auth:{ persistSession:true, autoRefreshToken:true } }
+  );
+
+  const $=id=>document.getElementById(id)
+  const fmtHM = d => d? new Date(d).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : '-'
+  const toISODate = d => new Date(d).toISOString().slice(0,10)
+  const pad = n => String(n).padStart(2,'0')
+  const durasi = (a,b)=>{
+    if(!a||!b) return '-'
+    const ms = (new Date(b)-new Date(a))
+    if(ms<=0) return '0j 00:00'
+    const h = Math.floor(ms/3_600_000), m = Math.floor(ms%3_600_000/60_000)
+    const j = Math.floor(h/24), hh=h%24
+    return (j? j+'j ':'') + pad(hh)+':'+pad(m)
+  }
+
+  let me=null, gRole='kasir', gBranch=null, viewBranch=null
+  let rows=[], allUsers=[]
+
+  // ====== BOOT ======
+  async function boot(){
+    const { data:{ session } } = await supabase.auth.getSession()
+    if(!session){ location.href='login.html'; return }
+
+    const { data: prof } = await supabase.from('profiles')
+      .select('id,full_name,email,role,branch_code').eq('id', session.user.id).single()
+
+    me = prof
+    gRole = (prof?.role||'kasir').toLowerCase()
+    gBranch = (prof?.branch_code||'').trim()
+
+    $('me').textContent = prof.full_name || prof.email
+    $('roleBadge').textContent = `role: ${gRole}`
+
+    const today = toISODate(new Date())
+    $('fltDate').value = today
+    $('kpiDateLabel').textContent = new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
+
+    if(gRole==='owner'){
+      $('branchSelect').style.display='inline-block'
+      $('branchBadge').style.display='none'
+      const { data: branches } = await supabase.from('branches').select('code,name').order('name')
+      $('branchSelect').innerHTML = (branches||[]).map(b=>`<option value="${b.code}">${b.name||b.code}</option>`).join('')
+      $('branchSelect').value = gBranch || branches?.[0]?.code || ''
+      viewBranch = $('branchSelect').value
+      $('branchSelect').onchange = async ()=>{ viewBranch=$('branchSelect').value; await reloadAll() }
+    }else{
+      $('branchBadge').style.display='inline-block'
+      $('branchBadge').textContent = 'branch: ' + (gBranch||'-')
+      viewBranch = gBranch
+    }
+
+    await loadUsers()
+    await reloadAll()
+
+    $('fltDate').addEventListener('change', reloadAll)
+    $('fltUser').addEventListener('change', render)
+    $('fltStatus').addEventListener('change', render)
+
+    $('btnCheckIn').addEventListener('click', checkInMe)
+    $('btnCheckOut').addEventListener('click', checkOutMe)
+
+    // logout
+    $('lnk-logout').addEventListener('click', async (e)=>{ e.preventDefault(); await supabase.auth.signOut(); location.href='login.html' })
+  }
+
+  async function loadUsers(){
+    const { data } = await supabase.from('profiles').select('id,full_name,branch_code').eq('branch_code', viewBranch).order('full_name')
+    allUsers = data||[]
+    $('fltUser').innerHTML = '<option value="">Semua User</option>' + allUsers.map(u=>`<option value="${u.id}">${u.full_name||u.id}</option>`).join('')
+  }
+
+  async function reloadAll(){
+    await loadUsers()
+    await loadAbsensi()
+    render()
+  }
+
+  function currentRangeISO(){
+    const d = $('fltDate').value || toISODate(new Date())
+    const min = new Date(d+'T00:00:00')
+    const max = new Date(d+'T23:59:59.999')
+    return { d, tmin: min.toISOString(), tmax: max.toISOString() }
+  }
+
+  async function loadAbsensi(){
+    const { d, tmin, tmax } = currentRangeISO()
+    let q = supabase.from('attendance').select('*').eq('branch_code', viewBranch).gte('date', d).lte('date', d)
+    const { data, error } = await q.order('check_in',{ascending:false})
+    if(error){ console.error(error); rows=[]; return }
+    rows = data||[]
+  }
+
+  function render(){
+    const fUser = $('fltUser').value
+    const fStatus = $('fltStatus').value
+    const list = (rows||[]).filter(r=>{
+      if(fUser && r.user_id!==fUser) return false
+      if(fStatus && (r.status||'')!==fStatus) return false
+      return true
+    })
+    $('summary').textContent = 'Total = ' + list.length
+    $('btnExport').disabled = list.length===0
+
+    const telatJam = 9, telatMenit = 0
+    let hadir=0, telat=0, i=1
+    $('tb').innerHTML = list.map(r=>{
+      const chIn = r.check_in ? new Date(r.check_in) : null
+      const chOut= r.check_out ? new Date(r.check_out): null
+      const isHadir = !!r.check_in || (r.status==='hadir')
+      if(isHadir) hadir++
+      const isTelat = chIn ? (chIn.getHours()>telatJam || (chIn.getHours()===telatJam && chIn.getMinutes()>telatMenit)) : false
+      if(isTelat) telat++
+      const uname = r.user_name || (allUsers.find(u=>u.id===r.user_id)?.full_name || r.user_id)
+      const st = r.status|| (isHadir?'hadir':'')
+      const note = r.note||''
+      return `<tr data-id="${r.id}">
+        <td>${i++}</td>
+        <td>${uname}</td>
+        <td>${new Date(r.date).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})}</td>
+        <td>${fmtHM(r.check_in)}</td>
+        <td>${fmtHM(r.check_out)}</td>
+        <td>${durasi(r.check_in, r.check_out)}</td>
+        <td style="text-transform:capitalize">${st||'-'}</td>
+        <td>${note||'-'}</td>
+        <td>
+          <button class="btn-sm btn-ghost" data-act="edit">✏️</button>
+          <button class="btn-sm btn-danger" data-act="del">🗑️</button>
+        </td>
+      </tr>`
+    }).join('')
+
+    $('kpiHadir').textContent = hadir
+    $('kpiTelat').textContent = telat
+  }
+
+  // ===== Check-in/out =====
+  async function getTodayMyRow(){
+    const { d } = currentRangeISO()
+    const { data } = await supabase.from('attendance')
+      .select('*').eq('user_id', me.id).eq('branch_code', viewBranch).eq('date', d).maybeSingle()
+    return data||null
+  }
+
+  async function checkInMe(){
+    const { d } = currentRangeISO()
+    if(!viewBranch){ alert('Cabang tidak terdeteksi'); return }
+    let row = await getTodayMyRow()
+    if(row && row.check_in){ alert('Sudah check in.'); return }
+    const payload = {
+      user_id: me.id, user_name: me.full_name || me.email,
+      branch_code: viewBranch, date: d, check_in: new Date().toISOString(),
+      status: 'hadir'
+    }
+    let res
+    if(row){ res = await supabase.from('attendance').update(payload).eq('id', row.id) }
+    else   { res = await supabase.from('attendance').insert(payload) }
+    if(res.error){ alert('Gagal check in: '+res.error.message); return }
+    await loadAbsensi(); render()
+  }
+
+  async function checkOutMe(){
+    const row = await getTodayMyRow()
+    if(!row || !row.check_in){ alert('Belum check in.'); return }
+    if(row.check_out){ alert('Sudah check out.'); return }
+    const { error } = await supabase.from('attendance').update({ check_out: new Date().toISOString() }).eq('id', row.id)
+    if(error){ alert('Gagal check out: '+error.message); return }
+    await loadAbsensi(); render()
+  }
+
+  // ===== Edit/Del catatan & status =====
+  document.getElementById('tb').addEventListener('click', async (e)=>{
+    const tr = e.target.closest('tr[data-id]'); if(!tr) return
+    const id = tr.getAttribute('data-id')
+    const actBtn = e.target.closest('button[data-act]'); if(!actBtn) return
+    const act = actBtn.getAttribute('data-act')
+    if(act==='del'){
+      if(!confirm('Hapus baris absensi ini?')) return
+      const { error } = await supabase.from('attendance').delete().eq('id', id)
+      if(error){ alert('Gagal hapus: '+error.message); return }
+      await loadAbsensi(); render()
+    }else if(act==='edit'){
+      const row = rows.find(r=>String(r.id)===String(id)); if(!row) return
+      $('note_id').value = row.id
+      $('e_status').value = row.status || ''
+      $('e_note').value = row.note || ''
+      openModal('modalNote')
+    }
+  })
+
+  function openModal(id){ $(id).classList.add('show') }
+  function closeModal(id){ $(id).classList.remove('show') }
+  $('xNote').onclick = ()=> closeModal('modalNote')
+  $('batalNote').onclick = ()=> closeModal('modalNote')
+  $('simpanNote').onclick = async ()=>{
+    const id=$('note_id').value
+    const status=$('e_status').value||null
+    const note=$('e_note').value||null
+    const { error } = await supabase.from('attendance').update({ status, note }).eq('id', id)
+    if(error){ const m=$('msgErr'); m.textContent='Gagal simpan: '+error.message; m.style.display='block'; return }
+    closeModal('modalNote'); await loadAbsensi(); render()
+  }
+
+  // ===== Export CSV =====
+  $('btnExport').onclick = ()=>{
+    if(!rows || rows.length===0) return
+    const f = $('fltDate').value || toISODate(new Date())
+    const list = Array.from(document.querySelectorAll('#tb tr')).map(tr=>{
+      const tds=tr.querySelectorAll('td'); return Array.from(tds).slice(1,8).map(td=>`"${(td.textContent||'').replace(/"/g,'""')}"`)
+    })
+    const header = ['User','Tanggal','Check-In','Check-Out','Durasi','Status','Keterangan']
+    const csv = [header.join(','), ...list.map(r=>r.join(','))].join('\n')
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`absensi_${f}.csv`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500)
+  }
+
+  // ===== Hamburger + Overlay =====
+  const sidebarEl = document.getElementById('sidebar');
+  const overlayEl = document.getElementById('overlay');
+  const btnHamb = document.getElementById('toggleSidebar');
+  function toggleSidebar(open){
+    const willOpen = (typeof open==='boolean') ? open : !sidebarEl.classList.contains('open');
+    sidebarEl.classList.toggle('open', willOpen);
+    overlayEl.classList.toggle('show', willOpen);
+    document.body.classList.toggle('noscroll', willOpen);
+    if(btnHamb) btnHamb.setAttribute('aria-expanded', String(willOpen));
+  }
+  btnHamb?.addEventListener('click', ()=> toggleSidebar());
+  overlayEl?.addEventListener('click', ()=> toggleSidebar(false));
+  window.addEventListener('keyup', (e)=>{ if(e.key==='Escape') toggleSidebar(false); });
+  document.addEventListener('click', (e)=>{ if(e.target.closest('.sidebar a')) toggleSidebar(false) });
+
+  // Start
+  boot()
+</script>
+</body>
+</html>

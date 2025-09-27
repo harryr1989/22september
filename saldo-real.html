@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Saldo Real (Tutup Shift) | Amko MiniLink</title>
+  <style>
+    :root{
+      --bg:#f6f8fb; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#0b63f3;
+      --card:#fff; --bd:#e5e7eb; --txt:#0f172a; --shadow:0 6px 18px rgba(15,23,42,.08);
+      --sidebar-w:240px;
+      --warn:#fff7ed; --warnbd:#fdba74; --warntext:#9a3412;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt);font-size:15px}
+    .layout{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh}
+
+    /* Sidebar */
+    .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px;z-index:20;position:relative}
+    .brand{color:#fff;font-weight:800;font-size:20px;margin-bottom:12px}
+    .nav{display:flex;flex-direction:column;gap:6px}
+    .nav a{display:flex;align-items:center;gap:10px;color:var(--sbfg);text-decoration:none;padding:10px 12px;border-radius:10px}
+    .nav a:hover{background:rgba(255,255,255,.1)}
+    .nav a.active{background:#0b3a66;color:#fff}
+    .group{margin-top:10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden}
+    .group-hd{padding:8px 10px;background:#0f2238;color:#cfe0f3;font-size:12px;font-weight:800;display:flex;justify-content:space-between}
+    .group-bd{padding:8px;background:#0f253f;display:flex;flex-direction:column;gap:6px}
+    .sidebar-footer{margin-top:auto;padding-top:10px;font-size:11px;color:#93a3b8}
+    .logout{display:block;margin-top:8px;background:#fecdd3;color:#7f1d1d;text-align:center;border-radius:10px;padding:9px 10px;font-weight:800}
+
+    /* Header & content */
+    header{position:sticky;top:0;z-index:9;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+    .content{padding:16px;max-width:1100px;margin:0 auto}
+    .pill{padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:#fff;font-size:14px;height:42px}
+    .pill[readonly], .pill[disabled]{background:#f8fafc;color:#475569}
+    .btn{border:none;border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:800;height:44px}
+    .btn-primary{background:var(--pri);color:#fff}
+    .btn-ghost{background:#f1f5f9}
+    .btn-outline{background:#fff;border:2px solid #0f172a}
+    .btn-sm{height:36px;padding:6px 10px;border-radius:10px;font-weight:700;cursor:pointer}
+
+    .card{background:var(--card);border:1px solid var(--bd);border-radius:18px;box-shadow:var(--shadow);padding:14px}
+    table{width:100%;border-collapse:collapse;background:#fff}
+    th,td{padding:10px;border:1px solid var(--bd);font-size:14px;text-align:left}
+    th{background:#f8fafc}
+    tfoot td{font-weight:800;background:#f8fafc}
+    .diff-pos{color:#16a34a;font-weight:800}
+    .diff-neg{color:#dc2626;font-weight:800}
+    .muted{color:#64748b}
+    h3{margin:0 0 8px 0}
+
+    /* Bar Wajib Saldo Kasir */
+    .kasir-card{background:var(--warn);border:2px dashed var(--warnbd);border-radius:14px;padding:12px;margin:12px 0}
+    .badge-wajib{display:inline-block;background:#fecaca;color:#7f1d1d;font-weight:900;border-radius:999px;padding:4px 10px;font-size:12px;margin-left:8px}
+
+    /* Lock overlay for inputs (when kasir belum diisi) */
+    .lock-mask{position:absolute;inset:0;background:rgba(248,250,252,.65);display:flex;align-items:center;justify-content:center;border-radius:14px}
+    .lock-mask span{background:#fff;border:1px solid var(--bd);border-radius:999px;padding:8px 12px;font-weight:800}
+
+    /* Hamburger & overlay */
+    .hamburger{font-size:22px;background:none;border:none;cursor:pointer;padding:8px;display:none}
+    .overlay{position:fixed;inset:0;background:rgba(2,6,23,.45);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:19}
+    .overlay.show{opacity:1;pointer-events:auto}
+    body.noscroll{overflow:hidden}
+    @media(max-width:980px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{position:fixed;left:-240px;top:0;bottom:0;width:var(--sidebar-w);transition:left .25s}
+      .sidebar.open{left:0}
+      .hamburger{display:block}
+      .content{padding:12px}
+      .pill{height:40px}
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">Amko MiniLink</div>
+    <nav class="nav">
+      <a href="dashboard.html">📊 Dashboard</a>
+      <a href="transaksi-mini-atm.html">🧮 Transaksi Mini ATM</a>
+      <div class="group">
+        <div class="group-hd"><span>MASTER DATA</span></div>
+        <div class="group-bd">
+          <a href="master-saldo-akun.html">💰 Master Saldo Akun</a>
+          <a href="mutasi-saldo.html">🔄 Mutasi Saldo</a>
+          <a class="active" href="saldo-real.html">📑 Saldo Real</a>
+        </div>
+      </div>
+      <div class="group">
+        <div class="group-hd"><span>LAPORAN</span></div>
+        <div class="group-bd">
+          <a href="laporan.html">📘 Laporan MiniLink</a>
+        </div>
+      </div>
+      <div class="group">
+        <div class="group-hd"><span>PENGATURAN</span></div>
+        <div class="group-bd">
+          <a href="manajemen-pengguna.html">👥 Manajemen Pengguna</a>
+          <a href="hak-akses.html">🔑 Hak Akses</a>
+          <a href="absensi.html">🕒 Absensi</a>
+        </div>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      © Amko MiniLink • v1
+      <a href="#" id="lnk-logout" class="logout">🚪 Logout</a>
+    </div>
+  </aside>
+
+  <!-- Overlay (mobile) -->
+  <div id="overlay" class="overlay" aria-hidden="true"></div>
+
+  <!-- Main -->
+  <div>
+    <header>
+      <button id="toggleSidebar" class="hamburger" aria-label="Toggle Sidebar" aria-controls="sidebar" aria-expanded="false">☰</button>
+      <h2 style="margin:0">Saldo Real (Tutup Shift)</h2>
+    </header>
+
+    <div class="content">
+      <!-- ====== FORM HEADER (dipertahankan) ====== -->
+      <div class="card" style="margin-bottom:8px">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input id="tgl" type="date" class="pill" readonly aria-readonly="true"/>
+          <input id="shift" class="pill" readonly aria-readonly="true" placeholder="Nama Shift (otomatis kasir aktif)"/>
+          <input id="kasir" class="pill" readonly aria-readonly="true" placeholder="Kasir aktif"/>
+          <input id="note" class="pill" placeholder="Catatan (opsional)" style="flex:1;min-width:200px"/>
+
+          <button id="btnSave" class="btn btn-primary" disabled>💾 Simpan Tutup Shift</button>
+          <button id="btnExport" class="btn btn-ghost" disabled>📊 Export CSV</button>
+          <div style="flex:1"></div>
+          <button id="btnReload" class="btn btn-outline" disabled>↻ Muat Ulang Saldo Sistem</button>
+        </div>
+
+        <!-- Ringkas total (dipertahankan) -->
+        <div id="sumInfo" style="margin-top:8px;font-weight:800">
+          Total Akun: 0 • Total Selisih: Rp 0
+        </div>
+      </div>
+
+      <!-- ====== BAR SALDO KASIR (WAJIB) ====== -->
+      <div class="kasir-card" style="margin-bottom:10px">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <div style="font-weight:900;color:var(--warntext)">Saldo Kasir (tambahan fisik untuk <u>Laci Tunai</u>)<span class="badge-wajib">WAJIB DIISI</span></div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="muted">Rp</span>
+            <input id="extraKasir" class="pill" placeholder="0" inputmode="numeric" style="width:220px"/>
+          </div>
+          <span class="muted">Nilai ini akan ditambahkan ke <b>Saldo Sistem</b> akun <b>Laci Tunai</b> sebelum perhitungan.</span>
+        </div>
+      </div>
+
+      <!-- ====== TABEL SALDO ====== -->
+      <div class="card" style="position:relative">
+        <!-- Lock mask: terbuka setelah saldo kasir DIISI (boleh 0) -->
+        <div id="lockMask" class="lock-mask"><span>Isi “Saldo Kasir” terlebih dahulu</span></div>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Akun</th>
+                <th>Tipe</th>
+                <th>Saldo Sistem <small>(+ Saldo Kasir untuk Laci)</small></th>
+                <th>Saldo Real</th>
+                <th>Selisih (Real − Sistem)</th>
+              </tr>
+            </thead>
+            <tbody id="tb"></tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3">TOTAL</td>
+                <td id="totSys">Rp 0</td>
+                <td id="totReal">Rp 0</td>
+                <td id="totDiff">Rp 0</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- ====== RIWAYAT (dipertahankan) ====== -->
+      <div class="card" style="margin-top:12px">
+        <h3>Riwayat Tutup Shift (tanggal terpilih)</h3>
+        <div class="muted" id="historyEmpty">Belum ada data.</div>
+        <div id="historyList" style="display:grid;gap:10px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ========= Helpers
+  const $ = id => document.getElementById(id)
+  const fmtID = n => new Intl.NumberFormat('id-ID').format(Number(n||0))   // 1.000
+  const fmtRp = n => 'Rp ' + fmtID(n)
+  const parseNum = v => Number(String(v??'').replace(/\D/g,''))||0
+  const toISO = d => new Date(d).toISOString().slice(0,10)
+
+  // ========= State (demo; sambungkan ke sistemmu jika perlu)
+  const currentUserName = 'Kasir Aktif' // ganti dari sesi loginmu
+  let saldoKasirExtra = null            // null = belum diisi; angka (>=0) = sudah diisi
+  let rows = [
+    { id: 1, account_name: 'Laci Tunai',  account_type: 'cash',   saldo_system: 1000000, saldo_real: null },
+    { id: 2, account_name: 'BRI',         account_type: 'bank',   saldo_system: 2000000, saldo_real: null },
+    { id: 3, account_name: 'BCA',         account_type: 'bank',   saldo_system: 1500000, saldo_real: null },
+    { id: 4, account_name: 'Server Pulsa',account_type: 'server', saldo_system: 500000,  saldo_real: null },
+  ]
+
+  // ========= Init: tanggal & kasir/shift
+  const todayISO = toISO(new Date())
+  $('tgl').value = todayISO
+  $('kasir').value = currentUserName
+  $('shift').value = currentUserName // sesuai instruksi: nama shift = nama kasir aktif (readonly)
+
+  // ======== Util: saldo sistem + kasir khusus Laci
+  function sysWithKasir(row){
+    let sys = row.saldo_system || 0;
+    if (/laci/i.test(row.account_name) && saldoKasirExtra !== null) sys += saldoKasirExtra;
+    return sys;
+  }
+
+  // ========= Saldo Kasir (wajib)
+  const lockMask = $('lockMask')
+  const setLocked = (locked) => {
+    lockMask.style.display = locked ? 'flex' : 'none'
+    $('btnSave').disabled   = locked
+    $('btnExport').disabled = locked
+    $('btnReload').disabled = locked
+  }
+  setLocked(true)
+
+  // ======== Render awal tabel (sekali saja)
+  function initialRender(){
+    let i = 1
+    const kasirEntered = (saldoKasirExtra!==null)
+    $('tb').innerHTML = rows.map(r=>{
+      const sys = sysWithKasir(r)
+      const diff = (r.saldo_real || 0) - sys
+      const realVal = (r.saldo_real==null?'':fmtID(r.saldo_real))
+      return `
+        <tr>
+          <td>${i++}</td>
+          <td>${r.account_name}</td>
+          <td>${r.account_type}</td>
+          <td id="sys-${r.id}">${fmtRp(sys)}</td>
+          <td>
+            <input data-real="${r.id}" class="pill" placeholder="0"
+                   ${kasirEntered?'':'disabled'}
+                   value="${realVal}" inputmode="numeric" style="height:36px"/>
+          </td>
+          <td id="diff-${r.id}" class="${diff>0?'diff-pos':diff<0?'diff-neg':''}">
+            ${kasirEntered && r.saldo_real!=null ? fmtRp(diff) : '—'}
+          </td>
+        </tr>
+      `
+    }).join('')
+    bindInputs()
+    updateTotals()
+  }
+
+  // ======== Update totals (tanpa rebuild baris)
+  function updateTotals(){
+    const kasirEntered = (saldoKasirExtra!==null)
+    const tSys  = rows.reduce((s,r)=> s + ( /laci/i.test(r.account_name) && kasirEntered ? (r.saldo_system||0)+saldoKasirExtra : (r.saldo_system||0) ), 0)
+    const tReal = rows.reduce((s,r)=> s + (r.saldo_real||0), 0)
+    const tDiff = kasirEntered ? (tReal - tSys) : 0
+    $('totSys').textContent  = fmtRp(kasirEntered ? tSys : 0)
+    $('totReal').textContent = fmtRp(kasirEntered ? tReal: 0)
+    $('totDiff').textContent = kasirEntered ? fmtRp(tDiff) : 'Rp 0'
+    $('sumInfo').textContent = `Total Akun: ${rows.length} • Total Selisih: ${kasirEntered ? fmtRp(tDiff) : 'Rp 0'}`
+  }
+
+  // ======== Bind input angka (tanpa re-render tabel)
+  function bindInputs(){
+    document.querySelectorAll('input[data-real]').forEach(inp=>{
+      inp.oninput = ()=>{
+        const id  = Number(inp.getAttribute('data-real'))
+        const val = parseNum(inp.value)
+        inp.value = val ? fmtID(val) : ''
+        const row = rows.find(r=>r.id===id)
+        row.saldo_real = (inp.value===''? null : val)
+
+        // hitung ulang hanya baris ini
+        const sys  = sysWithKasir(row)
+        const diff = (row.saldo_real || 0) - sys
+
+        const sysCell  = document.getElementById(`sys-${id}`)
+        const diffCell = document.getElementById(`diff-${id}`)
+        if(sysCell)  sysCell.textContent  = fmtRp(sys)
+        if(diffCell){
+          diffCell.textContent = (row.saldo_real==null ? '—' : fmtRp(diff))
+          diffCell.classList.toggle('diff-pos', diff>0)
+          diffCell.classList.toggle('diff-neg', diff<0)
+          if(diff===0) { diffCell.classList.remove('diff-pos','diff-neg') }
+        }
+
+        updateTotals()
+      }
+    })
+  }
+
+  // ======== Handler saldo kasir: update semua baris Laci + totals, tanpa rebuild
+  $('extraKasir').addEventListener('input', (e)=>{
+    const raw = e.target.value.replace(/\D/g,'')
+    if(raw===''){
+      saldoKasirExtra = null
+      e.target.value = ''
+      setLocked(true)
+    }else{
+      saldoKasirExtra = Number(raw)
+      e.target.value  = fmtID(saldoKasirExtra)
+      setLocked(false)
+    }
+
+    // enable/disable input real
+    document.querySelectorAll('input[data-real]').forEach(inp=>{
+      inp.disabled = (saldoKasirExtra===null)
+    })
+
+    // update setiap baris (sys+diff) sesuai saldoKasirExtra
+    rows.forEach(row=>{
+      const id = row.id
+      const sysCell  = document.getElementById(`sys-${id}`)
+      const diffCell = document.getElementById(`diff-${id}`)
+      if(sysCell){
+        const sys = sysWithKasir(row)
+        sysCell.textContent = fmtRp(sys)
+        if(diffCell){
+          if(row.saldo_real==null || saldoKasirExtra===null){
+            diffCell.textContent = '—'
+            diffCell.classList.remove('diff-pos','diff-neg')
+          }else{
+            const diff = row.saldo_real - sys
+            diffCell.textContent = fmtRp(diff)
+            diffCell.classList.toggle('diff-pos', diff>0)
+            diffCell.classList.toggle('diff-neg', diff<0)
+            if(diff===0) { diffCell.classList.remove('diff-pos','diff-neg') }
+          }
+        }
+      }
+    })
+
+    updateTotals()
+  })
+
+  // ====== Buttons (dummy actions)
+  $('btnReload').onclick = ()=> alert('Saldo sistem di-reload (dummy).')
+  $('btnSave').onclick   = ()=> alert('Tutup shift tersimpan (dummy).')
+  $('btnExport').onclick = ()=>{
+    if(saldoKasirExtra===null){ alert('Isi Saldo Kasir dulu.'); return }
+    const header = ['Akun','Tipe','Saldo Sistem(+Kasir Laci)','Saldo Real','Selisih']
+    const lines = [header.join(',')]
+    rows.forEach(r=>{
+      const sys = sysWithKasir(r)
+      const real = (r.saldo_real||0)
+      const diff = real - sys
+      const rec = [r.account_name, r.account_type, sys, real, diff].map(v=>{
+        const s=String(v); return /[",;]/.test(s)?`"${s.replace(/"/g,'""')}"`:s
+      })
+      lines.push(rec.join(','))
+    })
+    const blob = new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8;'})
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = `saldo_real_${$('tgl').value}.csv`
+    a.click()
+    setTimeout(()=>URL.revokeObjectURL(a.href),500)
+  }
+
+  // ====== Render awal (sekali)
+  initialRender()
+
+  // ====== Hamburger + overlay (mobile)
+  const sidebarEl = document.getElementById('sidebar');
+  const overlayEl = document.getElementById('overlay');
+  const btnHamb   = document.getElementById('toggleSidebar');
+  function toggleSidebar(open){
+    const willOpen = (typeof open==='boolean') ? open : !sidebarEl.classList.contains('open');
+    sidebarEl.classList.toggle('open', willOpen);
+    overlayEl.classList.toggle('show', willOpen);
+    document.body.classList.toggle('noscroll', willOpen);
+    if(btnHamb) btnHamb.setAttribute('aria-expanded', String(willOpen));
+  }
+  btnHamb?.addEventListener('click', ()=> toggleSidebar());
+  overlayEl?.addEventListener('click', ()=> toggleSidebar(false));
+  window.addEventListener('keyup', (e)=>{ if(e.key==='Escape') toggleSidebar(false); });
+  document.addEventListener('click', (e)=>{ if(e.target.closest('.sidebar a')) toggleSidebar(false) });
+</script>
+</body>
+</html>
