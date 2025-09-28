@@ -59,13 +59,13 @@
     <div class="card-h">
       <div class="brand">
         <div class="title">AMKO Mini<span class="link-red">Link</span></div>
-        <div class="tagline">Solusi Cepat Tarik &amp; Transfer Dana</div>
+        <div class="tagline">Catat Kas Aman &amp; rapi, Usaha Jadi Lancar</div>
       </div>
     </div>
     <div class="card-b">
       <form id="loginForm" novalidate>
         <div class="field" style="margin-bottom:12px">
-          <label for="email">Email</label>
+          <label for="email">Username</label>
           <input id="email" type="email" class="input" placeholder="owner@contoh.com" autocomplete="username" required />
         </div>
         <div class="field" style="margin-bottom:8px">
@@ -105,24 +105,72 @@
     const supabaseUrl="https://kfqcdcvcnyhisbmwftzb.supabase.co";
     const supabaseKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
     let supabase=null;
-    function initSupabase(){const storage=!el("rememberChk").checked?window.sessionStorage:window.localStorage;
-      supabase=window.supabase.createClient(supabaseUrl,supabaseKey,{auth:{persistSession:true,storage,autoRefreshToken:true,detectSessionInUrl:true}});}
+    function initSupabase(){
+      const storage=!el("rememberChk").checked?window.sessionStorage:window.localStorage;
+      supabase=window.supabase.createClient(supabaseUrl,supabaseKey,{
+        auth:{persistSession:true,storage,autoRefreshToken:true,detectSessionInUrl:true}
+      });
+    }
     initSupabase();
 
-    async function fetchUserRole(uid){const {data,error}=await supabase.from("profiles").select("role").eq("id",uid).maybeSingle();if(error){setMsg("Gagal ambil role: "+error.message,"error");return null;}return data?data.role:null;}
-    function redirectByRole(r){if(String(r).toLowerCase()==="owner"){window.location.href="dashboard.html";}else{window.location.href="master-saldo-akun.html";}}
+    // === PATCH: Ambil profil lengkap (role & full_name) ===
+    async function fetchUserProfile(uid){
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("role, full_name")
+        .eq("id", uid)
+        .maybeSingle();
+      if(error){
+        setMsg("Gagal ambil profil: "+error.message,"error");
+        return null;
+      }
+      return data; // { role, full_name }
+    }
 
-    async function redirectIfLoggedIn(){const {data:{session}}=await supabase.auth.getSession();if(session&&session.user){const r=await fetchUserRole(session.user.id);if(r)redirectByRole(r);}}
+    // === PATCH: Simpan ke localStorage untuk dipakai dashboard.html ===
+    function persistProfile(p){
+      try{
+        localStorage.setItem("user_role", (p?.role || "").toLowerCase());
+        localStorage.setItem("user_name", p?.full_name || "USER");
+      }catch(e){ console.warn("Gagal simpan ke localStorage:", e); }
+    }
+
+    function redirectByRole(r){
+      if(String(r).toLowerCase()==="owner"){
+        window.location.href="dashboard.html";
+      }else{
+        window.location.href="master-saldo-akun.html";
+      }
+    }
+
+    // Cek jika sudah login sebelumnya → ambil profil, simpan ke localStorage, lalu redirect sesuai role
+    async function redirectIfLoggedIn(){
+      const { data:{session} } = await supabase.auth.getSession();
+      if(session&&session.user){
+        const prof = await fetchUserProfile(session.user.id);
+        if(prof){
+          persistProfile(prof);        // <-- simpan role & nama
+          redirectByRole(prof.role);   // <-- arahkan sesuai role
+        }
+      }
+    }
     redirectIfLoggedIn();
 
+    // Submit login
     el("loginForm").addEventListener("submit",async e=>{
       e.preventDefault();setMsg("");setLoading(true);initSupabase();
       const email=el("email").value.trim(),password=el("password").value;
       if(!email||!password){setMsg("Email & sandi wajib diisi","error");setLoading(false);return;}
-      const {data,error}=await supabase.auth.signInWithPassword({email,password});
+
+      const { data, error } = await supabase.auth.signInWithPassword({email,password});
       if(error){setMsg("Login gagal: "+error.message,"error");setLoading(false);return;}
-      const role=await fetchUserRole(data.user.id);if(!role){setLoading(false);return;}
-      setMsg("Login berhasil. Mengarahkan...","info");redirectByRole(role);
+
+      // === PATCH: Setelah login, ambil profil, simpan ke localStorage, redirect sesuai role
+      const prof = await fetchUserProfile(data.user.id);
+      if(!prof){ setLoading(false); return; }
+      persistProfile(prof);
+      setMsg("Login berhasil. Mengarahkan...","info");
+      redirectByRole(prof.role);
     });
   </script>
 </body>
