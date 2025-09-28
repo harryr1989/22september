@@ -356,7 +356,7 @@
   /* ====== UI Jenis Mutasi ====== */
   function refreshJenisUI(){
     const v = $('jenis').value;
-    const isPindah = (v==='PINDAH');
+    const isPindah = (String(v).toUpperCase()==='PINDAH');
     $('rowAkunSingle').classList.toggle('hidden', isPindah);
     $('rowAkunPindah').classList.toggle('hidden', !isPindah);
     $('rowAdmin').classList.toggle('hidden', !isPindah);
@@ -380,7 +380,7 @@
     $('keterangan').value = '';
 
     refreshJenisUI();
-    $('modalMutasi').showModal();
+    $('modalMutasi').showModal(); const dlg=$('modalMutasi'); if(dlg?.dataset?.editId) delete dlg.dataset.editId;
 
     // beri hook
     window.dispatchEvent(new CustomEvent('add-mutation', { detail:{ branch:gBranch, user:me } }));
@@ -394,7 +394,7 @@
   async function onSaveMutasi(ev){
     ev.preventDefault();
 
-    const jenis = $('jenis').value;
+    const jenis = $('jenis').value.toLowerCase();
     const nominal = parseMoney($('nominal').value);
     const admin = parseMoney($('admin').value || '0');
     if(nominal <= 0){ alert('Nominal harus > 0'); return; }
@@ -438,7 +438,15 @@
     window.dispatchEvent(new CustomEvent('save-mutation', { detail: payload }));
 
     try{
-      await insertMutasiFallback(payload); // matikan jika Anda override sendiri
+      const dlg = document.getElementById('modalMutasi');
+      const editId = dlg?.dataset?.editId;
+      if(editId){
+        const { error } = await supabase.from('mutasi_saldo').update(payload).eq('id', editId);
+        if(error) throw error;
+        delete dlg.dataset.editId;
+      }else{
+        await insertMutasiFallback(payload); // matikan jika Anda override sendiri
+      }
       closeFormAdd();
       await loadKPI(); await loadRiwayat();
     }catch(err){
@@ -493,8 +501,74 @@
   }
 
   /* ===== Placeholder agar halaman tidak error jika fungsi asli ada di file lain ===== */
-  async function loadKPI(){ /* isi sesuai versi Anda */ }
-  async function loadRiwayat(){ /* isi sesuai versi Anda */ }
+  async function loadKPI(){ /* isi sesuai versi Anda atau query view KPI */
+    try{
+      const { data, error } = await supabase.from('v_dashboard_global_summary').select('*').maybeSingle();
+      if(error){ console.warn('KPI error', error); return; }
+      if(data){
+        const el = document.getElementById('kpiSection');
+        if(el) el.textContent = JSON.stringify(data);
+      }
+    }catch(e){ console.warn(e); }
+  }
+  async function loadRiwayat(){
+    try{
+      const { data, error } = await supabase
+        .from('mutasi_saldo')
+        .select('*')
+        .eq('branch_code', gBranch)
+        .order('created_at', { ascending:false })
+        .limit(50);
+      if(error){ console.warn('Riwayat error', error); return; }
+      const tb = document.getElementById('tb');
+      if(!tb) return;
+      tb.innerHTML = (data||[]).map((r, i)=>`
+        <tr>
+          <td>${i+1}</td>
+          <td>${r.created_by || ''}<br>${r.tanggal || ''}</td>
+          <td>${r.jenis || ''}</td>
+          <td>${r.akun_name || r.sumber_name || '-'}</td>
+          <td>${r.tujuan_name || '-'}</td>
+          <td class="num">${(r.nominal||0).toLocaleString('id-ID')}</td>
+          <td class="num">${(r.admin||0).toLocaleString('id-ID')}</td>
+          <td>${r.keterangan||''}</td>
+          <td>
+            <button class="btn-sm" onclick="editMutasi('${r.id}')">Edit</button>
+            <button class="btn-sm" onclick="deleteMutasi('${r.id}')">Hapus</button>
+          </td>
+        </tr>`).join('');
+    }catch(e){ console.warn(e); }
+  }
+
+  window.deleteMutasi = async function(id){
+    if(!confirm('Hapus mutasi ini?')) return;
+    const { error } = await supabase.from('mutasi_saldo').delete().eq('id', id);
+    if(error){ alert('Gagal hapus: '+error.message); return; }
+    await loadRiwayat(); await loadKPI();
+  }
+
+  window.editMutasi = async function(id){
+    const { data, error } = await supabase.from('mutasi_saldo').select('*').eq('id', id).single();
+    if(error){ alert('Gagal ambil data'); return; }
+    const r = data;
+    // set jenis (gunakan format original di UI: uppercase option values)
+    const j = String(r.jenis||'').toUpperCase();
+    const elJenis = document.getElementById('jenis');
+    if(elJenis){ elJenis.value = j; elJenis.dispatchEvent(new Event('change')); }
+
+    // set akun/nominal/dll
+    if(r.akun_id) document.getElementById('akun').value = r.akun_id;
+    if(r.sumber_id) document.getElementById('akunSumber').value = r.sumber_id;
+    if(r.tujuan_id) document.getElementById('akunTujuan').value = r.tujuan_id;
+    document.getElementById('admin').value = (r.admin||0);
+    document.getElementById('nominal').value = (r.nominal||0).toLocaleString('id-ID');
+    document.getElementById('keterangan').value = r.keterangan||'';
+
+    // simpan id edit di dataset modal
+    const dlg = document.getElementById('modalMutasi');
+    dlg.dataset.editId = id;
+    dlg.showModal();
+  }
 
   /* ===== Logout ===== */
   document.getElementById('lnk-logout').addEventListener('click', async (e)=>{
