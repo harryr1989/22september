@@ -16,7 +16,7 @@
     /* ===== Layout ===== */
     .layout{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh}
 
-    /* ===== Sidebar (match dashboard/master) ===== */
+    /* ===== Sidebar ===== */
     .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px;position:relative;z-index:20}
     .brand{color:#fff;font-weight:800;font-size:20px;margin-bottom:12px}
     .nav{padding:0;display:flex;flex-direction:column;gap:6px}
@@ -29,8 +29,13 @@
     .sidebar-footer{margin-top:auto;padding-top:10px;font-size:11px;color:#93a3b8}
     .logout{display:block;margin-top:8px;background:#fecdd3;color:#7f1d1d;text-align:center;border-radius:10px;padding:9px 10px;font-weight:800;text-decoration:none}
 
-    /* ===== Header & konten (ori) ===== */
-    header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+    /* ===== Header & konten ===== */
+    header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .hdr-left{display:flex;align-items:center;gap:12px;flex:1 1 auto;min-width:300px}
+    .hdr-right{display:flex;align-items:center;gap:8px}
+    .current-store{font-weight:800}
+    .user-badge{font-weight:800;letter-spacing:.2px;text-transform:uppercase}
+
     .btn{border:none;border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:700;height:44px;transition:background .15s,box-shadow .15s}
     .btn-primary{background:var(--pri);color:#fff}
     .btn-sm{height:36px;padding:6px 10px;border-radius:999px;font-weight:700;border:1px solid var(--bd);background:#fff}
@@ -59,17 +64,26 @@
     .overlay.show{opacity:1;pointer-events:auto}
     body.noscroll{overflow:hidden}
 
-    /* ===== Responsive: mobile like dashboard ===== */
+    /* ===== Responsive ===== */
     @media (max-width: 980px){
       .layout{grid-template-columns:1fr}
       .sidebar{
         position:fixed;left:-240px;top:0;bottom:0;width:var(--sidebar-w);
-        transition:left .25s ease; /* off-canvas */
+        transition:left .25s ease;
       }
       .sidebar.open{ left:0; }
-      .hamburger{ display:block; }          /* tombol muncul di HP */
-      .fab{ display:flex; }                 /* seperti versi sebelumnya (jika perlu) */
+      .hamburger{ display:block; }
+      .fab{ display:flex; }
     }
+
+    /* ===== Modal (dialog) ===== */
+    dialog{border:none;border-radius:16px;box-shadow:0 10px 30px rgba(2,6,23,.25);padding:0;max-width:640px;width:96%}
+    .dlg-hd{padding:14px 16px;border-bottom:1px solid var(--bd);font-weight:800}
+    .dlg-bd{padding:16px;display:grid;gap:10px}
+    .dlg-ft{padding:12px 16px;border-top:1px solid var(--bd);display:flex;gap:8px;justify-content:flex-end}
+    .row{display:grid;grid-template-columns:160px 1fr;gap:8px;align-items:center}
+    .w100{width:100%}
+    .hidden{display:none!important}
   </style>
 </head>
 <body>
@@ -80,11 +94,9 @@
     <div class="brand">Amko MiniLink</div>
 
     <nav class="nav" id="menuList">
-      <!-- Menu utama -->
       <a href="dashboard.html">📊 Dashboard</a>
       <a href="transaksi-mini-atm.html">🧮 Transaksi Mini ATM</a>
 
-      <!-- Grup MASTER DATA -->
       <div class="group">
         <div class="group-hd"><span>MASTER DATA</span><span>▾</span></div>
         <div class="group-bd">
@@ -94,7 +106,6 @@
         </div>
       </div>
 
-      <!-- Grup LAPORAN -->
       <div class="group">
         <div class="group-hd"><span>LAPORAN</span><span>▾</span></div>
         <div class="group-bd">
@@ -102,7 +113,6 @@
         </div>
       </div>
 
-      <!-- Grup PENGATURAN -->
       <div class="group">
         <div class="group-hd"><span>PENGATURAN</span><span>▾</span></div>
         <div class="group-bd">
@@ -122,16 +132,21 @@
   <!-- Overlay (mobile) -->
   <div id="overlay" class="overlay" aria-hidden="true"></div>
 
-  <!-- ===== Main (logika asli tidak diubah) ===== -->
+  <!-- ===== Main ===== -->
   <div>
     <header>
-      <!-- Hamburger muncul hanya di mobile -->
-      <button id="toggleSidebar" class="hamburger" aria-label="Toggle Sidebar" aria-controls="sidebar" aria-expanded="false">☰</button>
-      <h2 style="margin:0">Mutasi Saldo</h2>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <span class="pill" id="me">memuat…</span>
-        <span class="pill" id="branchBadge">branch: -</span>
+      <div class="hdr-left">
+        <button id="toggleSidebar" class="hamburger" aria-label="Toggle Sidebar" aria-controls="sidebar" aria-expanded="false">☰</button>
+
+        <!-- Dropdown branch (owner only) -->
         <select id="branchSelect" class="input" style="display:none"></select>
+
+        <!-- Label toko sekarang -->
+        <div class="current-store">TOKO SEKARANG: <span id="currentStoreName">-</span></div>
+      </div>
+
+      <div class="hdr-right">
+        <span id="userBadge" class="user-badge">MEMUAT…</span>
         <button id="btnTambah" class="btn btn-primary">+ Tambah Mutasi</button>
       </div>
     </header>
@@ -177,8 +192,68 @@
 
 <button id="fabAdd" class="fab" title="Tambah">+</button>
 
-<!-- MODAL FORM (tetap seperti file aslimu; isi form tidak diubah) -->
-<!-- … -->
+<!-- ===== MODAL TAMBAH MUTASI ===== -->
+<dialog id="modalMutasi">
+  <form id="formMutasi" method="dialog">
+    <div class="dlg-hd">Tambah Mutasi</div>
+    <div class="dlg-bd">
+
+      <!-- Hidden: tanggal otomatis hari ini -->
+      <input id="tanggal" name="tanggal" type="date" class="hidden">
+
+      <div class="row">
+        <label for="jenis">Jenis Mutasi</label>
+        <select id="jenis" name="jenis" class="input w100" required>
+          <option value="TAMBAH">Tambah Saldo</option>
+          <option value="KURANG">Ambil Saldo</option>
+          <option value="PINDAH">Pindah Saldo</option>
+          <option value="OPERASIONAL">Operasional</option>
+        </select>
+      </div>
+
+      <!-- Akun tunggal (Tambah/Ambil/Operasional) -->
+      <div id="rowAkunSingle" class="row">
+        <label for="akun">Akun</label>
+        <select id="akun" name="akun" class="input w100" required></select>
+      </div>
+
+      <!-- Akun sumber/tujuan (Pindah) -->
+      <div id="rowAkunPindah" class="hidden">
+        <div class="row">
+          <label for="akunSumber">Akun Sumber</label>
+          <select id="akunSumber" name="akunSumber" class="input w100"></select>
+        </div>
+        <div class="row">
+          <label for="akunTujuan">Akun Tujuan</label>
+          <select id="akunTujuan" name="akunTujuan" class="input w100"></select>
+        </div>
+      </div>
+
+      <div class="row">
+        <label for="nominal">Nominal (Rp ribuan)</label>
+        <input id="nominal" name="nominal" class="input w100" placeholder="cth 1.000 / 10.000" required>
+      </div>
+
+      <div class="row hidden" id="rowAdmin">
+        <label for="admin">Admin Bank (Rp)</label>
+        <input id="admin" name="admin" class="input w100" placeholder="cth 2.500" value="0">
+      </div>
+
+      <div class="row">
+        <label for="keterangan">Keterangan</label>
+        <input id="keterangan" name="keterangan" class="input w100" placeholder="catatan (opsional)">
+      </div>
+
+      <!-- Hidden untuk branch & user -->
+      <input type="hidden" id="branch_code" name="branch_code">
+      <input type="hidden" id="created_by" name="created_by">
+    </div>
+    <div class="dlg-ft">
+      <button type="button" id="btnCancel" class="btn btn-sm">Batal</button>
+      <button type="submit" id="btnSaveMutasi" class="btn btn-primary">Simpan</button>
+    </div>
+  </form>
+</dialog>
 
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -186,59 +261,249 @@
   const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y";
   const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: true, autoRefreshToken: true } });
 
-  const $ = id=>document.getElementById(id)
-  let me=null, gBranch=null
+  const $ = id=>document.getElementById(id);
+  let me=null, gBranch=null, branchesMap=new Map(), akunCabang=[];
 
-  /* ======== LOGIKA ASLI (tidak diubah) ======== */
+  function parseMoney(s){
+    if(s==null) return 0;
+    const cleaned = String(s).replace(/\./g,'').replace(/,/g,'').trim();
+    const n = Number(cleaned||0);
+    return isFinite(n) ? Math.round(n) : 0;
+  }
+  function fmt(n){
+    return (n||0).toLocaleString('id-ID');
+  }
+
   async function boot(){
-    const { data:{ session } } = await supabase.auth.getSession()
+    const { data:{ session } } = await supabase.auth.getSession();
     if(!session){ location.href='login.html'; return }
-    const { data: prof } = await supabase.from('profiles').select('id,full_name,email,branch_code,role').eq('id', session.user.id).single()
-    me = prof; gBranch = (prof.branch_code||'').trim()
-    $('me').textContent = prof.full_name || prof.email
 
-    if(prof.role==='owner'){
-      $('branchSelect').style.display='inline-block'
-      $('branchBadge').style.display='none'
-      const { data: branches } = await supabase.from('branches').select('code,name').order('name')
-      $('branchSelect').innerHTML = (branches||[]).map(b=>`<option value="${b.code}">${b.name}</option>`).join('')
-      $('branchSelect').value = gBranch || (branches?.[0]?.code || '')
-      gBranch = $('branchSelect').value
-      $('branchSelect').onchange = async ()=>{ gBranch=$('branchSelect').value; await loadKPI(); await loadRiwayat() }
+    // profil
+    const { data: prof } = await supabase.from('profiles')
+      .select('id,full_name,email,branch_code,role')
+      .eq('id', session.user.id).single();
+
+    me = prof;
+    gBranch = (prof.branch_code||'').trim();
+
+    // Badge user: NAMA-ROLE
+    const nm = (prof.full_name || prof.email || '').trim();
+    const firstName = nm ? nm.split(' ')[0] : '';
+    const roleRaw = (prof.role||'').trim();
+    $('userBadge').textContent = `${firstName}-${roleRaw}`.toUpperCase();
+
+    // branches
+    const { data: branches } = await supabase.from('branches').select('code,name').order('name');
+    (branches||[]).forEach(b=>branchesMap.set(b.code, b.name));
+    const isOwner = roleRaw.toLowerCase()==='owner';
+
+    if(isOwner){
+      $('branchSelect').style.display='inline-block';
+      $('branchSelect').innerHTML = (branches && branches.length)
+        ? branches.map(b=>`<option value="${b.code}">${b.name}</option>`).join('')
+        : '<option value="">-- Pilih Toko --</option>';
+      $('branchSelect').value = gBranch || (branches?.[0]?.code || '');
+      gBranch = $('branchSelect').value;
+      $('branchSelect').onchange = async ()=>{
+        gBranch = $('branchSelect').value;
+        updateCurrentStoreName();
+        await loadAkunCabang();
+      };
     }else{
-      $('branchBadge').textContent = 'branch: ' + (gBranch||'-')
+      $('branchSelect').style.display='none';
+    }
+    updateCurrentStoreName();
+
+    // tombol tambah & fab
+    document.getElementById('btnTambah')?.addEventListener('click', openFormAdd);
+    document.getElementById('fabAdd')?.addEventListener('click', openFormAdd);
+
+    // modal events
+    $('btnCancel').addEventListener('click', closeFormAdd);
+    $('formMutasi').addEventListener('submit', onSaveMutasi);
+    $('jenis').addEventListener('change', refreshJenisUI);
+
+    initSidebarToggler();
+
+    await loadAkunCabang();   // isi dropdown akun sesuai cabang
+    await loadKPI();          // placeholder
+    await loadRiwayat();      // placeholder
+  }
+
+  function updateCurrentStoreName(){
+    const name = branchesMap.get(gBranch) || gBranch || '-';
+    $('currentStoreName').textContent = name;
+  }
+
+  /* ====== Ambil daftar akun untuk cabang aktif ======
+     Asumsi tabel: public.accounts (id,name,branch_code)
+     Jika schema Anda berbeda, ubah SELECT di sini.
+  */
+  async function loadAkunCabang(){
+    const { data, error } = await supabase
+      .from('accounts')
+      .select('id,name,branch_code')
+      .eq('branch_code', gBranch)
+      .order('name');
+
+    akunCabang = data || [];
+    const opts = akunCabang.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+    $('akun').innerHTML = opts || '<option value="">(Belum ada akun)</option>';
+    $('akunSumber').innerHTML = opts || '<option value="">(Belum ada akun)</option>';
+    $('akunTujuan').innerHTML = opts || '<option value="">(Belum ada akun)</option>';
+  }
+
+  /* ====== UI Jenis Mutasi ====== */
+  function refreshJenisUI(){
+    const v = $('jenis').value;
+    const isPindah = (v==='PINDAH');
+    $('rowAkunSingle').classList.toggle('hidden', isPindah);
+    $('rowAkunPindah').classList.toggle('hidden', !isPindah);
+    $('rowAdmin').classList.toggle('hidden', !isPindah);
+    // set required
+    $('akun').required = !isPindah;
+    $('akunSumber').required = isPindah;
+    $('akunTujuan').required = isPindah;
+  }
+
+  /* ====== BUKA/TUTUP FORM ====== */
+  function openFormAdd(){
+    // Prefill
+    const today = new Date().toISOString().slice(0,10);
+    $('tanggal').value = today;               // hidden
+    $('branch_code').value = gBranch || '';
+    $('created_by').value = me?.id || '';
+
+    $('jenis').value = 'TAMBAH';
+    $('nominal').value = '';
+    $('admin').value = '0';
+    $('keterangan').value = '';
+
+    refreshJenisUI();
+    $('modalMutasi').showModal();
+
+    // beri hook
+    window.dispatchEvent(new CustomEvent('add-mutation', { detail:{ branch:gBranch, user:me } }));
+  }
+  function closeFormAdd(){
+    const dlg = $('modalMutasi');
+    if(dlg.open) dlg.close();
+  }
+
+  /* ====== SIMPAN ====== */
+  async function onSaveMutasi(ev){
+    ev.preventDefault();
+
+    const jenis = $('jenis').value;
+    const nominal = parseMoney($('nominal').value);
+    const admin = parseMoney($('admin').value || '0');
+    if(nominal <= 0){ alert('Nominal harus > 0'); return; }
+
+    // map akun id -> name
+    const mapIdToName = id => (akunCabang.find(a=>String(a.id)===String(id))?.name || null);
+
+    // rakit payload
+    let payload = {
+      tanggal: $('tanggal').value,          // hidden (hari ini)
+      jenis,
+      nominal,
+      admin: (jenis==='PINDAH' ? admin : 0),
+      keterangan: $('keterangan').value || null,
+      branch_code: $('branch_code').value || gBranch,
+      created_by: $('created_by').value || (me?.id||null),
+      sumber_id: null,
+      sumber_name: null,
+      tujuan_id: null,
+      tujuan_name: null,
+      akun_id: null,
+      akun_name: null
+    };
+
+    if(jenis==='PINDAH'){
+      const src = $('akunSumber').value, dst = $('akunTujuan').value;
+      if(!src || !dst){ alert('Pilih akun sumber & tujuan'); return; }
+      if(src===dst){ alert('Akun sumber & tujuan tidak boleh sama'); return; }
+      payload.sumber_id = src;
+      payload.sumber_name = mapIdToName(src);
+      payload.tujuan_id = dst;
+      payload.tujuan_name = mapIdToName(dst);
+    }else{
+      const ak = $('akun').value;
+      if(!ak){ alert('Pilih akun'); return; }
+      payload.akun_id = ak;
+      payload.akun_name = mapIdToName(ak);
     }
 
-    await loadKPI()
-    await loadRiwayat()
+    // hook untuk logika custom Anda
+    window.dispatchEvent(new CustomEvent('save-mutation', { detail: payload }));
+
+    try{
+      await insertMutasiFallback(payload); // matikan jika Anda override sendiri
+      closeFormAdd();
+      await loadKPI(); await loadRiwayat();
+    }catch(err){
+      alert('Gagal menyimpan mutasi: ' + (err?.message||err));
+    }
   }
-  boot()
 
-  // ======== Sidebar + Overlay (mobile) ========
-  const sidebarEl = document.getElementById('sidebar');
-  const overlayEl = document.getElementById('overlay');
-  const btnHamb = document.getElementById('toggleSidebar');
-
-  function toggleSidebar(open){
-    const willOpen = (typeof open==='boolean') ? open : !sidebarEl.classList.contains('open');
-    sidebarEl.classList.toggle('open', willOpen);
-    overlayEl.classList.toggle('show', willOpen);
-    document.body.classList.toggle('noscroll', willOpen);
-    if(btnHamb) btnHamb.setAttribute('aria-expanded', String(willOpen));
+  /* ====== Fallback insert aman ke mutasi_saldo ======
+     Sesuaikan kolom dengan schema Anda. Contoh kolom yang cukup umum:
+     - jenis, nominal, admin, keterangan, branch_code, created_by, tanggal
+     - akun_id/akun_name atau sumber_/tujuan_ untuk pindah
+  */
+  async function insertMutasiFallback(d){
+    const row = {
+      tanggal: d.tanggal,
+      jenis: d.jenis,
+      nominal: d.nominal,
+      admin: d.admin,
+      keterangan: d.keterangan,
+      branch_code: d.branch_code,
+      created_by: d.created_by,
+      akun_id: d.akun_id,
+      akun_name: d.akun_name,
+      sumber_id: d.sumber_id,
+      sumber_name: d.sumber_name,
+      tujuan_id: d.tujuan_id,
+      tujuan_name: d.tujuan_name
+    };
+    const { error } = await supabase.from('mutasi_saldo').insert(row);
+    if(error) throw error;
   }
-  btnHamb?.addEventListener('click', ()=> toggleSidebar());
-  overlayEl?.addEventListener('click', ()=> toggleSidebar(false));
-  window.addEventListener('keyup', (e)=>{ if(e.key==='Escape') toggleSidebar(false); });
-  document.querySelectorAll('.sidebar .nav a').forEach(a=>{
-    a.addEventListener('click', ()=> toggleSidebar(false));
-  });
 
-  // ======== Logout (asli) ========
+  /* ===== Sidebar ===== */
+  function initSidebarToggler(){
+    const sidebarEl = document.getElementById('sidebar');
+    const overlayEl = document.getElementById('overlay');
+    const btnHamb = document.getElementById('toggleSidebar');
+
+    function toggleSidebar(open){
+      const willOpen = (typeof open==='boolean') ? open : !sidebarEl.classList.contains('open');
+      sidebarEl.classList.toggle('open', willOpen);
+      overlayEl.classList.toggle('show', willOpen);
+      document.body.classList.toggle('noscroll', willOpen);
+      if(btnHamb) btnHamb.setAttribute('aria-expanded', String(willOpen));
+    }
+    btnHamb?.addEventListener('click', ()=> toggleSidebar());
+    overlayEl?.addEventListener('click', ()=> toggleSidebar(false));
+    window.addEventListener('keyup', (e)=>{ if(e.key==='Escape') toggleSidebar(false); });
+    document.querySelectorAll('.sidebar .nav a').forEach(a=>{
+      a.addEventListener('click', ()=> toggleSidebar(false));
+    });
+  }
+
+  /* ===== Placeholder agar halaman tidak error jika fungsi asli ada di file lain ===== */
+  async function loadKPI(){ /* isi sesuai versi Anda */ }
+  async function loadRiwayat(){ /* isi sesuai versi Anda */ }
+
+  /* ===== Logout ===== */
   document.getElementById('lnk-logout').addEventListener('click', async (e)=>{
     e.preventDefault();
     await supabase.auth.signOut();
     location.href='login.html';
   });
+
+  boot();
 </script>
 </body>
 </html>
