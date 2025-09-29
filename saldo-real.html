@@ -8,8 +8,7 @@
     :root{
       --bg:#f6f8fb; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#0b63f3;
       --card:#fff; --bd:#e5e7eb; --txt:#0f172a; --shadow:0 6px 18px rgba(15,23,42,.08);
-      --sidebar-w:240px;
-      --warn:#fff7ed; --warnbd:#fdba74; --warntext:#9a3412;
+      --sidebar-w:240px; --warn:#fff7ed; --warnbd:#fdba74; --warntext:#9a3412; --blue:#2563eb;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt);font-size:15px}
@@ -30,6 +29,10 @@
 
     /* Header & content */
     header{position:sticky;top:0;z-index:9;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+    .input{border:1px solid var(--bd);background:#fff;border-radius:10px;padding:10px 12px;font-size:14px;height:42px;outline:none}
+    #currentStore{font-weight:800;text-align:center;flex:1}
+    #userRole{font-weight:800;color:var(--blue)} /* biru tebal */
+
     .content{padding:16px;max-width:1100px;margin:0 auto}
     .pill{padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:#fff;font-size:14px;height:42px}
     .pill[readonly], .pill[disabled]{background:#f8fafc;color:#475569}
@@ -49,15 +52,12 @@
     .muted{color:#64748b}
     h3{margin:0 0 8px 0}
 
-    /* Bar Wajib Saldo Kasir */
     .kasir-card{background:var(--warn);border:2px dashed var(--warnbd);border-radius:14px;padding:12px;margin:12px 0}
     .badge-wajib{display:inline-block;background:#fecaca;color:#7f1d1d;font-weight:900;border-radius:999px;padding:4px 10px;font-size:12px;margin-left:8px}
 
-    /* Lock overlay for inputs (when kasir belum diisi) */
     .lock-mask{position:absolute;inset:0;background:rgba(248,250,252,.65);display:flex;align-items:center;justify-content:center;border-radius:14px}
     .lock-mask span{background:#fff;border:1px solid var(--bd);border-radius:999px;padding:8px 12px;font-weight:800}
 
-    /* Hamburger & overlay */
     .hamburger{font-size:22px;background:none;border:none;cursor:pointer;padding:8px;display:none}
     .overlay{position:fixed;inset:0;background:rgba(2,6,23,.45);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:19}
     .overlay.show{opacity:1;pointer-events:auto}
@@ -114,13 +114,22 @@
 
   <!-- Main -->
   <div>
+    <!-- ===== Header (dropdown owner, toko sekarang, user-role biru) ===== -->
     <header>
       <button id="toggleSidebar" class="hamburger" aria-label="Toggle Sidebar" aria-controls="sidebar" aria-expanded="false">☰</button>
-      <h2 style="margin:0">Saldo Real (Tutup Shift)</h2>
+
+      <!-- Kiri: Dropdown cabang (OWNER only) -->
+      <select id="branchSelect" class="input" style="min-width:220px;display:none"></select>
+
+      <!-- Tengah: Status toko -->
+      <div id="currentStore">TOKO SEKARANG: -</div>
+
+      <!-- Kanan: USER-ROLE (huruf besar tebal biru) -->
+      <div id="userRole"></div>
     </header>
 
     <div class="content">
-      <!-- ====== FORM HEADER (dipertahankan) ====== -->
+      <!-- ====== FORM HEADER ====== -->
       <div class="card" style="margin-bottom:8px">
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <input id="tgl" type="date" class="pill" readonly aria-readonly="true"/>
@@ -134,7 +143,6 @@
           <button id="btnReload" class="btn btn-outline" disabled>↻ Muat Ulang Saldo Sistem</button>
         </div>
 
-        <!-- Ringkas total (dipertahankan) -->
         <div id="sumInfo" style="margin-top:8px;font-weight:800">
           Total Akun: 0 • Total Selisih: Rp 0
         </div>
@@ -154,7 +162,6 @@
 
       <!-- ====== TABEL SALDO ====== -->
       <div class="card" style="position:relative">
-        <!-- Lock mask: terbuka setelah saldo kasir DIISI (boleh 0) -->
         <div id="lockMask" class="lock-mask"><span>Isi “Saldo Kasir” terlebih dahulu</span></div>
         <div style="overflow:auto">
           <table>
@@ -181,59 +188,180 @@
         </div>
       </div>
 
-      <!-- ====== RIWAYAT (dipertahankan) ====== -->
+      <!-- ====== RIWAYAT REKAP (tabel sesuai permintaan) ====== -->
       <div class="card" style="margin-top:12px">
-        <h3>Riwayat Tutup Shift (tanggal terpilih)</h3>
-        <div class="muted" id="historyEmpty">Belum ada data.</div>
-        <div id="historyList" style="display:grid;gap:10px"></div>
+        <h3>Riwayat Tutup Shift (tanggal terpilih & cabang aktif)</h3>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>User & Tanggal</th>
+                <th>Saldo Awal</th>
+                <th>Saldo Sistem</th>
+                <th>Saldo Real (Rp)</th>
+                <th>Selisih (Rp)</th>
+                <th>Keterangan</th>
+              </tr>
+            </thead>
+            <tbody id="histBody">
+              <tr><td colspan="7" class="muted" id="historyEmpty">Belum ada data.</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<script>
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+  // ==== Supabase init ====
+  const supabase = createClient(
+    "https://kfqcdcvcnyhisbmwftzb.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmcWNkY3ZjbnloaXNibXdmdHpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MTY0ODIsImV4cCI6MjA3NDA5MjQ4Mn0.EMp1XoHvi7CcN91lQW8mhfLQnaZHpCGkVo93Q3Ty03Y",
+    { auth: { persistSession: true, autoRefreshToken: true } }
+  );
+
   // ========= Helpers
   const $ = id => document.getElementById(id)
-  const fmtID = n => new Intl.NumberFormat('id-ID').format(Number(n||0))   // 1.000
+  const fmtID = n => new Intl.NumberFormat('id-ID').format(Number(n||0))
   const fmtRp = n => 'Rp ' + fmtID(n)
   const parseNum = v => Number(String(v??'').replace(/\D/g,''))||0
   const toISO = d => new Date(d).toISOString().slice(0,10)
 
-  // ========= State (demo; sambungkan ke sistemmu jika perlu)
-  const currentUserName = 'Kasir Aktif' // ganti dari sesi loginmu
-  let saldoKasirExtra = null            // null = belum diisi; angka (>=0) = sudah diisi
-  let rows = [
-    { id: 1, account_name: 'Laci Tunai',  account_type: 'cash',   saldo_system: 1000000, saldo_real: null },
-    { id: 2, account_name: 'BRI',         account_type: 'bank',   saldo_system: 2000000, saldo_real: null },
-    { id: 3, account_name: 'BCA',         account_type: 'bank',   saldo_system: 1500000, saldo_real: null },
-    { id: 4, account_name: 'Server Pulsa',account_type: 'server', saldo_system: 500000,  saldo_real: null },
-  ]
+  // ========= Global state
+  let gRole=null, gBranch=null, viewBranch=null, gName='USER'
+  let branchMap = new Map() // code -> name
+  let rows = []  // {id, account_name, account_type, saldo_system, saldo_real}
+  let saldoKasirExtra = null // null = belum diisi; angka (>=0) = sudah diisi
 
-  // ========= Init: tanggal & kasir/shift
-  const todayISO = toISO(new Date())
-  $('tgl').value = todayISO
-  $('kasir').value = currentUserName
-  $('shift').value = currentUserName // sesuai instruksi: nama shift = nama kasir aktif (readonly)
+  // ========= Boot
+  async function boot(){
+    const { data:{ session } } = await supabase.auth.getSession()
+    if(!session){ location.href="login.html"; return }
 
-  // ======== Util: saldo sistem + kasir khusus Laci
-  function sysWithKasir(row){
-    let sys = row.saldo_system || 0;
-    if (/laci/i.test(row.account_name) && saldoKasirExtra !== null) sys += saldoKasirExtra;
-    return sys;
+    const { data: prof, error } = await supabase
+      .from('profiles').select('role,branch_code,full_name,email')
+      .eq('id', session.user.id).single()
+    if(error){ alert("Gagal ambil profil: "+error.message); return }
+
+    gRole   = String(prof.role||'').toLowerCase()
+    gBranch = String(prof.branch_code||'').trim()
+    gName   = (prof.full_name || prof.email || 'USER')
+
+    $('userRole').textContent = `${gName.toUpperCase()}-${gRole.toUpperCase()}`
+    const todayISO = toISO(new Date())
+    $('tgl').value = todayISO
+    $('kasir').value = gName
+    $('shift').value = gName
+
+    if (gRole === 'owner'){
+      $('branchSelect').style.display = ''
+      await loadBranches()   // isi branchMap + dropdown (label = nama saja)
+    } else {
+      $('branchSelect').style.display = 'none'
+      viewBranch = gBranch
+      await ensureBranchNameFor(viewBranch)
+      renderCurrentStore()
+    }
+
+    await loadAccounts()
+    await loadHistory()
+
+    // Realtime refresh untuk akun di cabang aktif
+    const ch = supabase.channel('rt-saldo-real')
+    ch.on('postgres_changes',{event:'*',schema:'public',table:'accounts'}, async (payload)=>{
+      const rec = payload.new || payload.old || {}
+      if ((rec.branch_code||'').trim() === (viewBranch||'').trim()){
+        await loadAccounts()
+      }
+    })
+    ch.subscribe()
   }
 
-  // ========= Saldo Kasir (wajib)
-  const lockMask = $('lockMask')
-  const setLocked = (locked) => {
-    lockMask.style.display = locked ? 'flex' : 'none'
-    $('btnSave').disabled   = locked
-    $('btnExport').disabled = locked
-    $('btnReload').disabled = locked
+  // ====== Branch helpers
+  function renderCurrentStore(){
+    const name = branchMap.get(viewBranch) || viewBranch || '-'
+    $('currentStore').textContent = `TOKO SEKARANG: ${name}`
   }
-  setLocked(true)
 
-  // ======== Render awal tabel (sekali saja)
-  function initialRender(){
+  async function ensureBranchNameFor(code){
+    if(!code) return
+    if(branchMap.has(code)) return
+    const { data: one } = await supabase.from('branches').select('code,name').eq('code', code).maybeSingle?.() ?? {}
+    if(one){ branchMap.set(one.code, one.name || one.code) }
+    else { branchMap.set(code, code) }
+  }
+
+  async function loadBranches(){
+    const sel = $('branchSelect')
+    sel.innerHTML = `<option value="">Memuat cabang…</option>`
+    let list = []
+
+    const { data: br, error: ebr } = await supabase.from('branches').select('code,name').order('name')
+    if(!ebr && br && br.length){
+      list = br.map(b=>({code:(b.code||'').trim(), name:(b.name||b.code).trim()}))
+    } else {
+      const { data: accs } = await supabase.from('accounts').select('branch_code').order('branch_code')
+      const set = new Set((accs||[]).map(a=>(a.branch_code||'').trim()).filter(Boolean))
+      list = Array.from(set).map(code=>({code, name: code}))
+    }
+
+    branchMap = new Map(list.map(b=>[b.code, b.name]))
+    viewBranch = (gBranch && branchMap.has(gBranch)) ? gBranch : (list[0]?.code || '')
+    // Tampilkan NAMA saja di dropdown
+    sel.innerHTML = list.map(b=>`<option value="${b.code}">${b.name}</option>`).join('')
+    sel.value = viewBranch
+    renderCurrentStore()
+
+    sel.onchange = async ()=>{
+      viewBranch = sel.value
+      renderCurrentStore()
+      saldoKasirExtra = null
+      $('extraKasir').value = ''
+      setLocked(true)
+      await loadAccounts()
+      await loadHistory()
+    }
+  }
+
+  // ====== Ambil akun sesuai cabang aktif
+  async function loadAccounts(){
+    const cab = viewBranch || gBranch
+    if(!cab){ rows = []; renderTable(); updateTotals(); return }
+
+    const { data, error } = await supabase
+      .from('accounts')
+      .select('id,name,account_type,saldo,branch_code,updated_at')
+      .eq('branch_code', cab)
+      .order('name')
+    if(error){ alert("Gagal ambil akun: "+error.message); return }
+
+    rows = (data||[]).map(a=>({
+      id: a.id,
+      account_name: a.name || '(Tanpa Nama)',
+      account_type: a.account_type || '',
+      saldo_system: Number(a.saldo||0),
+      saldo_real: null,
+      updated_at: a.updated_at
+    }))
+
+    rows.sort((A,B)=>{
+      const aL = A.account_type==='cash' && /laci/i.test(A.account_name||'')
+      const bL = B.account_type==='cash' && /laci/i.test(B.account_name||'')
+      if(aL && !bL) return -1
+      if(!aL && bL) return 1
+      return (A.account_name||'').localeCompare(B.account_name||'')
+    })
+
+    renderTable()
+    updateTotals()
+  }
+
+  // ====== Render tabel saldo
+  function renderTable(){
     let i = 1
     const kasirEntered = (saldoKasirExtra!==null)
     $('tb').innerHTML = rows.map(r=>{
@@ -244,7 +372,7 @@
         <tr>
           <td>${i++}</td>
           <td>${r.account_name}</td>
-          <td>${r.account_type}</td>
+          <td>${r.account_type || '-'}</td>
           <td id="sys-${r.id}">${fmtRp(sys)}</td>
           <td>
             <input data-real="${r.id}" class="pill" placeholder="0"
@@ -258,10 +386,16 @@
       `
     }).join('')
     bindInputs()
-    updateTotals()
   }
 
-  // ======== Update totals (tanpa rebuild baris)
+  // ====== Util: saldo sistem + kasir khusus Laci
+  function sysWithKasir(row){
+    let sys = row.saldo_system || 0;
+    if (/laci/i.test(row.account_name) && saldoKasirExtra !== null) sys += saldoKasirExtra;
+    return sys;
+  }
+
+  // ======= Totals
   function updateTotals(){
     const kasirEntered = (saldoKasirExtra!==null)
     const tSys  = rows.reduce((s,r)=> s + ( /laci/i.test(r.account_name) && kasirEntered ? (r.saldo_system||0)+saldoKasirExtra : (r.saldo_system||0) ), 0)
@@ -273,22 +407,22 @@
     $('sumInfo').textContent = `Total Akun: ${rows.length} • Total Selisih: ${kasirEntered ? fmtRp(tDiff) : 'Rp 0'}`
   }
 
-  // ======== Bind input angka (tanpa re-render tabel)
+  // ===== Bind input angka (saldo real)
   function bindInputs(){
     document.querySelectorAll('input[data-real]').forEach(inp=>{
       inp.oninput = ()=>{
-        const id  = Number(inp.getAttribute('data-real'))
+        const id  = inp.getAttribute('data-real')
         const val = parseNum(inp.value)
         inp.value = val ? fmtID(val) : ''
-        const row = rows.find(r=>r.id===id)
+        const row = rows.find(r=>String(r.id)===String(id))
+        if(!row) return
         row.saldo_real = (inp.value===''? null : val)
 
-        // hitung ulang hanya baris ini
         const sys  = sysWithKasir(row)
         const diff = (row.saldo_real || 0) - sys
 
-        const sysCell  = document.getElementById(`sys-${id}`)
-        const diffCell = document.getElementById(`diff-${id}`)
+        const sysCell  = document.getElementById(`sys-${row.id}`)
+        const diffCell = document.getElementById(`diff-${row.id}`)
         if(sysCell)  sysCell.textContent  = fmtRp(sys)
         if(diffCell){
           diffCell.textContent = (row.saldo_real==null ? '—' : fmtRp(diff))
@@ -296,13 +430,24 @@
           diffCell.classList.toggle('diff-neg', diff<0)
           if(diff===0) { diffCell.classList.remove('diff-pos','diff-neg') }
         }
-
         updateTotals()
       }
     })
   }
 
-  // ======== Handler saldo kasir: update semua baris Laci + totals, tanpa rebuild
+  // ===== Saldo Kasir -> aktifkan tombol
+  const lockMask = $('lockMask')
+  const setLocked = (locked) => {
+    lockMask.style.display = locked ? 'flex' : 'none'
+    $('btnSave').disabled   = locked
+    $('btnExport').disabled = locked
+    $('btnReload').disabled = locked
+    document.querySelectorAll('input[data-real]').forEach(inp=>{
+      inp.disabled = locked
+    })
+  }
+  setLocked(true)
+
   $('extraKasir').addEventListener('input', (e)=>{
     const raw = e.target.value.replace(/\D/g,'')
     if(raw===''){
@@ -314,17 +459,9 @@
       e.target.value  = fmtID(saldoKasirExtra)
       setLocked(false)
     }
-
-    // enable/disable input real
-    document.querySelectorAll('input[data-real]').forEach(inp=>{
-      inp.disabled = (saldoKasirExtra===null)
-    })
-
-    // update setiap baris (sys+diff) sesuai saldoKasirExtra
     rows.forEach(row=>{
-      const id = row.id
-      const sysCell  = document.getElementById(`sys-${id}`)
-      const diffCell = document.getElementById(`diff-${id}`)
+      const sysCell  = document.getElementById(`sys-${row.id}`)
+      const diffCell = document.getElementById(`diff-${row.id}`)
       if(sysCell){
         const sys = sysWithKasir(row)
         sysCell.textContent = fmtRp(sys)
@@ -342,13 +479,75 @@
         }
       }
     })
-
     updateTotals()
   })
 
-  // ====== Buttons (dummy actions)
-  $('btnReload').onclick = ()=> alert('Saldo sistem di-reload (dummy).')
-  $('btnSave').onclick   = ()=> alert('Tutup shift tersimpan (dummy).')
+  // ====== Simpan Tutup Shift (insert ke shift_history + reload riwayat)
+  $('btnSave').onclick = async ()=>{
+    if(saldoKasirExtra===null){ alert('Isi Saldo Kasir dulu.'); return }
+    const cab = viewBranch || gBranch
+    const branch_name = (branchMap.get(cab) || cab)
+    const date = $('tgl').value
+    const cashier = $('kasir').value || gName
+    const note = $('note').value || ''
+
+    const details = rows.map(r=>{
+      const sys = sysWithKasir(r)
+      const real = r.saldo_real || 0
+      return { account_name: r.account_name, account_type: r.account_type, system_with_kasir: sys, real, diff: real - sys }
+    })
+    const total_system = details.reduce((s,d)=>s+d.system_with_kasir,0)
+    const total_real   = details.reduce((s,d)=>s+d.real,0)
+    const total_diff   = total_real - total_system
+
+    const { error } = await supabase.from('shift_history').insert([{
+      date, branch_code: cab, branch_name,
+      cashier, note,
+      opening_cash: saldoKasirExtra,        // << Saldo Awal
+      total_system, total_real, total_diff,
+      details
+    }])
+    if(error){ alert('Gagal menyimpan: ' + error.message); return }
+
+    alert('Tutup shift tersimpan.')
+    await loadHistory()
+  }
+
+  // ====== Riwayat Rekap: tanggal & cabang aktif
+  async function loadHistory(){
+    const cab = viewBranch || gBranch
+    if(!cab){ $('histBody').innerHTML = `<tr><td colspan="7" class="muted">Belum ada data.</td></tr>`; return }
+    const date = $('tgl').value
+    const { data, error } = await supabase
+      .from('shift_history')
+      .select('id,date,branch_code,branch_name,cashier,opening_cash,total_system,total_real,total_diff,note,created_at')
+      .eq('branch_code', cab)
+      .eq('date', date)
+      .order('created_at', { ascending:false })
+    if(error){ console.error(error); return }
+
+    const list = data || []
+    if(list.length===0){
+      $('histBody').innerHTML = `<tr><td colspan="7" class="muted">Belum ada data.</td></tr>`
+      return
+    }
+
+    const rowsHtml = list.map((h,idx)=>`
+      <tr>
+        <td>${idx+1}</td>
+        <td><b>${h.cashier || '-'}</b> • ${h.date}</td>
+        <td>${fmtRp(h.opening_cash || 0)}</td>
+        <td>${fmtRp(h.total_system || 0)}</td>
+        <td>${fmtRp(h.total_real || 0)}</td>
+        <td>${fmtRp(h.total_diff || 0)}</td>
+        <td>${h.note ? h.note.replace(/</g,'&lt;') : '-'}</td>
+      </tr>
+    `).join('')
+    $('histBody').innerHTML = rowsHtml
+  }
+
+  // ===== Dummy actions export/reload
+  $('btnReload').onclick = ()=> { alert('Saldo sistem di-reload (dummy).'); }
   $('btnExport').onclick = ()=>{
     if(saldoKasirExtra===null){ alert('Isi Saldo Kasir dulu.'); return }
     const header = ['Akun','Tipe','Saldo Sistem(+Kasir Laci)','Saldo Real','Selisih']
@@ -365,15 +564,13 @@
     const blob = new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8;'})
     const a = document.createElement('a')
     a.href = URL.createObjectURL(blob)
-    a.download = `saldo_real_${$('tgl').value}.csv`
+    const cabName = (branchMap.get(viewBranch||gBranch)||viewBranch||gBranch)
+    a.download = `saldo_real_${$('tgl').value}_${cabName}.csv`
     a.click()
     setTimeout(()=>URL.revokeObjectURL(a.href),500)
   }
 
-  // ====== Render awal (sekali)
-  initialRender()
-
-  // ====== Hamburger + overlay (mobile)
+  // ===== Hamburger + overlay (mobile)
   const sidebarEl = document.getElementById('sidebar');
   const overlayEl = document.getElementById('overlay');
   const btnHamb   = document.getElementById('toggleSidebar');
@@ -388,6 +585,14 @@
   overlayEl?.addEventListener('click', ()=> toggleSidebar(false));
   window.addEventListener('keyup', (e)=>{ if(e.key==='Escape') toggleSidebar(false); });
   document.addEventListener('click', (e)=>{ if(e.target.closest('.sidebar a')) toggleSidebar(false) });
+
+  // ===== Logout
+  document.getElementById('lnk-logout').addEventListener('click', async ()=>{
+    await supabase.auth.signOut(); location.href="login.html"
+  })
+
+  // ===== Start
+  boot()
 </script>
 </body>
 </html>
