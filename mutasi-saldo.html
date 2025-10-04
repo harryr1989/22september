@@ -9,6 +9,10 @@
       --sidebar-w:240px;
       --bg:#f6f8fb; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#0b63f3;
       --card:#fff; --bd:#e5e7eb; --txt:#0f172a; --ring:#93c5fd33;
+      --pos:#16a34a; /* hijau */
+      --neg:#dc2626; /* merah */
+      --neu:#ca8a04; /* kuning */
+      --blue:#0b63f3; /* nama user */
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt);font-size:15px;line-height:1.5}
@@ -72,10 +76,7 @@
     /* ===== Responsive ===== */
     @media (max-width: 980px){
       .layout{grid-template-columns:1fr}
-      .sidebar{
-        position:fixed;left:-240px;top:0;bottom:0;width:var(--sidebar-w);
-        transition:left .25s ease;
-      }
+      .sidebar{ position:fixed;left:-240px;top:0;bottom:0;width:var(--sidebar-w); transition:left .25s ease; }
       .sidebar.open{ left:0; }
       .hamburger{ display:block; }
       .fab{ display:flex; }
@@ -89,6 +90,16 @@
     .row{display:grid;grid-template-columns:160px 1fr;gap:8px;align-items:center}
     .w100{width:100%}
     .hidden{display:none!important}
+
+    /* ===== Pewarnaan permintaan Anda ===== */
+    .name-blue{color:var(--blue);font-weight:700}
+    .time{font-variant-numeric:tabular-nums}
+    .jenis{font-weight:800}
+    .jenis-tambah{color:var(--pos)}
+    .jenis-kurang{color:var(--neg)}
+    .jenis-pindah{color:var(--neu)}
+    /* opsional: operasional ikut negatif */
+    .jenis-operasional{color:var(--neg)}
   </style>
 </head>
 <body>
@@ -304,6 +315,13 @@
     const txt = (from||'…') + ' → ' + (to||'…');
     $('filterInfo').textContent = 'Filter: ' + txt;
     $('pageInfo').textContent = 'Filter: ' + txt;
+  }
+  function toLocalTimeStr(ts){
+    if(!ts) return '';
+    try{
+      const d = new Date(ts);
+      return d.toLocaleTimeString('id-ID', { hour12:false });
+    }catch{ return ''; }
   }
 
   /* ===== Boot ===== */
@@ -618,11 +636,25 @@
         const sumber = (jenis === 'pindah') ? (r.sumber_name || '-') : (r.akun_name || '-');
         const tujuan = (jenis === 'pindah') ? (r.tujuan_name || '-') : '-';
 
+        // Pewarnaan jenis
+        const jenisClass = jenis==='tambah' ? 'jenis-tambah'
+                         : (jenis==='kurang' || jenis==='operasional') ? 'jenis-kurang'
+                         : jenis==='pindah' ? 'jenis-pindah'
+                         : '';
+
+        // Nama biru + tanggal normal + waktu dari created_at
+        const creator = (r.created_by_name || r.created_by || '');
+        const tgl = (r.tanggal || (r.created_at ? String(r.created_at).slice(0,10) : ''));
+        const jam = toLocalTimeStr(r.created_at);
+
         return `
           <tr>
             <td>${i+1}</td>
-            <td>${(r.created_by_name || r.created_by || '')}<br>${r.tanggal || ''}</td>
-            <td>${(r.jenis||'').toString().toUpperCase()}</td>
+            <td>
+              <span class="name-blue">${creator}</span><br>
+              <span>${tgl}</span>${jam ? `<br><span class="time">${jam}</span>` : ''}
+            </td>
+            <td><span class="jenis ${jenisClass}">${(r.jenis||'').toString().toUpperCase()}</span></td>
             <td>${sumber}</td>
             <td>${tujuan}</td>
             <td class="num">${(r.nominal||0).toLocaleString('id-ID')}</td>
