@@ -188,7 +188,7 @@
         </div>
       </div>
 
-      <!-- ====== RIWAYAT REKAP (tabel sesuai permintaan) ====== -->
+      <!-- ====== RIWAYAT REKAP (tanpa kolom "Saldo Awal") ====== -->
       <div class="card" style="margin-top:12px">
         <h3>Riwayat Tutup Shift (tanggal terpilih & cabang aktif)</h3>
         <div style="overflow:auto">
@@ -197,11 +197,11 @@
               <tr>
                 <th>No</th>
                 <th>User & Tanggal</th>
-                <th>Saldo Awal</th>
                 <th>Saldo Sistem</th>
                 <th>Saldo Real (Rp)</th>
                 <th>Selisih (Rp)</th>
                 <th>Keterangan</th>
+                <th>Aksi</th>
               </tr>
             </thead>
             <tbody id="histBody">
@@ -230,6 +230,13 @@
   const fmtRp = n => 'Rp ' + fmtID(n)
   const parseNum = v => Number(String(v??'').replace(/\D/g,''))||0
   const toISO = d => new Date(d).toISOString().slice(0,10)
+
+  // ===== Debug helper
+  function showError(prefix, err){
+    const msg = (err && (err.message || err.error_description || err.hint)) ? (err.message || err.error_description || err.hint) : JSON.stringify(err);
+    console.error(prefix, err);
+    alert(prefix + ': ' + msg);
+  }
 
   // ========= Global state
   let gRole=null, gBranch=null, viewBranch=null, gName='USER'
@@ -482,7 +489,7 @@
     updateTotals()
   })
 
-  // ====== Simpan Tutup Shift (insert ke shift_history + reload riwayat)
+  // ====== Simpan Tutup Shift (insert ke shift_history + reload riwayat) — TANPA opening_cash
   $('btnSave').onclick = async ()=>{
     if(saldoKasirExtra===null){ alert('Isi Saldo Kasir dulu.'); return }
     const cab = viewBranch || gBranch
@@ -490,6 +497,8 @@
     const date = $('tgl').value
     const cashier = $('kasir').value || gName
     const note = $('note').value || ''
+
+    console.log('[SAVE] date=', date, 'branch_code=', cab, 'branch_name=', branch_name);
 
     const details = rows.map(r=>{
       const sys = sysWithKasir(r)
@@ -500,27 +509,37 @@
     const total_real   = details.reduce((s,d)=>s+d.real,0)
     const total_diff   = total_real - total_system
 
-    const { error } = await supabase.from('shift_history').insert([{
+    const payload = {
       date, branch_code: cab, branch_name,
       cashier, note,
-      opening_cash: saldoKasirExtra,        // << Saldo Awal
       total_system, total_real, total_diff,
       details
-    }])
-    if(error){ alert('Gagal menyimpan: ' + error.message); return }
+    }
+
+    const { data: ins, error } = await supabase
+      .from('shift_history')
+      .insert([payload])
+      .select('id')
+
+    if(error){ showError('Gagal menyimpan', error); return }
 
     alert('Tutup shift tersimpan.')
     await loadHistory()
   }
 
-  // ====== Riwayat Rekap: tanggal & cabang aktif
+  // ====== Riwayat Rekap: tanggal & cabang aktif (TANPA kolom "Saldo Awal") — dengan logging
   async function loadHistory(){
     const cab = viewBranch || gBranch
-    if(!cab){ $('histBody').innerHTML = `<tr><td colspan="7" class="muted">Belum ada data.</td></tr>`; return }
     const date = $('tgl').value
+    console.log('[LOAD] date=', date, 'branch_code=', cab);
+
+    if(!cab){
+      $('histBody').innerHTML = `<tr><td colspan="7" class="muted">Belum ada data.</td></tr>`
+      return
+    }
     const { data, error } = await supabase
       .from('shift_history')
-      .select('id,date,branch_code,branch_name,cashier,opening_cash,total_system,total_real,total_diff,note,created_at')
+      .select('id,date,branch_code,branch_name,cashier,total_system,total_real,total_diff,note,created_at')
       .eq('branch_code', cab)
       .eq('date', date)
       .order('created_at', { ascending:false })
@@ -532,15 +551,24 @@
       return
     }
 
+    const isOwner = (gRole || '').toLowerCase() === 'owner';
+    const isAdmin = (gRole || '').toLowerCase() === 'admin';
+    const canOperate = isOwner || isAdmin;
+
     const rowsHtml = list.map((h,idx)=>`
-      <tr>
+      <tr data-id="${h.id}">
         <td>${idx+1}</td>
         <td><b>${h.cashier || '-'}</b> • ${h.date}</td>
-        <td>${fmtRp(h.opening_cash || 0)}</td>
         <td>${fmtRp(h.total_system || 0)}</td>
         <td>${fmtRp(h.total_real || 0)}</td>
         <td>${fmtRp(h.total_diff || 0)}</td>
         <td>${h.note ? h.note.replace(/</g,'&lt;') : '-'}</td>
+        <td>
+          ${canOperate ? `
+            <button class="btn-sm btn-ghost" data-act="edit" title="Edit catatan">✏️</button>
+            <button class="btn-sm btn-outline" data-act="delete" title="Hapus entri">🗑️</button>
+          ` : '—'}
+        </td>
       </tr>
     `).join('')
     $('histBody').innerHTML = rowsHtml
@@ -585,6 +613,62 @@
   overlayEl?.addEventListener('click', ()=> toggleSidebar(false));
   window.addEventListener('keyup', (e)=>{ if(e.key==='Escape') toggleSidebar(false); });
   document.addEventListener('click', (e)=>{ if(e.target.closest('.sidebar a')) toggleSidebar(false) });
+
+  // ===== Event delegation tombol Aksi (Edit/Hapus) di Riwayat
+  document.getElementById('histBody')?.addEventListener('click', async (e)=>{
+    const btn = e.target.closest('button[data-act]');
+    if(!btn) return;
+
+    const tr = btn.closest('tr');
+    const id = tr?.getAttribute('data-id');
+    if(!id) return;
+
+    const act = btn.getAttribute('data-act');
+    const isOwner = (gRole || '').toLowerCase() === 'owner';
+    const isAdmin = (gRole || '').toLowerCase() === 'admin';
+    const canOperate = isOwner || isAdmin;
+
+    if(!canOperate){
+      alert('Aksi ini hanya untuk Owner/Admin.');
+      return;
+    }
+
+    if(act === 'edit'){
+      // Kolom "Keterangan" sekarang index ke-5
+      const curNoteCell = tr.children[5];
+      const current = (curNoteCell?.textContent || '').trim();
+      const next = prompt('Ubah catatan (opsional, boleh kosong):', current);
+      if(next === null) return; // dibatalkan
+
+      const { error } = await supabase
+        .from('shift_history')
+        .update({ note: next || null })
+        .eq('id', id);
+
+      if(error){
+        alert('Gagal mengubah catatan: ' + error.message);
+        return;
+      }
+      await loadHistory();
+      alert('Catatan berhasil diubah.');
+    }
+
+    if(act === 'delete'){
+      if(!confirm('Yakin ingin menghapus entri tutup shift ini? Tindakan ini tidak dapat dibatalkan.')) return;
+
+      const { error } = await supabase
+        .from('shift_history')
+        .delete()
+        .eq('id', id);
+
+      if(error){
+        alert('Gagal menghapus: ' + error.message);
+        return;
+      }
+      await loadHistory();
+      alert('Entri berhasil dihapus.');
+    }
+  });
 
   // ===== Logout
   document.getElementById('lnk-logout').addEventListener('click', async ()=>{
