@@ -58,6 +58,11 @@
     .input{border:1px solid var(--bd);background:#fff;border-radius:10px;padding:10px 12px;font-size:15px;outline:none}
     .input:focus{box-shadow:0 0 0 4px var(--ring);border-color:#bfdbfe}
 
+    /* ===== Filter row ===== */
+    .filters{display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin:8px 0 12px}
+    .field{display:flex;flex-direction:column;gap:4px}
+    .field label{font-size:12px;color:#475569}
+
     /* ===== Hamburger & Overlay ===== */
     .hamburger{font-size:22px;background:none;border:none;cursor:pointer;padding:8px;display:none}
     .overlay{position:fixed;inset:0;background:rgba(2,6,23,.45);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:19}
@@ -154,6 +159,22 @@
     <!-- KPI -->
     <div class="card">
       <h3 style="margin:0 0 8px 0">KPI Mutasi</h3>
+
+      <!-- Filter tanggal -->
+      <div class="filters">
+        <div class="field">
+          <label for="fFrom">Dari</label>
+          <input type="date" id="fFrom" class="input">
+        </div>
+        <div class="field">
+          <label for="fTo">Sampai</label>
+          <input type="date" id="fTo" class="input">
+        </div>
+        <button id="btnApplyFilter" class="btn-sm">Terapkan</button>
+        <button id="btnResetFilter" class="btn-sm">Reset</button>
+        <span class="pill" id="filterInfo">Filter: -</span>
+      </div>
+
       <div class="kpi-grid">
         <div class="kpi-card"><div class="kpi-title">Total Tambah</div><div id="kpiTambah" class="kpi-value">Rp 0</div></div>
         <div class="kpi-card"><div class="kpi-title">Total Kurang</div><div id="kpiKurang" class="kpi-value">Rp 0</div></div>
@@ -164,7 +185,6 @@
     <!-- Riwayat -->
     <div class="card">
       <h3 style="margin:0 0 8px 0">Riwayat Mutasi</h3>
-      <div id="totalRow" style="margin-bottom:6px;font-weight:600">Total = 0</div>
       <table>
         <thead>
           <tr>
@@ -182,9 +202,7 @@
         <tbody id="tb"></tbody>
       </table>
       <div class="pager">
-        <button class="btn-sm" id="btnPrev">⟨ Prev</button>
-        <span class="pill" id="pageInfo">Hal 1</span>
-        <button class="btn-sm" id="btnNext">Next ⟩</button>
+        <span class="pill" id="pageInfo">Filter: -</span>
       </div>
     </div>
   </div>
@@ -213,19 +231,22 @@
 
       <!-- Akun tunggal (Tambah/Ambil/Operasional) -->
       <div id="rowAkunSingle" class="row">
-        <label for="akun">Akun</label>
+        <label for="akun"><span id="lblAkunSingle">Akun</span></label>
         <select id="akun" name="akun" class="input w100" required></select>
+        <div id="hintSingle" style="font-size:12px;color:#64748b;margin-top:4px"></div>
       </div>
 
       <!-- Akun sumber/tujuan (Pindah) -->
       <div id="rowAkunPindah" class="hidden">
         <div class="row">
-          <label for="akunSumber">Akun Sumber</label>
+          <label for="akunSumber"><span id="lblAkunSumber">Akun Sumber</span></label>
           <select id="akunSumber" name="akunSumber" class="input w100"></select>
+          <div id="hintSumber" style="font-size:12px;color:#64748b;margin-top:4px"></div>
         </div>
         <div class="row">
-          <label for="akunTujuan">Akun Tujuan</label>
+          <label for="akunTujuan"><span id="lblAkunTujuan">Akun Tujuan</span></label>
           <select id="akunTujuan" name="akunTujuan" class="input w100"></select>
+          <div id="hintTujuan" style="font-size:12px;color:#64748b;margin-top:4px"></div>
         </div>
       </div>
 
@@ -264,16 +285,28 @@
   const $ = id=>document.getElementById(id);
   let me=null, gBranch=null, branchesMap=new Map(), akunCabang=[];
 
+  /* ===== Utils ===== */
   function parseMoney(s){
     if(s==null) return 0;
     const cleaned = String(s).replace(/\./g,'').replace(/,/g,'').trim();
     const n = Number(cleaned||0);
     return isFinite(n) ? Math.round(n) : 0;
   }
-  function fmt(n){
-    return (n||0).toLocaleString('id-ID');
+  const fmt = (n)=> 'Rp ' + (n||0).toLocaleString('id-ID');
+
+  function getDateRange(){
+    const d1 = $('fFrom')?.value || '';
+    const d2 = $('fTo')?.value || '';
+    return { from: d1 || null, to: d2 || null };
+  }
+  function setFilterInfo(){
+    const {from,to} = getDateRange();
+    const txt = (from||'…') + ' → ' + (to||'…');
+    $('filterInfo').textContent = 'Filter: ' + txt;
+    $('pageInfo').textContent = 'Filter: ' + txt;
   }
 
+  /* ===== Boot ===== */
   async function boot(){
     const { data:{ session } } = await supabase.auth.getSession();
     if(!session){ location.href='login.html'; return }
@@ -286,7 +319,7 @@
     me = prof;
     gBranch = (prof.branch_code||'').trim();
 
-    // Badge user: NAMA-ROLE
+    // Badge user
     const nm = (prof.full_name || prof.email || '').trim();
     const firstName = nm ? nm.split(' ')[0] : '';
     const roleRaw = (prof.role||'').trim();
@@ -307,12 +340,36 @@
       $('branchSelect').onchange = async ()=>{
         gBranch = $('branchSelect').value;
         updateCurrentStoreName();
+        $('branch_code').value = gBranch;   // ikut cabang
         await loadAkunCabang();
+        await refreshAll();                 // ← riwayat & KPI ikut cabang
       };
     }else{
       $('branchSelect').style.display='none';
     }
     updateCurrentStoreName();
+
+    // Default filter = bulan berjalan
+    const today = new Date();
+    const first = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0,10);
+    const tday = today.toISOString().slice(0,10);
+    $('fFrom').value = first;
+    $('fTo').value = tday;
+    setFilterInfo();
+
+    // tombol filter
+    $('btnApplyFilter').addEventListener('click', async ()=>{
+      const { from, to } = getDateRange();
+      if (from && to && from > to) { alert('Tanggal Dari tidak boleh lebih besar dari Sampai'); return; }
+      setFilterInfo();
+      await refreshAll();
+    });
+    $('btnResetFilter').addEventListener('click', async ()=>{
+      $('fFrom').value = first;
+      $('fTo').value = tday;
+      setFilterInfo();
+      await refreshAll();
+    });
 
     // tombol tambah & fab
     document.getElementById('btnTambah')?.addEventListener('click', openFormAdd);
@@ -326,8 +383,7 @@
     initSidebarToggler();
 
     await loadAkunCabang();   // isi dropdown akun sesuai cabang
-    await loadKPI();          // placeholder
-    await loadRiwayat();      // placeholder
+    await refreshAll();       // KPI + Riwayat pertama kali
   }
 
   function updateCurrentStoreName(){
@@ -335,12 +391,9 @@
     $('currentStoreName').textContent = name;
   }
 
-  /* ====== Ambil daftar akun untuk cabang aktif ======
-     Asumsi tabel: public.accounts (id,name,branch_code)
-     Jika schema Anda berbeda, ubah SELECT di sini.
-  */
+  /* ====== Ambil daftar akun untuk cabang aktif ====== */
   async function loadAkunCabang(){
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('accounts')
       .select('id,name,branch_code')
       .eq('branch_code', gBranch)
@@ -353,24 +406,51 @@
     $('akunTujuan').innerHTML = opts || '<option value="">(Belum ada akun)</option>';
   }
 
-  /* ====== UI Jenis Mutasi ====== */
+  /* ====== UI Jenis Mutasi (DINAMIS LABEL + HINT) ====== */
   function refreshJenisUI(){
-    const v = $('jenis').value;
-    const isPindah = (String(v).toUpperCase()==='PINDAH');
+    const up = String($('jenis').value).toUpperCase();
+    const isPindah = (up === 'PINDAH');
+
     $('rowAkunSingle').classList.toggle('hidden', isPindah);
     $('rowAkunPindah').classList.toggle('hidden', !isPindah);
     $('rowAdmin').classList.toggle('hidden', !isPindah);
-    // set required
+
     $('akun').required = !isPindah;
     $('akunSumber').required = isPindah;
     $('akunTujuan').required = isPindah;
+
+    const lblSingle = $('lblAkunSingle');
+    const lblSumber = $('lblAkunSumber');
+    const lblTujuan = $('lblAkunTujuan');
+    const hintSingle = $('hintSingle');
+    const hintSumber = $('hintSumber');
+    const hintTujuan = $('hintTujuan');
+
+    if (isPindah){
+      lblSumber.textContent = 'Sumber (diambil dari)';
+      lblTujuan.textContent = 'Tujuan (ditambahkan ke)';
+      hintSumber.textContent = 'Uang DIAMBIL dari akun ini. Contoh: Laci Tunai, Rekening BRI.';
+      hintTujuan.textContent = 'Uang DITAMBAHKAN ke akun ini (tujuan pindah).';
+      hintSingle.textContent = '';
+    } else if (up === 'TAMBAH'){
+      lblSingle.textContent = 'Masuk ke Akun';
+      hintSingle.textContent = 'Uang MASUK ke akun ini. Contoh: Laci Tunai, Rekening BRI.';
+      hintSumber.textContent = hintTujuan.textContent = '';
+    } else if (up === 'KURANG'){
+      lblSingle.textContent = 'Keluar dari Akun';
+      hintSingle.textContent = 'Uang KELUAR dari akun ini. Contoh: Ambil dari Laci Tunai.';
+      hintSumber.textContent = hintTujuan.textContent = '';
+    } else {
+      lblSingle.textContent = 'Keluar dari Akun (Operasional)';
+      hintSingle.textContent = 'Biaya operasional memakai dana dari akun ini.';
+      hintSumber.textContent = hintTujuan.textContent = '';
+    }
   }
 
   /* ====== BUKA/TUTUP FORM ====== */
   function openFormAdd(){
-    // Prefill
     const today = new Date().toISOString().slice(0,10);
-    $('tanggal').value = today;               // hidden
+    $('tanggal').value = today;
     $('branch_code').value = gBranch || '';
     $('created_by').value = me?.id || '';
 
@@ -380,10 +460,8 @@
     $('keterangan').value = '';
 
     refreshJenisUI();
-    $('modalMutasi').showModal(); const dlg=$('modalMutasi'); if(dlg?.dataset?.editId) delete dlg.dataset.editId;
-
-    // beri hook
-    window.dispatchEvent(new CustomEvent('add-mutation', { detail:{ branch:gBranch, user:me } }));
+    const dlg=$('modalMutasi'); if(dlg?.dataset?.editId) delete dlg.dataset.editId;
+    dlg.showModal();
   }
   function closeFormAdd(){
     const dlg = $('modalMutasi');
@@ -399,43 +477,32 @@
     const admin = parseMoney($('admin').value || '0');
     if(nominal <= 0){ alert('Nominal harus > 0'); return; }
 
-    // map akun id -> name
     const mapIdToName = id => (akunCabang.find(a=>String(a.id)===String(id))?.name || null);
 
-    // rakit payload
     let payload = {
-      tanggal: $('tanggal').value,          // hidden (hari ini)
+      tanggal: $('tanggal').value,
       jenis,
       nominal,
-      admin: (jenis==='PINDAH' ? admin : 0),
+      admin: (jenis==='pindah' ? admin : 0),
       keterangan: $('keterangan').value || null,
       branch_code: $('branch_code').value || gBranch,
       created_by: $('created_by').value || (me?.id||null),
-      sumber_id: null,
-      sumber_name: null,
-      tujuan_id: null,
-      tujuan_name: null,
-      akun_id: null,
-      akun_name: null
+      sumber_id: null, sumber_name: null,
+      tujuan_id: null, tujuan_name: null,
+      akun_id: null,   akun_name: null
     };
 
-    if(jenis==='PINDAH'){
+    if(jenis==='pindah'){
       const src = $('akunSumber').value, dst = $('akunTujuan').value;
       if(!src || !dst){ alert('Pilih akun sumber & tujuan'); return; }
       if(src===dst){ alert('Akun sumber & tujuan tidak boleh sama'); return; }
-      payload.sumber_id = src;
-      payload.sumber_name = mapIdToName(src);
-      payload.tujuan_id = dst;
-      payload.tujuan_name = mapIdToName(dst);
+      payload.sumber_id = src; payload.sumber_name = mapIdToName(src);
+      payload.tujuan_id = dst; payload.tujuan_name = mapIdToName(dst);
     }else{
       const ak = $('akun').value;
       if(!ak){ alert('Pilih akun'); return; }
-      payload.akun_id = ak;
-      payload.akun_name = mapIdToName(ak);
+      payload.akun_id = ak; payload.akun_name = mapIdToName(ak);
     }
-
-    // hook untuk logika custom Anda
-    window.dispatchEvent(new CustomEvent('save-mutation', { detail: payload }));
 
     try{
       const dlg = document.getElementById('modalMutasi');
@@ -445,35 +512,24 @@
         if(error) throw error;
         delete dlg.dataset.editId;
       }else{
-        await insertMutasiFallback(payload); // matikan jika Anda override sendiri
+        await insertMutasiFallback(payload);
       }
       closeFormAdd();
-      await loadKPI(); await loadRiwayat();
+      await refreshAll();
     }catch(err){
       alert('Gagal menyimpan mutasi: ' + (err?.message||err));
     }
   }
 
-  /* ====== Fallback insert aman ke mutasi_saldo ======
-     Sesuaikan kolom dengan schema Anda. Contoh kolom yang cukup umum:
-     - jenis, nominal, admin, keterangan, branch_code, created_by, tanggal
-     - akun_id/akun_name atau sumber_/tujuan_ untuk pindah
-  */
+  /* ====== Fallback insert aman ke mutasi_saldo ====== */
   async function insertMutasiFallback(d){
     const row = {
-      tanggal: d.tanggal,
-      jenis: d.jenis,
-      nominal: d.nominal,
-      admin: d.admin,
-      keterangan: d.keterangan,
-      branch_code: d.branch_code,
-      created_by: d.created_by,
-      akun_id: d.akun_id,
-      akun_name: d.akun_name,
-      sumber_id: d.sumber_id,
-      sumber_name: d.sumber_name,
-      tujuan_id: d.tujuan_id,
-      tujuan_name: d.tujuan_name
+      tanggal: d.tanggal, jenis: d.jenis, nominal: d.nominal,
+      admin: d.admin, keterangan: d.keterangan,
+      branch_code: d.branch_code, created_by: d.created_by,
+      akun_id: d.akun_id, akun_name: d.akun_name,
+      sumber_id: d.sumber_id, sumber_name: d.sumber_name,
+      tujuan_id: d.tujuan_id, tujuan_name: d.tujuan_name
     };
     const { error } = await supabase.from('mutasi_saldo').insert(row);
     if(error) throw error;
@@ -500,63 +556,108 @@
     });
   }
 
-  /* ===== Placeholder agar halaman tidak error jika fungsi asli ada di file lain ===== */
-  async function loadKPI(){ /* isi sesuai versi Anda atau query view KPI */
-    try{
-      const { data, error } = await supabase.from('v_dashboard_global_summary').select('*').maybeSingle();
-      if(error){ console.warn('KPI error', error); return; }
-      if(data){
-        const el = document.getElementById('kpiSection');
-        if(el) el.textContent = JSON.stringify(data);
-      }
-    }catch(e){ console.warn(e); }
+  /* ====== KPI (menghormati filter tanggal & cabang) ====== */
+  async function loadKPI(){
+    const { from, to } = getDateRange();
+
+    // Ambil baris sesuai cabang + tanggal, dari VIEW (fallback ke tabel)
+    const q1 = supabase.from('v_mutasi_summary').select('jenis, nominal').eq('branch_code', gBranch);
+    if (from) q1.gte('tanggal', from);
+    if (to)   q1.lte('tanggal', to);
+    let { data, error } = await q1;
+
+    if (error){ // fallback ke tabel
+      const q2 = supabase.from('mutasi_saldo').select('jenis, nominal').eq('branch_code', gBranch);
+      if (from) q2.gte('tanggal', from);
+      if (to)   q2.lte('tanggal', to);
+      ({ data, error } = await q2);
+      if (error){ console.warn('KPI error', error); return; }
+    }
+
+    // Hitung KPI (pindah diabaikan)
+    let totalTambah = 0, totalKurang = 0;
+    (data||[]).forEach(r=>{
+      const j = String(r.jenis||'').toLowerCase();
+      const n = Number(r.nominal||0);
+      if (j === 'tambah') totalTambah += n;
+      else if (j === 'kurang' || j === 'operasional') totalKurang += n;
+    });
+
+    $('kpiTambah').textContent = fmt(totalTambah);
+    $('kpiKurang').textContent = fmt(totalKurang);
+    $('kpiNet').textContent    = fmt(totalTambah - totalKurang);
   }
+
+  /* ====== Riwayat (VIEW + fallback) ====== */
   async function loadRiwayat(){
+    const { from, to } = getDateRange();
+
     try{
-      const { data, error } = await supabase
-        .from('mutasi_saldo')
-        .select('*')
-        .eq('branch_code', gBranch)
-        .order('created_at', { ascending:false })
-        .limit(50);
+      let qb = supabase.from('v_mutasi_summary').select('*').eq('branch_code', gBranch)
+        .order('created_at', { ascending:false }).limit(200);
+      if (from) qb = qb.gte('tanggal', from);
+      if (to)   qb = qb.lte('tanggal', to);
+      let { data, error } = await qb;
+
+      if(error){
+        qb = supabase.from('mutasi_saldo').select('*').eq('branch_code', gBranch)
+          .order('created_at', { ascending:false }).limit(200);
+        if (from) qb = qb.gte('tanggal', from);
+        if (to)   qb = qb.lte('tanggal', to);
+        ({ data, error } = await qb);
+      }
       if(error){ console.warn('Riwayat error', error); return; }
+
       const tb = document.getElementById('tb');
       if(!tb) return;
-      tb.innerHTML = (data||[]).map((r, i)=>`
-        <tr>
-          <td>${i+1}</td>
-          <td>${r.created_by || ''}<br>${r.tanggal || ''}</td>
-          <td>${r.jenis || ''}</td>
-          <td>${r.akun_name || r.sumber_name || '-'}</td>
-          <td>${r.tujuan_name || '-'}</td>
-          <td class="num">${(r.nominal||0).toLocaleString('id-ID')}</td>
-          <td class="num">${(r.admin||0).toLocaleString('id-ID')}</td>
-          <td>${r.keterangan||''}</td>
-          <td>
-            <button class="btn-sm" onclick="editMutasi('${r.id}')">Edit</button>
-            <button class="btn-sm" onclick="deleteMutasi('${r.id}')">Hapus</button>
-          </td>
-        </tr>`).join('');
+
+      tb.innerHTML = (data||[]).map((r, i)=>{
+        const jenis = String(r.jenis||'').toLowerCase();
+
+        // LOGIKA SUMBER/TUJUAN SESUAI KEBUTUHAN
+        const sumber = (jenis === 'pindah') ? (r.sumber_name || '-') : (r.akun_name || '-');
+        const tujuan = (jenis === 'pindah') ? (r.tujuan_name || '-') : '-';
+
+        return `
+          <tr>
+            <td>${i+1}</td>
+            <td>${(r.created_by_name || r.created_by || '')}<br>${r.tanggal || ''}</td>
+            <td>${(r.jenis||'').toString().toUpperCase()}</td>
+            <td>${sumber}</td>
+            <td>${tujuan}</td>
+            <td class="num">${(r.nominal||0).toLocaleString('id-ID')}</td>
+            <td class="num">${(r.admin||0).toLocaleString('id-ID')}</td>
+            <td>${r.keterangan||''}</td>
+            <td>
+              <button class="btn-sm" onclick="editMutasi('${r.id}')">Edit</button>
+              <button class="btn-sm" onclick="deleteMutasi('${r.id}')">Hapus</button>
+            </td>
+          </tr>`;
+      }).join('');
     }catch(e){ console.warn(e); }
   }
 
+  async function refreshAll(){
+    await loadKPI();
+    await loadRiwayat();
+  }
+
+  /* ===== Aksi tabel ===== */
   window.deleteMutasi = async function(id){
     if(!confirm('Hapus mutasi ini?')) return;
     const { error } = await supabase.from('mutasi_saldo').delete().eq('id', id);
     if(error){ alert('Gagal hapus: '+error.message); return; }
-    await loadRiwayat(); await loadKPI();
+    await refreshAll();
   }
 
   window.editMutasi = async function(id){
     const { data, error } = await supabase.from('mutasi_saldo').select('*').eq('id', id).single();
     if(error){ alert('Gagal ambil data'); return; }
     const r = data;
-    // set jenis (gunakan format original di UI: uppercase option values)
     const j = String(r.jenis||'').toUpperCase();
     const elJenis = document.getElementById('jenis');
     if(elJenis){ elJenis.value = j; elJenis.dispatchEvent(new Event('change')); }
 
-    // set akun/nominal/dll
     if(r.akun_id) document.getElementById('akun').value = r.akun_id;
     if(r.sumber_id) document.getElementById('akunSumber').value = r.sumber_id;
     if(r.tujuan_id) document.getElementById('akunTujuan').value = r.tujuan_id;
@@ -564,7 +665,6 @@
     document.getElementById('nominal').value = (r.nominal||0).toLocaleString('id-ID');
     document.getElementById('keterangan').value = r.keterangan||'';
 
-    // simpan id edit di dataset modal
     const dlg = document.getElementById('modalMutasi');
     dlg.dataset.editId = id;
     dlg.showModal();
@@ -577,6 +677,7 @@
     location.href='login.html';
   });
 
+  /* ===== Start ===== */
   boot();
 </script>
 </body>
