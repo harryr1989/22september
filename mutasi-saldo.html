@@ -9,18 +9,13 @@
       --sidebar-w:240px;
       --bg:#f6f8fb; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#0b63f3;
       --card:#fff; --bd:#e5e7eb; --txt:#0f172a; --ring:#93c5fd33;
-      --pos:#16a34a; /* hijau */
-      --neg:#dc2626; /* merah */
-      --neu:#ca8a04; /* kuning */
-      --blue:#0b63f3; /* nama user */
+      --pos:#16a34a; --neg:#dc2626; --neu:#ca8a04; --blue:#0b63f3;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt);font-size:15px;line-height:1.5}
 
-    /* ===== Layout ===== */
     .layout{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh}
 
-    /* ===== Sidebar ===== */
     .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px;position:relative;z-index:20}
     .brand{color:#fff;font-weight:800;font-size:20px;margin-bottom:12px}
     .nav{padding:0;display:flex;flex-direction:column;gap:6px}
@@ -33,7 +28,6 @@
     .sidebar-footer{margin-top:auto;padding-top:10px;font-size:11px;color:#93a3b8}
     .logout{display:block;margin-top:8px;background:#fecdd3;color:#7f1d1d;text-align:center;border-radius:10px;padding:9px 10px;font-weight:800;text-decoration:none}
 
-    /* ===== Header & konten ===== */
     header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
     .hdr-left{display:flex;align-items:center;gap:12px;flex:1 1 auto;min-width:300px}
     .hdr-right{display:flex;align-items:center;gap:8px}
@@ -43,12 +37,15 @@
     .btn{border:none;border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:700;height:44px;transition:background .15s,box-shadow .15s}
     .btn-primary{background:var(--pri);color:#fff}
     .btn-sm{height:36px;padding:6px 10px;border-radius:999px;font-weight:700;border:1px solid var(--bd);background:#fff}
+
     .card{background:var(--card);border:1px solid var(--bd);border-radius:22px;box-shadow:0 6px 18px rgba(15,23,42,.08);padding:16px;margin:12px 16px}
+
     .kpi-grid{display:grid;grid-template-columns:repeat(1,1fr);gap:10px}
     @media(min-width:560px){ .kpi-grid{grid-template-columns:repeat(3,1fr)} }
     .kpi-card{background:#fff;border:1px solid var(--bd);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:6px}
     .kpi-title{font-size:12px;color:#475569}
     .kpi-value{font-size:20px;font-weight:800}
+
     table{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden}
     th,td{padding:10px;border:1px solid var(--bd);font-size:14px;text-align:left;vertical-align:top}
     th{background:#f8fafc;position:sticky;top:0;z-index:1;box-shadow:inset 0 -1px #e5e7eb}
@@ -62,18 +59,30 @@
     .input{border:1px solid var(--bd);background:#fff;border-radius:10px;padding:10px 12px;font-size:15px;outline:none}
     .input:focus{box-shadow:0 0 0 4px var(--ring);border-color:#bfdbfe}
 
-    /* ===== Filter row ===== */
     .filters{display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin:8px 0 12px}
     .field{display:flex;flex-direction:column;gap:4px}
     .field label{font-size:12px;color:#475569}
+    #filterInfo, #lastUpdateInfo { white-space: nowrap; }
 
-    /* ===== Hamburger & Overlay ===== */
+    /* Tombol aksi cepat di samping filter (tinted) */
+    .mutasi-actions{
+      margin-left:auto; display:flex; gap:6px; flex-wrap:wrap; align-items:center;
+    }
+    .mutasi-actions .act{ border:1px solid var(--bd); font-weight:800; transition:background .15s,color .15s,border-color .15s,transform .05s; }
+    .mutasi-actions .act:active{ transform:translateY(1px); }
+    .mutasi-actions .act:focus-visible{ box-shadow:0 0 0 3px var(--ring); }
+    .mutasi-actions .act.tambah{ background:#ecfdf5;color:var(--pos);border-color:#bbf7d0; }
+    .mutasi-actions .act.tambah:hover{ background:var(--pos);color:#fff;border-color:var(--pos); }
+    .mutasi-actions .act.kurang,.mutasi-actions .act.operasional{ background:#fef2f2;color:var(--neg);border-color:#fecaca; }
+    .mutasi-actions .act.kurang:hover,.mutasi-actions .act.operasional:hover{ background:var(--neg);color:#fff;border-color:var(--neg); }
+    .mutasi-actions .act.pindah{ background:#fffbeb;color:var(--neu);border-color:#fde68a; }
+    .mutasi-actions .act.pindah:hover{ background:#ca8a04;color:#fff;border-color:#ca8a04; }
+
     .hamburger{font-size:22px;background:none;border:none;cursor:pointer;padding:8px;display:none}
     .overlay{position:fixed;inset:0;background:rgba(2,6,23,.45);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:19}
     .overlay.show{opacity:1;pointer-events:auto}
     body.noscroll{overflow:hidden}
 
-    /* ===== Responsive ===== */
     @media (max-width: 980px){
       .layout{grid-template-columns:1fr}
       .sidebar{ position:fixed;left:-240px;top:0;bottom:0;width:var(--sidebar-w); transition:left .25s ease; }
@@ -81,8 +90,8 @@
       .hamburger{ display:block; }
       .fab{ display:flex; }
     }
+    @media (max-width:560px){ .mutasi-actions{ display:none; } }
 
-    /* ===== Modal (dialog) ===== */
     dialog{border:none;border-radius:16px;box-shadow:0 10px 30px rgba(2,6,23,.25);padding:0;max-width:640px;width:96%}
     .dlg-hd{padding:14px 16px;border-bottom:1px solid var(--bd);font-weight:800}
     .dlg-bd{padding:16px;display:grid;gap:10px}
@@ -91,29 +100,28 @@
     .w100{width:100%}
     .hidden{display:none!important}
 
-    /* ===== Pewarnaan & badge Jenis ===== */
     .name-blue{color:var(--blue);font-weight:700}
     .time{font-variant-numeric:tabular-nums}
     .jenis-badge{display:inline-flex;align-items:center;gap:8px;font-weight:800;border-radius:999px;padding:4px 10px;border:1px solid var(--bd);background:#fff}
     .jenis-ico{font-size:14px;line-height:1}
-    .jenis-tambah{color:var(--pos)}
-    .jenis-kurang{color:var(--neg)}
-    .jenis-pindah{color:var(--neu)}
-    .jenis-operasional{color:var(--neg)}
+    .jenis-tambah{color:var(--pos)} .jenis-kurang{color:var(--neg)} .jenis-pindah{color:var(--neu)} .jenis-operasional{color:var(--neg)}
+    .jenis-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .mini-amt{font-size:12px;padding:2px 6px;border-radius:999px;border:1px solid var(--bd);background:#f8fafc;font-weight:700;line-height:1.2;}
+    .mini-plus{color:var(--pos)} .mini-minus{color:var(--neg)} .mini-plusminus{color:var(--neu)}
 
-    /* ===== Sembunyikan kolom Admin di layar kecil ===== */
     @media (max-width: 680px){
       table thead th:nth-child(8),
-      table tbody td:nth-child(8){
-        display:none;
-      }
+      table tbody td:nth-child(8){ display:none; }
+    }
+    @media (max-width: 540px){
+      table thead th:nth-child(7),
+      table tbody td:nth-child(7){ display:none; }
     }
   </style>
 </head>
 <body>
 <div class="layout">
 
-  <!-- ===== Sidebar ===== -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">Amko MiniLink</div>
 
@@ -132,9 +140,7 @@
 
       <div class="group">
         <div class="group-hd"><span>LAPORAN</span><span>▾</span></div>
-        <div class="group-bd">
-          <a href="laporan.html">📘 Laporan MiniLink</a>
-        </div>
+        <div class="group-bd"><a href="laporan.html">📘 Laporan MiniLink</a></div>
       </div>
 
       <div class="group">
@@ -153,33 +159,25 @@
     </div>
   </aside>
 
-  <!-- Overlay (mobile) -->
   <div id="overlay" class="overlay" aria-hidden="true"></div>
 
-  <!-- ===== Main ===== -->
   <div>
     <header>
       <div class="hdr-left">
         <button id="toggleSidebar" class="hamburger" aria-label="Toggle Sidebar" aria-controls="sidebar" aria-expanded="false">☰</button>
-
-        <!-- Dropdown branch (owner only) -->
         <select id="branchSelect" class="input" style="display:none"></select>
-
-        <!-- Label toko sekarang -->
         <div class="current-store">TOKO SEKARANG: <span id="currentStoreName">-</span></div>
       </div>
-
       <div class="hdr-right">
         <span id="userBadge" class="user-badge">MEMUAT…</span>
-        <button id="btnTambah" class="btn btn-primary">+ Tambah Mutasi</button>
       </div>
     </header>
 
-    <!-- KPI -->
+    <!-- Ringkasan -->
     <div class="card">
-      <h3 style="margin:0 0 8px 0">KPI Mutasi</h3>
+      <h3 style="margin:0 0 8px 0">Ringkasan Mutasi</h3>
 
-      <!-- Filter tanggal -->
+      <!-- Filter + Aksi cepat -->
       <div class="filters">
         <div class="field">
           <label for="fFrom">Dari</label>
@@ -192,6 +190,15 @@
         <button id="btnApplyFilter" class="btn-sm">Terapkan</button>
         <button id="btnResetFilter" class="btn-sm">Reset</button>
         <span class="pill" id="filterInfo">Filter: -</span>
+        <span class="pill" id="lastUpdateInfo">Update terakhir: -</span>
+
+        <!-- Aksi cepat jenis mutasi (desktop/tablet) -->
+        <div class="mutasi-actions" id="mutasiActions">
+          <button type="button" class="btn-sm act tambah" data-jenis="TAMBAH" title="Tambah Saldo">➕ Tambah</button>
+          <button type="button" class="btn-sm act kurang" data-jenis="KURANG" title="Ambil Saldo">➖ Ambil</button>
+          <button type="button" class="btn-sm act pindah"  data-jenis="PINDAH" title="Pindah Saldo">🔁 Pindah</button>
+          <button type="button" class="btn-sm act operasional" data-jenis="OPERASIONAL" title="Operasional">🧾 Operasional</button>
+        </div>
       </div>
 
       <div class="kpi-grid">
@@ -222,33 +229,24 @@
         </thead>
         <tbody id="tb"></tbody>
       </table>
-      <div class="pager">
-        <span class="pill" id="pageInfo">Filter: -</span>
-      </div>
+      <div class="pager"><span class="pill" id="pageInfo">Filter: -</span></div>
     </div>
   </div>
 </div>
 
 <button id="fabAdd" class="fab" title="Tambah">+</button>
 
-<!-- ===== MODAL TAMBAH MUTASI ===== -->
+<!-- ===== MODAL MUTASI (tanpa dropdown jenis) ===== -->
 <dialog id="modalMutasi">
   <form id="formMutasi" method="dialog">
-    <div class="dlg-hd">Tambah Mutasi</div>
+    <div class="dlg-hd" id="dlgTitle">Tambah Mutasi</div>
     <div class="dlg-bd">
 
       <!-- Hidden: tanggal otomatis hari ini -->
       <input id="tanggal" name="tanggal" type="date" class="hidden">
 
-      <div class="row">
-        <label for="jenis">Jenis Mutasi</label>
-        <select id="jenis" name="jenis" class="input w100" required>
-          <option value="TAMBAH">Tambah Saldo</option>
-          <option value="KURANG">Ambil Saldo</option>
-          <option value="PINDAH">Pindah Saldo</option>
-          <option value="OPERASIONAL">Operasional</option>
-        </select>
-      </div>
+      <!-- Hidden jenis -->
+      <input id="jenis_hidden" name="jenis" type="hidden" value="tambah">
 
       <!-- Akun tunggal (Tambah/Ambil/Operasional) -->
       <div id="rowAkunSingle" class="row">
@@ -330,11 +328,17 @@
     if(!ts) return '';
     try{
       const d = new Date(ts);
-      return d.toLocaleTimeString('id-ID', { hour12:false });
+      return d.toLocaleTimeString('id-ID', { hour12:false }); // hh:mm:ss
     }catch{ return ''; }
   }
+  function formatDateTimeID(iso){
+    if(!iso) return '-';
+    const d = new Date(iso);
+    const tgl = d.toLocaleDateString('id-ID', { year:'numeric', month:'2-digit', day:'2-digit' }); // dd/mm/yyyy
+    const jam = d.toLocaleTimeString('id-ID', { hour12:false }); // hh:mm:ss
+    return `${tgl} ${jam}`;
+  }
 
-  /* Ambil saldo saat ini dari akun */
   async function getCurrentSaldoByAccountId(accId){
     if(!accId) return 0;
     const { data: acc, error } = await supabase.from('accounts').select('*').eq('id', accId).single();
@@ -348,7 +352,6 @@
     const { data:{ session } } = await supabase.auth.getSession();
     if(!session){ location.href='login.html'; return }
 
-    // profil
     const { data: prof } = await supabase.from('profiles')
       .select('id,full_name,email,branch_code,role')
       .eq('id', session.user.id).single();
@@ -377,9 +380,9 @@
       $('branchSelect').onchange = async ()=>{
         gBranch = $('branchSelect').value;
         updateCurrentStoreName();
-        $('branch_code').value = gBranch;   // ikut cabang
+        $('branch_code').value = gBranch;
         await loadAkunCabang();
-        await refreshAll();                 // ← riwayat & KPI ikut cabang
+        await refreshAll();
       };
     }else{
       $('branchSelect').style.display='none';
@@ -408,16 +411,22 @@
       await refreshAll();
     });
 
-    // tombol tambah & fab
-    document.getElementById('btnTambah')?.addEventListener('click', openFormAdd);
-    document.getElementById('fabAdd')?.addEventListener('click', openFormAdd);
+    // FAB (mobile) default → Tambah
+    document.getElementById('fabAdd')?.addEventListener('click', ()=> openFormAddWithJenis('TAMBAH'));
 
     // modal events
     $('btnCancel').addEventListener('click', closeFormAdd);
     $('formMutasi').addEventListener('submit', onSaveMutasi);
-    $('jenis').addEventListener('change', refreshJenisUI);
 
     initSidebarToggler();
+
+    // Binding 4 tombol aksi cepat
+    document.querySelectorAll('#mutasiActions [data-jenis]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const j = btn.getAttribute('data-jenis');
+        openFormAddWithJenis(j);
+      });
+    });
 
     await loadAkunCabang();   // isi dropdown akun sesuai cabang
     await refreshAll();       // KPI + Riwayat pertama kali
@@ -443,60 +452,68 @@
     $('akunTujuan').innerHTML = opts || '<option value="">(Belum ada akun)</option>';
   }
 
-  /* ====== UI Jenis Mutasi (DINAMIS LABEL + HINT) ====== */
-  function refreshJenisUI(){
-    const up = String($('jenis').value).toUpperCase();
-    const isPindah = (up === 'PINDAH');
+  /* ====== SETUP FORM BERDASARKAN JENIS ====== */
+  function setJenisUI(jenisUp){
+    // jenisUp: 'TAMBAH' | 'KURANG' | 'PINDAH' | 'OPERASIONAL'
+    const j = String(jenisUp||'TAMBAH').toUpperCase();
 
+    // hidden jenis untuk submit
+    $('jenis_hidden').value = j.toLowerCase();
+
+    // judul header
+    const title = j==='TAMBAH' ? 'Tambah Saldo'
+                : j==='KURANG' ? 'Ambil Saldo'
+                : j==='PINDAH' ? 'Pindah Saldo'
+                : 'Operasional';
+    $('dlgTitle').textContent = title;
+
+    const isPindah = (j==='PINDAH');
+
+    // tampil/sembunyi blok
     $('rowAkunSingle').classList.toggle('hidden', isPindah);
     $('rowAkunPindah').classList.toggle('hidden', !isPindah);
-    $('rowAdmin').classList.toggle('hidden', !isPindah);
+    $('rowAdmin').classList.toggle('hidden', !isPindah); // admin hanya untuk pindah (sesuai versi sebelumnya)
 
+    // requirement
     $('akun').required = !isPindah;
     $('akunSumber').required = isPindah;
     $('akunTujuan').required = isPindah;
 
-    const lblSingle = $('lblAkunSingle');
-    const lblSumber = $('lblAkunSumber');
-    const lblTujuan = $('lblAkunTujuan');
-    const hintSingle = $('hintSingle');
-    const hintSumber = $('hintSumber');
-    const hintTujuan = $('hintTujuan');
-
+    // label & hint
     if (isPindah){
-      lblSumber.textContent = 'Sumber (diambil dari)';
-      lblTujuan.textContent = 'Tujuan (ditambahkan ke)';
-      hintSumber.textContent = 'Uang DIAMBIL dari akun ini. Contoh: Laci Tunai, Rekening BRI.';
-      hintTujuan.textContent = 'Uang DITAMBAHKAN ke akun ini (tujuan pindah).';
-      hintSingle.textContent = '';
-    } else if (up === 'TAMBAH'){
-      lblSingle.textContent = 'Masuk ke Akun';
-      hintSingle.textContent = 'Uang MASUK ke akun ini. Contoh: Laci Tunai, Rekening BRI.';
-      hintSumber.textContent = hintTujuan.textContent = '';
-    } else if (up === 'KURANG'){
-      lblSingle.textContent = 'Keluar dari Akun';
-      hintSingle.textContent = 'Uang KELUAR dari akun ini. Contoh: Ambil dari Laci Tunai.';
-      hintSumber.textContent = hintTujuan.textContent = '';
+      $('lblAkunSumber').textContent = 'Akun Sumber';
+      $('lblAkunTujuan').textContent = 'Akun Tujuan';
+      $('hintSumber').textContent = 'Uang DIAMBIL dari akun ini.';
+      $('hintTujuan').textContent = 'Uang DITAMBAHKAN ke akun ini.';
+      $('lblAkunSingle').textContent = 'Akun';
+      $('hintSingle').textContent = '';
+    } else if (j==='TAMBAH'){
+      $('lblAkunSingle').textContent = 'Masuk ke Akun';
+      $('hintSingle').textContent = 'Uang MASUK ke akun ini.';
+      $('hintSumber').textContent = $('hintTujuan').textContent = '';
+    } else if (j==='KURANG'){
+      $('lblAkunSingle').textContent = 'Keluar dari Akun';
+      $('hintSingle').textContent = 'Uang KELUAR dari akun ini.';
+      $('hintSumber').textContent = $('hintTujuan').textContent = '';
     } else {
-      lblSingle.textContent = 'Keluar dari Akun (Operasional)';
-      hintSingle.textContent = 'Biaya operasional memakai dana dari akun ini.';
-      hintSumber.textContent = hintTujuan.textContent = '';
+      $('lblAkunSingle').textContent = 'Keluar dari Akun (Operasional)';
+      $('hintSingle').textContent = 'Biaya operasional memakai dana dari akun ini.';
+      $('hintSumber').textContent = $('hintTujuan').textContent = '';
     }
   }
 
   /* ====== BUKA/TUTUP FORM ====== */
-  function openFormAdd(){
+  function openFormAddWithJenis(jenis){
     const today = new Date().toISOString().slice(0,10);
     $('tanggal').value = today;
     $('branch_code').value = gBranch || '';
     $('created_by').value = me?.id || '';
 
-    $('jenis').value = 'TAMBAH';
     $('nominal').value = '';
     $('admin').value = '0';
     $('keterangan').value = '';
 
-    refreshJenisUI();
+    setJenisUI(jenis);
     const dlg=$('modalMutasi'); if(dlg?.dataset?.editId) delete dlg.dataset.editId;
     dlg.showModal();
   }
@@ -509,7 +526,7 @@
   async function onSaveMutasi(ev){
     ev.preventDefault();
 
-    const jenis = $('jenis').value.toLowerCase();
+    const jenis = $('jenis_hidden').value; // sudah lowercase dari setJenisUI
     const nominal = parseMoney($('nominal').value);
     const admin = parseMoney($('admin').value || '0');
     if(nominal <= 0){ alert('Nominal harus > 0'); return; }
@@ -518,16 +535,13 @@
 
     let payload = {
       tanggal: $('tanggal').value,
-      jenis,
+      jenis, // 'tambah' | 'kurang' | 'pindah' | 'operasional'
       nominal,
       admin: (jenis==='pindah' ? admin : 0),
       keterangan: $('keterangan').value || null,
       branch_code: $('branch_code').value || gBranch,
       created_by: $('created_by').value || (me?.id||null),
-
-      // tampilkan nama pembuat di tabel
       created_by_name: (me?.full_name || me?.email || null),
-
       sumber_id: null, sumber_name: null,
       tujuan_id: null, tujuan_name: null,
       akun_id: null,   akun_name: null
@@ -544,7 +558,7 @@
 
       // Saldo awal/akhir ditampilkan untuk SUMBER (uang berkurang)
       saldo_awal = await getCurrentSaldoByAccountId(src);
-      saldo_akhir = saldo_awal - nominal - 0; // admin pindah dihitung terpisah jika perlu
+      saldo_akhir = saldo_awal - nominal;
     }else{
       const ak = $('akun').value;
       if(!ak){ alert('Pilih akun'); return; }
@@ -657,14 +671,15 @@
         const tujuanNama = (jenis === 'pindah') ? (r.tujuan_name || '-') : '-';
         const tujuanId   = (jenis === 'pindah') ? (r.tujuan_id || '')    : '';
 
-        // Pewarnaan & ikon jenis
+        // Pewarnaan & ikon jenis (seragam)
         const jenisClass = jenis==='tambah' ? 'jenis-tambah'
                          : (jenis==='kurang' || jenis==='operasional') ? 'jenis-kurang'
                          : jenis==='pindah' ? 'jenis-pindah'
                          : '';
-        const jenisIcon = jenis==='tambah' ? '⬆️'
-                         : (jenis==='kurang' || jenis==='operasional') ? '⬇️'
-                         : jenis==='pindah' ? '↔️'
+        const jenisIcon = jenis==='tambah' ? '➕'
+                         : jenis==='kurang' ? '➖'
+                         : jenis==='operasional' ? '🧾'
+                         : jenis==='pindah' ? '🔁'
                          : '';
 
         // Nama biru + tanggal normal + waktu dari created_at
@@ -677,6 +692,12 @@
         const sa = (r.saldo_awal!=null) ? fmt(Number(r.saldo_awal)) : '-';
         const sk = (r.saldo_akhir!=null) ? fmt(Number(r.saldo_akhir)) : '-';
 
+        /* mini badge nominal di kolom Jenis (berwarna sesuai jenis) */
+        const nominal = Number(r.nominal||0);
+        let miniClass = 'mini-plusminus', signed = '±';
+        if (jenis==='tambah'){ miniClass='mini-plus'; signed='+'; }
+        else if (jenis==='kurang' || jenis==='operasional'){ miniClass='mini-minus'; signed='-'; }
+
         return `
           <tr>
             <td>${i+1}</td>
@@ -685,10 +706,13 @@
               <span>${tgl}</span>${jam ? `<br><span class="time">${jam}</span>` : ''}
             </td>
             <td>
-              <span class="jenis-badge ${jenisClass}" title="${(r.jenis||'').toString().toUpperCase()}">
-                <span class="jenis-ico">${jenisIcon}</span>
-                <span>${(r.jenis||'').toString().toUpperCase()}</span>
-              </span>
+              <div class="jenis-wrap">
+                <span class="jenis-badge ${jenisClass}" title="${(r.jenis||'').toString().toUpperCase()}">
+                  <span class="jenis-ico">${jenisIcon}</span>
+                  <span>${(r.jenis||'').toString().toUpperCase()}</span>
+                </span>
+                <span class="mini-amt ${miniClass}" title="Nominal transaksi">${signed}${fmt(nominal).replace('Rp ','Rp ')}</span>
+              </div>
             </td>
             <td title="${sumberId ? 'Sumber/Akun ID: ' + sumberId : ''}">${sumberNama}</td>
             <td title="${tujuanId ? 'Tujuan ID: ' + tujuanId : ''}">${tujuanNama}</td>
@@ -703,6 +727,25 @@
             </td>
           </tr>`;
       }).join('');
+
+      /* ==== Update badge "Update terakhir" & (opsional) set fTo sekali ==== */
+      const last = (data||[]).reduce((max, r)=>{
+        const c = r.created_at ? new Date(r.created_at).getTime() : 0;
+        return (c > max) ? c : max;
+      }, 0);
+
+      const lastEl = document.getElementById('lastUpdateInfo');
+      if(lastEl){
+        lastEl.textContent = 'Update terakhir: ' + (last ? formatDateTimeID(new Date(last).toISOString()) : '-');
+      }
+
+      // (Opsional) set tanggal "Sampai" ke update terbaru pada load pertama saja
+      if (!loadRiwayat._initializedOnce && last){
+        document.getElementById('fTo').value = new Date(last).toISOString().slice(0,10);
+        setFilterInfo();
+        loadRiwayat._initializedOnce = true;
+      }
+
     }catch(e){ console.warn(e); }
   }
 
@@ -723,20 +766,21 @@
     const { data, error } = await supabase.from('mutasi_saldo').select('*').eq('id', id).single();
     if(error){ alert('Gagal ambil data'); return; }
     const r = data;
-    const j = String(r.jenis||'').toUpperCase();
-    const elJenis = document.getElementById('jenis');
-    if(elJenis){ elJenis.value = j; elJenis.dispatchEvent(new Event('change')); }
+    // Buka form sesuai jenis baris yang diedit
+    const jenisUpper = String(r.jenis||'tambah').toUpperCase();
+    openFormAddWithJenis(jenisUpper);
 
-    if(r.akun_id) document.getElementById('akun').value = r.akun_id;
-    if(r.sumber_id) document.getElementById('akunSumber').value = r.sumber_id;
-    if(r.tujuan_id) document.getElementById('akunTujuan').value = r.tujuan_id;
-    document.getElementById('admin').value = (r.admin||0);
-    document.getElementById('nominal').value = (r.nominal||0).toLocaleString('id-ID');
-    document.getElementById('keterangan').value = r.keterangan||'';
+    // Isi field
+    if(r.akun_id) $('akun').value = r.akun_id;
+    if(r.sumber_id) $('akunSumber').value = r.sumber_id;
+    if(r.tujuan_id) $('akunTujuan').value = r.tujuan_id;
+    $('admin').value = (r.admin||0);
+    $('nominal').value = (r.nominal||0).toLocaleString('id-ID');
+    $('keterangan').value = r.keterangan||'';
 
+    // Tandai sedang edit (kalau nanti mau dipakai update)
     const dlg = document.getElementById('modalMutasi');
     dlg.dataset.editId = id;
-    dlg.showModal();
   }
 
   /* ===== Logout ===== */
