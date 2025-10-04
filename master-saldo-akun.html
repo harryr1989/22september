@@ -19,7 +19,7 @@
 
     .layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
 
-    /* ===== Sidebar (sesuai struktur diminta) ===== */
+    /* ===== Sidebar ===== */
     .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px;display:flex;flex-direction:column;transition:left .25s ease}
     .brand{color:#fff;font-weight:800;font-size:20px;margin-bottom:12px}
     .nav{display:flex;flex-direction:column;gap:6px}
@@ -34,10 +34,13 @@
     .sidebar-footer{margin-top:auto;padding-top:10px;font-size:11px;color:#93a3b8}
     .logout{display:block;margin-top:8px;background:#fecdd3;color:#7f1d1d;text-align:center;border-radius:10px;padding:9px 10px;font-weight:800;text-decoration:none}
 
-    /* ===== Header / Topbar (ori) ===== */
+    /* ===== Header / Topbar ===== */
     header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
     .title{margin:0;font-size:18px}
     .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px}
+
+    /* User-Role biru tebal */
+    #userRole{font-weight:800;color:#2563eb;}
 
     /* Hamburger */
     .hamburger{font-size:22px;background:none;border:none;cursor:pointer;padding:8px;display:none}
@@ -77,7 +80,7 @@
     .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:50}
     .modal.show{display:flex}
     .dialog{width:min(760px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:92vh}
-    .dlg-hd{background:#0ea5e9;color:#fff;padding:12px 16px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+    .dlg-hd{background:#0ea5e9;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;font-weight:800}
     .dlg-bd{padding:14px;display:grid;gap:12px;overflow:auto}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     label{font-size:12px;color:#475569;margin-bottom:6px;display:block}
@@ -157,28 +160,30 @@
   <!-- Overlay untuk mobile -->
   <div id="overlay" class="overlay" aria-hidden="true"></div>
 
-  <!-- ===== Bagian lain (ORI) ===== -->
+  <!-- ===== Konten ===== -->
   <div>
+    <!-- HEADER: dropdown kiri (owner only), teks tengah, USER-ROLE kanan (biru tebal) -->
     <header>
       <button id="toggleSidebar" class="hamburger" aria-label="Toggle Sidebar">☰</button>
-      <h2 class="title">Master Akun Saldo</h2>
-      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-        <div id="me" class="pill">memuat…</div>
-        <div id="roleBadge" class="pill">role: …</div>
-        <div id="branchBadge" class="pill">branch: …</div>
+
+      <!-- Kiri: Dropdown cabang (OWNER only) -->
+      <select id="branchSelect" class="input" style="min-width:220px;display:none">
+        <option value="">Memuat cabang…</option>
+      </select>
+
+      <!-- Tengah: Status toko -->
+      <div id="currentStore" class="title" style="font-weight:800; text-align:center; flex:1;">
+        TOKO SEKARANG: -
       </div>
+
+      <!-- Kanan: USER-ROLE (huruf besar tebal biru) -->
+      <div id="userRole"></div>
     </header>
 
     <div class="topbar">
-      <!-- Owner only -->
-      <div id="branchRow" style="display:none; margin-bottom:10px; gap:8px; align-items:center; flex-wrap:wrap">
-        <span style="font-size:12px;color:#475569;">Cabang</span>
-        <select id="branchSelect" class="input" style="width:260px;max-width:100%">
-          <option value="">Memuat cabang…</option>
-        </select>
-      </div>
+      <!-- (Bar cabang lama dihapus) -->
 
-      <!-- Info Owner -->
+      <!-- Info Owner (tetap, untuk pengingat cabang aktif saat ini) -->
       <div id="ownerNotice" class="pill" style="display:none; margin:6px 0 12px 0; background:#ecfeff; border-color:#a5f3fc; color:#0c4a6e;">
         Mode Owner: aksi <b>Tambah / Edit / Hapus</b> hanya untuk cabang <b id="ownerNoticeBranch">-</b>.
       </div>
@@ -199,10 +204,10 @@
   </div>
 </div>
 
-<!-- FAB (tetap ori; muncul untuk owner, diatur lewat JS) -->
+<!-- FAB (muncul untuk owner lewat JS) -->
 <button id="fabAdd" class="fab" title="Tambah" style="display:none;position:fixed;right:14px;bottom:calc(14px + var(--safe-bottom));width:56px;height:56px;border-radius:999px;background:var(--pri);color:#fff;box-shadow:0 10px 24px rgba(11,99,243,.35);z-index:15;font-size:26px;font-weight:900;align-items:center;justify-content:center;">+</button>
 
-<!-- Modal (ori) -->
+<!-- Modal -->
 <div class="modal" id="modal">
   <div class="dialog">
     <div class="dlg-hd">
@@ -308,7 +313,7 @@
   }
 
   // format ribuan input saldo
-  ;(()=>{ 
+  ;(()=>{
     const el = $('m_saldo')
     el.addEventListener('input', e=>{
       const raw = e.target.value.replace(/\D/g,'')
@@ -335,20 +340,23 @@
     gBranch = (prof.branch_code || '').toString().trim()
     viewBranch = gBranch
 
-    $('me').textContent = `${prof.full_name || prof.email}`
-    $('roleBadge').textContent = `role: ${gRole}`
-    $('branchBadge').textContent = `branch: ${viewBranch || '-'}`
+    // USER-ROLE biru tebal (huruf besar)
+    const nama = (prof.full_name || prof.email || 'USER').toUpperCase()
+    const role = (gRole || '').toUpperCase()
+    $('userRole').textContent = `${nama}-${role}`
+
+    $('currentStore').textContent = `TOKO SEKARANG: ${viewBranch || '-'}`
 
     if(isOwner()){
       $('fabAdd').style.display='flex'
-      $('branchRow').style.display='flex'
       $('ownerNotice').style.display='inline-block'
       $('ownerNoticeBranch').textContent = viewBranch || '-'
+      $('branchSelect').style.display = ''   // tampilkan dropdown di header
       await loadBranches()
     }else{
       $('fabAdd').style.display='none'
-      $('branchRow').style.display='none'
       $('ownerNotice').style.display='none'
+      $('branchSelect').style.display = 'none'
     }
 
     await loadAccounts()
@@ -364,6 +372,7 @@
     sel.innerHTML = `<option value="">Memuat cabang…</option>`
     let list = []
 
+    // Ambil dari tabel branches (kalau ada), fallback dari accounts
     const { data: br, error: ebr } = await supabase.from('branches').select('code,name').order('name')
     if(!ebr && br && br.length){
       list = br.map(b=>({code:(b.code||'').trim(), name:b.name || b.code}))
@@ -385,7 +394,7 @@
 
     sel.onchange = ()=>{
       viewBranch = sel.value
-      $('branchBadge').textContent = `branch: ${viewBranch}`
+      $('currentStore').textContent = `TOKO SEKARANG: ${viewBranch}`
       if (isOwner()){
         $('ownerNoticeBranch').textContent = viewBranch || '-'
       }
@@ -576,7 +585,7 @@
     a.addEventListener('click', ()=> toggleSidebar(false));
   });
 
-  // Logout (ori)
+  // Logout
   document.getElementById('lnk-logout').addEventListener('click', async ()=>{
     await supabase.auth.signOut(); location.href="login.html"
   })
