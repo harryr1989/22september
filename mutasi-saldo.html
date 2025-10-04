@@ -91,15 +91,23 @@
     .w100{width:100%}
     .hidden{display:none!important}
 
-    /* ===== Pewarnaan permintaan Anda ===== */
+    /* ===== Pewarnaan & badge Jenis ===== */
     .name-blue{color:var(--blue);font-weight:700}
     .time{font-variant-numeric:tabular-nums}
-    .jenis{font-weight:800}
+    .jenis-badge{display:inline-flex;align-items:center;gap:8px;font-weight:800;border-radius:999px;padding:4px 10px;border:1px solid var(--bd);background:#fff}
+    .jenis-ico{font-size:14px;line-height:1}
     .jenis-tambah{color:var(--pos)}
     .jenis-kurang{color:var(--neg)}
     .jenis-pindah{color:var(--neu)}
-    /* opsional: operasional ikut negatif */
     .jenis-operasional{color:var(--neg)}
+
+    /* ===== Sembunyikan kolom Admin di layar kecil ===== */
+    @media (max-width: 680px){
+      table thead th:nth-child(8),
+      table tbody td:nth-child(8){
+        display:none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -204,8 +212,10 @@
             <th>Jenis</th>
             <th>Sumber</th>
             <th>Tujuan</th>
+            <th class="num">Saldo Awal</th>
             <th class="num">Nominal</th>
             <th class="num">Admin</th>
+            <th class="num">Saldo Akhir</th>
             <th>Keterangan</th>
             <th>Aksi</th>
           </tr>
@@ -322,6 +332,15 @@
       const d = new Date(ts);
       return d.toLocaleTimeString('id-ID', { hour12:false });
     }catch{ return ''; }
+  }
+
+  /* Ambil saldo saat ini dari akun */
+  async function getCurrentSaldoByAccountId(accId){
+    if(!accId) return 0;
+    const { data: acc, error } = await supabase.from('accounts').select('*').eq('id', accId).single();
+    if(error) return 0;
+    const v = acc?.saldo ?? acc?.balance ?? acc?.amount ?? 0;
+    return Number(v)||0;
   }
 
   /* ===== Boot ===== */
@@ -505,10 +524,16 @@
       keterangan: $('keterangan').value || null,
       branch_code: $('branch_code').value || gBranch,
       created_by: $('created_by').value || (me?.id||null),
+
+      // tampilkan nama pembuat di tabel
+      created_by_name: (me?.full_name || me?.email || null),
+
       sumber_id: null, sumber_name: null,
       tujuan_id: null, tujuan_name: null,
       akun_id: null,   akun_name: null
     };
+
+    let saldo_awal = 0, saldo_akhir = 0;
 
     if(jenis==='pindah'){
       const src = $('akunSumber').value, dst = $('akunTujuan').value;
@@ -516,41 +541,35 @@
       if(src===dst){ alert('Akun sumber & tujuan tidak boleh sama'); return; }
       payload.sumber_id = src; payload.sumber_name = mapIdToName(src);
       payload.tujuan_id = dst; payload.tujuan_name = mapIdToName(dst);
+
+      // Saldo awal/akhir ditampilkan untuk SUMBER (uang berkurang)
+      saldo_awal = await getCurrentSaldoByAccountId(src);
+      saldo_akhir = saldo_awal - nominal - 0; // admin pindah dihitung terpisah jika perlu
     }else{
       const ak = $('akun').value;
       if(!ak){ alert('Pilih akun'); return; }
       payload.akun_id = ak; payload.akun_name = mapIdToName(ak);
+
+      saldo_awal = await getCurrentSaldoByAccountId(ak);
+      if (jenis==='tambah') saldo_akhir = saldo_awal + nominal;
+      else /* kurang/operasional */ saldo_akhir = saldo_awal - nominal;
     }
 
     try{
-      const dlg = document.getElementById('modalMutasi');
-      const editId = dlg?.dataset?.editId;
-      if(editId){
-        const { error } = await supabase.from('mutasi_saldo').update(payload).eq('id', editId);
-        if(error) throw error;
-        delete dlg.dataset.editId;
-      }else{
-        await insertMutasiFallback(payload);
+      const rowWithSaldo = { ...payload, saldo_awal, saldo_akhir };
+
+      const { error } = await supabase.from('mutasi_saldo').insert(rowWithSaldo);
+      if(error){
+        // Jika kolom saldo_awal/akhir belum ada di DB, ulangi tanpa kolom tambahan
+        const { error: err2 } = await supabase.from('mutasi_saldo').insert(payload);
+        if(err2) throw err2;
       }
+
       closeFormAdd();
       await refreshAll();
     }catch(err){
       alert('Gagal menyimpan mutasi: ' + (err?.message||err));
     }
-  }
-
-  /* ====== Fallback insert aman ke mutasi_saldo ====== */
-  async function insertMutasiFallback(d){
-    const row = {
-      tanggal: d.tanggal, jenis: d.jenis, nominal: d.nominal,
-      admin: d.admin, keterangan: d.keterangan,
-      branch_code: d.branch_code, created_by: d.created_by,
-      akun_id: d.akun_id, akun_name: d.akun_name,
-      sumber_id: d.sumber_id, sumber_name: d.sumber_name,
-      tujuan_id: d.tujuan_id, tujuan_name: d.tujuan_name
-    };
-    const { error } = await supabase.from('mutasi_saldo').insert(row);
-    if(error) throw error;
   }
 
   /* ===== Sidebar ===== */
@@ -633,32 +652,50 @@
         const jenis = String(r.jenis||'').toLowerCase();
 
         // LOGIKA SUMBER/TUJUAN SESUAI KEBUTUHAN
-        const sumber = (jenis === 'pindah') ? (r.sumber_name || '-') : (r.akun_name || '-');
-        const tujuan = (jenis === 'pindah') ? (r.tujuan_name || '-') : '-';
+        const sumberNama = (jenis === 'pindah') ? (r.sumber_name || '-') : (r.akun_name || '-');
+        const sumberId   = (jenis === 'pindah') ? (r.sumber_id || '')   : (r.akun_id || '');
+        const tujuanNama = (jenis === 'pindah') ? (r.tujuan_name || '-') : '-';
+        const tujuanId   = (jenis === 'pindah') ? (r.tujuan_id || '')    : '';
 
-        // Pewarnaan jenis
+        // Pewarnaan & ikon jenis
         const jenisClass = jenis==='tambah' ? 'jenis-tambah'
                          : (jenis==='kurang' || jenis==='operasional') ? 'jenis-kurang'
                          : jenis==='pindah' ? 'jenis-pindah'
                          : '';
+        const jenisIcon = jenis==='tambah' ? '⬆️'
+                         : (jenis==='kurang' || jenis==='operasional') ? '⬇️'
+                         : jenis==='pindah' ? '↔️'
+                         : '';
 
         // Nama biru + tanggal normal + waktu dari created_at
-        const creator = (r.created_by_name || r.created_by || '');
+        const creatorName = (r.created_by_name || r.created_by || '');
+        const creatorId   = (r.created_by || '');
         const tgl = (r.tanggal || (r.created_at ? String(r.created_at).slice(0,10) : ''));
         const jam = toLocalTimeStr(r.created_at);
+
+        // Saldo awal/akhir jika ada; jika tidak ada tampil '-'
+        const sa = (r.saldo_awal!=null) ? fmt(Number(r.saldo_awal)) : '-';
+        const sk = (r.saldo_akhir!=null) ? fmt(Number(r.saldo_akhir)) : '-';
 
         return `
           <tr>
             <td>${i+1}</td>
             <td>
-              <span class="name-blue">${creator}</span><br>
+              <span class="name-blue" title="User ID: ${creatorId}">${creatorName}</span><br>
               <span>${tgl}</span>${jam ? `<br><span class="time">${jam}</span>` : ''}
             </td>
-            <td><span class="jenis ${jenisClass}">${(r.jenis||'').toString().toUpperCase()}</span></td>
-            <td>${sumber}</td>
-            <td>${tujuan}</td>
-            <td class="num">${(r.nominal||0).toLocaleString('id-ID')}</td>
-            <td class="num">${(r.admin||0).toLocaleString('id-ID')}</td>
+            <td>
+              <span class="jenis-badge ${jenisClass}" title="${(r.jenis||'').toString().toUpperCase()}">
+                <span class="jenis-ico">${jenisIcon}</span>
+                <span>${(r.jenis||'').toString().toUpperCase()}</span>
+              </span>
+            </td>
+            <td title="${sumberId ? 'Sumber/Akun ID: ' + sumberId : ''}">${sumberNama}</td>
+            <td title="${tujuanId ? 'Tujuan ID: ' + tujuanId : ''}">${tujuanNama}</td>
+            <td class="num">${sa}</td>
+            <td class="num">${fmt(r.nominal||0)}</td>
+            <td class="num">${fmt(r.admin||0)}</td>
+            <td class="num">${sk}</td>
             <td>${r.keterangan||''}</td>
             <td>
               <button class="btn-sm" onclick="editMutasi('${r.id}')">Edit</button>
