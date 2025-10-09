@@ -71,43 +71,101 @@
       .pill{height:40px}
     }
   </style>
+
+<style id="sidebar-patch-css">
+/* === Sidebar seperti TRANSAKSI MINI ATM (patch override) === */
+:root{
+  --sidebar-w:240px;
+}
+.sidebar{
+  background:#0f172a !important; color:#e5e7eb !important;
+  display:flex !important; flex-direction:column !important;
+  transition:left .25s ease !important;
+  padding:0 !important;
+}
+.brand{
+  background:#0a5eb6 !important; color:#fff !important;
+  font-weight:800 !important; font-size:15px !important;
+  padding:12px 14px !important; margin:0 !important;
+}
+.nav{ padding:6px !important; display:flex !important; flex-direction:column !important; gap:0 !important; overflow:auto !important; }
+.nav a{
+  display:block !important; text-decoration:none !important; color:#e5e7eb !important;
+  font-size:13px !important; font-weight:400 !important;
+  padding:8px 10px !important; border-radius:8px !important; line-height:1.2 !important;
+}
+.nav a:hover{ background:rgba(255,255,255,.10) !important; }
+.nav a.active{ background:#0b3a66 !important; color:#fff !important; }
+
+.group{
+  margin-top:6px !important;
+  border:1px solid rgba(255,255,255,.08) !important;
+  border-radius:8px !important; overflow:hidden !important;
+}
+.group-hd{
+  padding:8px 10px !important; background:#0e223a !important; color:#cfe0f3 !important;
+  font-size:12px !important; font-weight:400 !important; letter-spacing:0 !important;
+  display:flex !important; justify-content:space-between !important; align-items:center !important; cursor:pointer !important;
+  text-transform:none !important;
+}
+.group-hd .chev{ transition:transform .2s ease !important; }
+.group.collapsed .group-hd .chev{ transform:rotate(-90deg) !important; }
+.group-bd{ padding:6px !important; background:#0f253f !important; }
+.group.collapsed .group-bd{ display:none !important; }
+
+/* Mobile layout expectations */
+@media (max-width: 840px){
+  .sidebar{ position:fixed !important; left:calc(-1 * var(--sidebar-w)) !important; top:0 !important; bottom:0 !important; width:var(--sidebar-w) !important; z-index:20 !important; }
+  .sidebar.open{ left:0 !important; }
+}
+</style>
+
 </head>
 <body>
 <div class="layout">
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
-    <div class="brand">Amko MiniLink</div>
-    <nav class="nav">
-      <a href="dashboard.html">📊 Dashboard</a>
-      <a href="transaksi-mini-atm.html">🧮 Transaksi Mini ATM</a>
-      <div class="group">
-        <div class="group-hd"><span>MASTER DATA</span></div>
-        <div class="group-bd">
-          <a href="master-saldo-akun.html">💰 Master Saldo Akun</a>
-          <a href="mutasi-saldo.html">🔄 Mutasi Saldo</a>
-          <a class="active" href="saldo-real.html">📑 Saldo Real</a>
-        </div>
+  <div class="brand">Amko MiniLink</div>
+
+  <nav class="nav" id="menuList">
+    <!-- Menu utama -->
+    <a href="dashboard.html">📊 Dashboard</a>
+    <a href="transaksi-mini-atm.html">🧮 Transaksi Mini ATM</a>
+
+    <!-- Grup MASTER DATA -->
+    <div class="group" data-key="grp_master">
+      <div class="group-hd"><span>📂 Master Data</span><span class="chev">▾</span></div>
+      <div class="group-bd">
+        <a href="master-saldo-akun.html">💰 Master Saldo Akun</a>
+        <a href="mutasi-saldo.html">🔄 Mutasi Saldo</a>
+        <a href="saldo-real.html">📑 Saldo Real</a>
       </div>
-      <div class="group">
-        <div class="group-hd"><span>LAPORAN</span></div>
-        <div class="group-bd">
-          <a href="laporan.html">📘 Laporan MiniLink</a>
-        </div>
-      </div>
-      <div class="group">
-        <div class="group-hd"><span>PENGATURAN</span></div>
-        <div class="group-bd">
-          <a href="manajemen-pengguna.html">👥 Manajemen Pengguna</a>
-          <a href="hak-akses.html">🔑 Hak Akses</a>
-          <a href="absensi.html">🕒 Absensi</a>
-        </div>
-      </div>
-    </nav>
-    <div class="sidebar-footer">
-      © Amko MiniLink • v1
-      <a href="#" id="lnk-logout" class="logout">🚪 Logout</a>
     </div>
-  </aside>
+
+    <!-- Grup LAPORAN -->
+    <div class="group" data-key="grp_laporan">
+      <div class="group-hd"><span>📘 Laporan</span><span class="chev">▾</span></div>
+      <div class="group-bd">
+        <a href="laporan.html">📘 Laporan MiniLink</a>
+      </div>
+    </div>
+
+    <!-- Grup PENGATURAN -->
+    <div class="group" data-key="grp_pengaturan">
+      <div class="group-hd"><span>⚙️ Pengaturan</span><span class="chev">▾</span></div>
+      <div class="group-bd">
+        <a href="manajemen-pengguna.html">👥 Manajemen Pengguna</a>
+        <a href="hak-akses.html">🔑 Hak Akses</a>
+        <a href="absensi.html">🕒 Absensi</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer" style="margin-top:auto;padding:8px 8px 10px;font-size:11px;color:#93a3b8">
+    © Amko MiniLink • v1
+    <a href="#" id="lnk-logout" class="logout" style="display:block;margin-top:8px;background:#fecdd3;color:#7f1d1d;text-align:center;border-radius:10px;padding:9px 10px;font-weight:800;text-decoration:none">🚪 Logout</a>
+  </div>
+</aside>
 
   <!-- Overlay (mobile) -->
   <div id="overlay" class="overlay" aria-hidden="true"></div>
@@ -188,7 +246,7 @@
         </div>
       </div>
 
-      <!-- ====== RIWAYAT REKAP (tanpa kolom "Saldo Awal") ====== -->
+      <!-- ====== RIWAYAT REKAP (tabel sesuai permintaan) ====== -->
       <div class="card" style="margin-top:12px">
         <h3>Riwayat Tutup Shift (tanggal terpilih & cabang aktif)</h3>
         <div style="overflow:auto">
@@ -197,11 +255,11 @@
               <tr>
                 <th>No</th>
                 <th>User & Tanggal</th>
+                <th>Saldo Awal</th>
                 <th>Saldo Sistem</th>
                 <th>Saldo Real (Rp)</th>
                 <th>Selisih (Rp)</th>
                 <th>Keterangan</th>
-                <th>Aksi</th>
               </tr>
             </thead>
             <tbody id="histBody">
@@ -230,13 +288,6 @@
   const fmtRp = n => 'Rp ' + fmtID(n)
   const parseNum = v => Number(String(v??'').replace(/\D/g,''))||0
   const toISO = d => new Date(d).toISOString().slice(0,10)
-
-  // ===== Debug helper
-  function showError(prefix, err){
-    const msg = (err && (err.message || err.error_description || err.hint)) ? (err.message || err.error_description || err.hint) : JSON.stringify(err);
-    console.error(prefix, err);
-    alert(prefix + ': ' + msg);
-  }
 
   // ========= Global state
   let gRole=null, gBranch=null, viewBranch=null, gName='USER'
@@ -489,7 +540,7 @@
     updateTotals()
   })
 
-  // ====== Simpan Tutup Shift (insert ke shift_history + reload riwayat) — TANPA opening_cash
+  // ====== Simpan Tutup Shift (insert ke shift_history + reload riwayat)
   $('btnSave').onclick = async ()=>{
     if(saldoKasirExtra===null){ alert('Isi Saldo Kasir dulu.'); return }
     const cab = viewBranch || gBranch
@@ -497,8 +548,6 @@
     const date = $('tgl').value
     const cashier = $('kasir').value || gName
     const note = $('note').value || ''
-
-    console.log('[SAVE] date=', date, 'branch_code=', cab, 'branch_name=', branch_name);
 
     const details = rows.map(r=>{
       const sys = sysWithKasir(r)
@@ -509,37 +558,27 @@
     const total_real   = details.reduce((s,d)=>s+d.real,0)
     const total_diff   = total_real - total_system
 
-    const payload = {
+    const { error } = await supabase.from('shift_history').insert([{
       date, branch_code: cab, branch_name,
       cashier, note,
+      opening_cash: saldoKasirExtra,        // << Saldo Awal
       total_system, total_real, total_diff,
       details
-    }
-
-    const { data: ins, error } = await supabase
-      .from('shift_history')
-      .insert([payload])
-      .select('id')
-
-    if(error){ showError('Gagal menyimpan', error); return }
+    }])
+    if(error){ alert('Gagal menyimpan: ' + error.message); return }
 
     alert('Tutup shift tersimpan.')
     await loadHistory()
   }
 
-  // ====== Riwayat Rekap: tanggal & cabang aktif (TANPA kolom "Saldo Awal") — dengan logging
+  // ====== Riwayat Rekap: tanggal & cabang aktif
   async function loadHistory(){
     const cab = viewBranch || gBranch
+    if(!cab){ $('histBody').innerHTML = `<tr><td colspan="7" class="muted">Belum ada data.</td></tr>`; return }
     const date = $('tgl').value
-    console.log('[LOAD] date=', date, 'branch_code=', cab);
-
-    if(!cab){
-      $('histBody').innerHTML = `<tr><td colspan="7" class="muted">Belum ada data.</td></tr>`
-      return
-    }
     const { data, error } = await supabase
       .from('shift_history')
-      .select('id,date,branch_code,branch_name,cashier,total_system,total_real,total_diff,note,created_at')
+      .select('id,date,branch_code,branch_name,cashier,opening_cash,total_system,total_real,total_diff,note,created_at')
       .eq('branch_code', cab)
       .eq('date', date)
       .order('created_at', { ascending:false })
@@ -551,24 +590,15 @@
       return
     }
 
-    const isOwner = (gRole || '').toLowerCase() === 'owner';
-    const isAdmin = (gRole || '').toLowerCase() === 'admin';
-    const canOperate = isOwner || isAdmin;
-
     const rowsHtml = list.map((h,idx)=>`
-      <tr data-id="${h.id}">
+      <tr>
         <td>${idx+1}</td>
         <td><b>${h.cashier || '-'}</b> • ${h.date}</td>
+        <td>${fmtRp(h.opening_cash || 0)}</td>
         <td>${fmtRp(h.total_system || 0)}</td>
         <td>${fmtRp(h.total_real || 0)}</td>
         <td>${fmtRp(h.total_diff || 0)}</td>
         <td>${h.note ? h.note.replace(/</g,'&lt;') : '-'}</td>
-        <td>
-          ${canOperate ? `
-            <button class="btn-sm btn-ghost" data-act="edit" title="Edit catatan">✏️</button>
-            <button class="btn-sm btn-outline" data-act="delete" title="Hapus entri">🗑️</button>
-          ` : '—'}
-        </td>
       </tr>
     `).join('')
     $('histBody').innerHTML = rowsHtml
@@ -614,62 +644,6 @@
   window.addEventListener('keyup', (e)=>{ if(e.key==='Escape') toggleSidebar(false); });
   document.addEventListener('click', (e)=>{ if(e.target.closest('.sidebar a')) toggleSidebar(false) });
 
-  // ===== Event delegation tombol Aksi (Edit/Hapus) di Riwayat
-  document.getElementById('histBody')?.addEventListener('click', async (e)=>{
-    const btn = e.target.closest('button[data-act]');
-    if(!btn) return;
-
-    const tr = btn.closest('tr');
-    const id = tr?.getAttribute('data-id');
-    if(!id) return;
-
-    const act = btn.getAttribute('data-act');
-    const isOwner = (gRole || '').toLowerCase() === 'owner';
-    const isAdmin = (gRole || '').toLowerCase() === 'admin';
-    const canOperate = isOwner || isAdmin;
-
-    if(!canOperate){
-      alert('Aksi ini hanya untuk Owner/Admin.');
-      return;
-    }
-
-    if(act === 'edit'){
-      // Kolom "Keterangan" sekarang index ke-5
-      const curNoteCell = tr.children[5];
-      const current = (curNoteCell?.textContent || '').trim();
-      const next = prompt('Ubah catatan (opsional, boleh kosong):', current);
-      if(next === null) return; // dibatalkan
-
-      const { error } = await supabase
-        .from('shift_history')
-        .update({ note: next || null })
-        .eq('id', id);
-
-      if(error){
-        alert('Gagal mengubah catatan: ' + error.message);
-        return;
-      }
-      await loadHistory();
-      alert('Catatan berhasil diubah.');
-    }
-
-    if(act === 'delete'){
-      if(!confirm('Yakin ingin menghapus entri tutup shift ini? Tindakan ini tidak dapat dibatalkan.')) return;
-
-      const { error } = await supabase
-        .from('shift_history')
-        .delete()
-        .eq('id', id);
-
-      if(error){
-        alert('Gagal menghapus: ' + error.message);
-        return;
-      }
-      await loadHistory();
-      alert('Entri berhasil dihapus.');
-    }
-  });
-
   // ===== Logout
   document.getElementById('lnk-logout').addEventListener('click', async ()=>{
     await supabase.auth.signOut(); location.href="login.html"
@@ -678,5 +652,68 @@
   // ===== Start
   boot()
 </script>
+
+<script id="sidebar-patch-js">
+// === Active link robust (alias das/dashboard/index) ===
+(function(){
+  function normPath(u){ return (u||'').toLowerCase().split('/').pop().replace(/[#?].*$/,'') || 'index.html'; }
+  function isActive(link){
+    try{
+      const current = normPath(location.pathname);
+      const target  = normPath(link);
+      const EQUIV = new Set(['das.html','dashboard.html','index.html','']);
+      const curSet = EQUIV.has(current) ? EQUIV : new Set([current]);
+      const tgtSet = EQUIV.has(target)  ? EQUIV : new Set([target]);
+      for(const v of curSet){ if(tgtSet.has(v)) return true; }
+      return false;
+    }catch(e){ return false; }
+  }
+  function applyActive(){
+    document.querySelectorAll('.sidebar .nav a').forEach(a=>{
+      const href = a.getAttribute('href')||'';
+      a.classList.toggle('active', isActive(href));
+    });
+  }
+
+  // === Collapse state persist via localStorage ===
+  function getGroupState(k){ const st=JSON.parse(localStorage.getItem("sidebar_groups_state")||"{}"); return st[k]!==false; }
+  function setGroupState(k,open){ const st=JSON.parse(localStorage.getItem("sidebar_groups_state")||"{}"); st[k]=!!open; localStorage.setItem("sidebar_groups_state",JSON.stringify(st)); }
+  function initGroups(){
+    document.querySelectorAll('.sidebar .group').forEach(g=>{
+      const key = g.getAttribute('data-key')||'';
+      if(key && !getGroupState(key)) g.classList.add('collapsed');
+      const hd = g.querySelector('.group-hd');
+      hd && hd.addEventListener('click', ()=>{
+        const open = !g.classList.contains('collapsed');
+        if(open) g.classList.add('collapsed'); else g.classList.remove('collapsed');
+        if(key) setGroupState(key, !open);
+      });
+    });
+  }
+
+  // Close sidebar on link click (mobile)
+  function initAutoClose(){
+    document.querySelectorAll('.sidebar .nav a').forEach(a=>{
+      a.addEventListener('click', ()=>{
+        const sb = document.getElementById('sidebar');
+        const ov = document.getElementById('overlay');
+        if(sb && sb.classList.contains('open')){
+          sb.classList.remove('open');
+          if(ov){ ov.classList.remove('show'); }
+          document.body.classList.remove('noscroll');
+        }
+      });
+    });
+  }
+
+  // Run after DOM ready
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', ()=>{ applyActive(); initGroups(); initAutoClose(); });
+  }else{
+    applyActive(); initGroups(); initAutoClose();
+  }
+})();
+</script>
+
 </body>
 </html>

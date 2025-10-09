@@ -6,48 +6,91 @@
   <title>Transaksi Mini-ATM | Amko MiniLink</title>
   <style>
     :root{
-      --bg:#f6f8fb; --sb:#0b1320; --sb2:#0f1b2d; --sbfg:#cbd5e1; --pri:#0b63f3;
-      --card:#fff; --bd:#1f2a3c; --bd2:#213148; --muted:#8aa0be; --txt:#0f172a;
+      --bg:#f6f8fb; --card:#fff; --txt:#0f172a;
       --shadow:0 6px 18px rgba(15,23,42,.08);
-      --touch:50px; --radius:16px;
-      --H_BAR:46px;
-      --red:#ef4444;
-      --sidebar-w:260px;
+      --H_BAR:46px; --sidebar-w:240px;
+
+      /* Warna sidebar (disamakan dgn dashboard) */
+      --sb:#0f172a;      /* latar sidebar */
+      --sb-fg:#e5e7eb;  /* teks menu */
+      --sb-brand:#0a5eb6; /* bar brand */
+      --sb-active:#0b3a66; /* menu aktif */
+
+      /* Lainnya yg sudah ada */
+      --muted:#8aa0be;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt)}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt)}
     .layout{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh}
 
-    /* ===== SIDEBAR ===== */
+    /* ===== SIDEBAR (match dashboard) ===== */
     .sidebar{
-      background:linear-gradient(180deg,var(--sb),var(--sb2));
-      color:var(--sbfg);
-      padding:14px;
-      display:flex; flex-direction:column; gap:10px;
       position:sticky; top:0; align-self:start; height:100vh;
-      z-index:20;
+      width:var(--sidebar-w);
+      background:var(--sb); color:var(--sb-fg);
+      display:flex; flex-direction:column;
       transition:left .25s ease;
+      z-index:10001;              /* di atas overlay */
+      pointer-events:auto;
+      padding:0;                  /* nol seperti dashboard */
+      border-right:0;
     }
-    .brand{color:#fff;font-weight:900;font-size:18px; letter-spacing:.2px; padding:6px 10px}
-    .nav{display:flex;flex-direction:column;gap:8px; overflow:auto}
-    .nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;text-decoration:none;color:var(--sbfg); border:1px solid transparent; min-height:36px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-    .nav a:hover{background:rgba(255,255,255,.08)}
-    .nav a.active{background:#0b63f3;color:#fff;border-color:#0b63f3}
-    .group{border:1px solid var(--bd2);border-radius:12px;background:rgba(255,255,255,.03)}
-    .group-header{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;font-weight:800;color:#d7e3f7; border-bottom:1px solid var(--bd2)}
-    .group-body{display:flex;flex-direction:column;padding:8px; gap:6px}
+    .brand{
+      background:var(--sb-brand);
+      color:#fff;
+      font-weight:800; font-size:15px;
+      padding:12px 14px; letter-spacing:0;
+    }
+    .nav{
+      padding:6px; display:flex; flex-direction:column; gap:0; /* tanpa gap agar rapi seperti dashboard */
+      overflow:auto;
+    }
+    .nav a{
+      display:block;
+      text-decoration:none;
+      color:var(--sb-fg);
+      font-size:13px;              /* ✅ ukuran menu */
+      font-weight:400;             /* normal (dashboard) */
+      padding:8px 10px;            /* ✅ padding menu */
+      border-radius:8px;           /* ✅ radius */
+      min-height:unset;
+    }
+    .nav a:hover{background:rgba(255,255,255,.06)}
+    .nav a.active{background:var(--sb-active); color:#fff}
+
+    .group{
+      margin:6px;                  /* ringkas mirip dashboard */
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px;
+      background:transparent;
+      overflow:hidden;
+    }
+    .group-header{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:8px 10px;
+      background:#0e223a;          /* seperti dashboard */
+      color:#c6d3e1;
+      font-size:12px; font-weight:400;
+      cursor:pointer;
+    }
+    .group-body{
+      padding:6px; background:#0f253f;
+      display:flex; flex-direction:column; gap:0;
+    }
     .group.collapsed .group-body{display:none}
-    .footer{ margin-top:auto; display:flex; flex-direction:column; gap:8px; padding:8px 4px; color:#9fb2d0; font-size:12px }
+    .footer{
+      margin-top:auto; padding:8px; color:#93a3b8; font-size:11px; display:flex; flex-direction:column; gap:8px;
+    }
     .logout{
-      display:flex; align-items:center; justify-content:center; gap:8px;
-      height:40px; border-radius:10px; font-weight:800; text-decoration:none;
-      background:#fca5a5; color:#991b1b; border:2px solid #fecaca;
+      display:block; text-align:center; text-decoration:none;
+      margin-top:6px; padding:8px 10px; border-radius:8px;
+      background:#e11d48; color:#fff; border:none; font-weight:700;
     }
     .logout:hover{filter:brightness(.98)}
-    .ver{opacity:.85; padding:0 8px}
+    .ver{opacity:.9; padding:0 4px}
 
-    /* ===== BRANCH BAR ===== */
+    /* ===== BRANCH BAR (HEADER) ===== */
     .branchbar{
       position:sticky; top:0; z-index:55;
       display:flex; justify-content:space-between; align-items:center; gap:10px;
@@ -58,7 +101,8 @@
     .bb-right{ display:flex; gap:6px; align-items:center; flex-wrap:wrap }
     .bb-select{min-width:260px;height:36px;border:1px solid #cfd6de;border-radius:8px;padding:0 10px;background:#fff;outline:none;font-size:14px}
     .bb-now{font-size:14px;color:#1f2a37}
-    .pill{padding:6px 10px;border:1px solid #d3d8de;border-radius:999px;background:#f9fafb;font-size:12px}
+    .bb-now strong{font-weight:900}
+    .user-role{font-size:14px;font-weight:900;color:#2563eb; text-transform:uppercase; letter-spacing:.2px}
 
     /* ===== CONTENT ===== */
     .grid{display:grid;grid-template-columns:1fr;gap:12px;margin:12px 16px}
@@ -112,10 +156,13 @@
     .kpi-card.laci-mid{border-left:4px solid #f59e0b;background:linear-gradient(180deg,#fef3c7,#ffffff 58%)}
     .kpi-card.laci-high{border-left:4px solid #16a34a;background:linear-gradient(180deg,#dcfce7,#ffffff 58%)}
 
-    /* ===== Hamburger & Overlay ===== */
+    /* ===== Hamburger & Overlay (mobile) ===== */
     .hamburger{font-size:22px;background:none;border:none;cursor:pointer;padding:8px;display:none}
-    .overlay{position:fixed;inset:0;background:rgba(2,6,23,.45);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:19}
-    .overlay.show{opacity:1;pointer-events:auto}
+    .overlay{
+      position:fixed; inset:0; background:rgba(2,6,23,.45);
+      opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:10000; /* di bawah sidebar */
+    }
+    .overlay.show{opacity:1; pointer-events:auto}
     body.noscroll{overflow:hidden}
 
     /* ===== Responsive ===== */
@@ -125,7 +172,7 @@
         position:fixed; left:calc(-1 * var(--sidebar-w)); top:0; bottom:0; width:var(--sidebar-w);
       }
       .sidebar.open{ left:0; }
-      .hamburger{ display:block; } /* tombol tampil di mobile */
+      .hamburger{ display:block; }
       .row{grid-template-columns:1fr}
     }
   </style>
@@ -149,18 +196,17 @@
 
   <!-- ===== Main ===== -->
   <div>
-    <!-- BRANCH BAR -->
+    <!-- HEADER / BRANCH BAR -->
     <div id="branchTopBar" class="branchbar">
       <div class="bb-left">
-        <!-- Hamburger muncul hanya di mobile -->
+        <!-- Hamburger untuk mobile -->
         <button id="toggleSidebar" class="hamburger" aria-label="Toggle Sidebar" aria-controls="sidebar" aria-expanded="false">☰</button>
 
         <select id="branchTopSelect" class="bb-select"><option value="">-- Pilih Toko --</option></select>
         <span class="bb-now">TOKO SEKARANG: <strong id="bbNowName">-</strong></span>
       </div>
       <div class="bb-right">
-        <span id="me" class="pill">memuat…</span>
-        <span id="roleBadge" class="pill">role: …</span>
+        <span id="userRole" class="user-role">-</span>
       </div>
     </div>
 
@@ -248,7 +294,7 @@
   </div>
 </div>
 
-<!-- Modal Pilih Jenis -->
+<!-- ===== Modals (no change) ===== -->
 <div class="modal" id="modalJenis">
   <div class="dialog">
     <div class="dlg-hd">
@@ -266,7 +312,6 @@
   </div>
 </div>
 
-<!-- Modal Form -->
 <div class="modal" id="modalForm">
   <div class="dialog">
     <div class="dlg-hd">
@@ -439,8 +484,11 @@
       viewBranch = saved.code || gBranch || ''
     }
 
-    $('me').textContent   = prof?.full_name || prof?.email || '-'
-    $('roleBadge').textContent = `role: ${gRole}`
+    // Set nama-role kanan (biru, uppercase)
+    const nm = (prof?.full_name || prof?.email || '-').split(' ')[0].toUpperCase()
+    const roleUp = (gRole||'').toUpperCase()
+    $('userRole').textContent = `${nm}–${roleUp}`
+
     $('kpi_profit_wrap').style.display = (gRole==='owner') ? 'block' : 'none'
 
     await initSidebar()
@@ -471,7 +519,6 @@
   }
 
   async function populateFilterOptions(){
-    // USER by branch
     const uSel = $('fltUser')
     if(viewBranch){
       const { data: users } = await supabase.from('profiles').select('full_name,branch_code').eq('branch_code', viewBranch).order('full_name')
@@ -596,7 +643,7 @@
   function buildWhatsAppText(){
     const cab = localStorage.getItem('current_branch_name') || viewBranch || '-'
     const header = [
-      `*LAPORAN SUMBER DANA,*`,``,`*CABANG : ${cab}*`,``,`*Report By:* ${$('me').textContent || '-'}`,`*Generated at:* ${fmtMakassar()}`
+      `*LAPORAN SUMBER DANA,*`,``,`*CABANG : ${cab}*`,``,`*Report By:* ${$('userRole').textContent || '-'}`,`*Generated at:* ${fmtMakassar()}`
     ].join('\n')
     const section = (title, list) => {
       if(!list || !list.length) return ''
@@ -763,7 +810,7 @@
       if(!confirm('Hapus transaksi ini?')) return
       const { error } = await supabase.from('transactions').delete().eq('id', id)
       if(error) return alert('Gagal hapus: '+error.message)
-      await refreshByRange() // KPI transaksi + KPI saldo + tabel semuanya reload
+      await refreshByRange()
     }else if(act==='edit'){
       const row = (lastRiwayatRows||[]).find(r=>r.id===id); if(!row) return alert('Data tidak ditemukan')
       editMode=true; editId=id
@@ -778,7 +825,7 @@
     }
   })
 
-  // Simpan (insert / update-as-replace)
+  // Simpan
   $('simpanForm').onclick = async ()=>{
     const jenis=$('f_jenis').value, branch=viewBranch, sumber=$('f_sumber').value||null, terima=$('f_terima').value||null, note=$('f_ket').value.trim()
     const findLaci=()=> (cacheAcc.cash||[]).find(a=>/laci/i.test(a.name||''))||null
@@ -883,42 +930,63 @@
     }
   }
 
-  // ===== Sidebar builder (menu sesuai screenshot) =====
+  /* ===== Sidebar builder (struktur sama + highlight robust seperti dashboard) ===== */
+  function normPath(u){
+    return (u||'').toLowerCase().split('/').pop().replace(/[#?].*$/,'') || 'index.html';
+  }
+  function isActive(link){
+    const current = normPath(location.pathname);
+    const target  = normPath(link);
+    const EQUIV = new Set(['das.html','dashboard.html','index.html','']);
+    const curSet = EQUIV.has(current) ? EQUIV : new Set([current]);
+    const tgtSet = EQUIV.has(target)  ? EQUIV : new Set([target]);
+    for(const v of curSet){ if(tgtSet.has(v)) return true; }
+    return false;
+  }
+
   async function initSidebar(){
     const roleLS=(localStorage.getItem("user_role")||gRole||"kasir").toLowerCase();
     const menuModel=[
       { type:"item", label:"Dashboard", icon:"📊", link:"./dashboard.html" },
       { type:"item", label:"Transaksi Mini ATM", icon:"🧮", link:"./transaksi-mini-atm.html" },
-      { type:"group", key:"grp_master", title:"MASTER DATA", icon:"📂",
+      { type:"group", key:"grp_master", title:"Master Data", icon:"📂",
         items:[ {type:"item",label:"Master Saldo Akun",icon:"💰",link:"./master-saldo-akun.html"},
                 {type:"item",label:"Mutasi Saldo",icon:"🔄",link:"./mutasi-saldo.html"},
                 {type:"item",label:"Saldo Real",icon:"📑",link:"./saldo-real.html"} ] },
-      { type:"item", label:"Laporan", icon:"📘", link:"./laporan.html", ownerOnly:true },
-      { type:"group", key:"grp_pengaturan", title:"PENGATURAN", icon:"⚙️",
+      { type:"group", key:"grp_laporan", title:"Laporan", icon:"📘",
+        items:[ {type:"item",label:"Laporan MiniLink",icon:"📘",link:"./laporan.html"} ]},
+      { type:"group", key:"grp_pengaturan", title:"Pengaturan", icon:"⚙️",
         items:[ {type:"item",label:"Manajemen Pengguna",icon:"👥",link:"./manajemen-pengguna.html",ownerOnly:true},
                 {type:"item",label:"Hak Akses",icon:"🔑",link:"./hak-akses.html",ownerOnly:true} ] }
     ];
-    function isActive(link){ const here=location.pathname.split("/").pop()||"transaksi-mini-atm.html"; return (link||"").endsWith(here) }
     function getGroupState(k){ const st=JSON.parse(localStorage.getItem("sidebar_groups_state")||"{}"); return st[k]!==false }
     function setGroupState(k,o){ const st=JSON.parse(localStorage.getItem("sidebar_groups_state")||"{}"); st[k]=!!o; localStorage.setItem("sidebar_groups_state",JSON.stringify(st)) }
+
     const nav=document.getElementById("menuList"); nav.innerHTML="";
     menuModel.forEach(n=>{
       if(n.ownerOnly && roleLS!=="owner") return;
       if(n.type==="item"){
         const a=document.createElement("a"); a.href=n.link;
-        a.innerHTML=`<span class="ico">${n.icon}</span><span class="label">${n.label}</span>`;
-        if(isActive(n.link)) a.classList.add("active"); nav.appendChild(a);
+        a.textContent=`${n.icon} ${n.label}`;
+        if(isActive(n.link)) a.classList.add("active");
+        nav.appendChild(a);
       }else{
         const g=document.createElement("div"); g.className="group"; if(!getGroupState(n.key)) g.classList.add("collapsed");
-        const h=document.createElement("div"); h.className="group-header"; h.innerHTML=`<div class="title">${n.title}</div><div class="chev">▾</div>`;
+        const h=document.createElement("div"); h.className="group-header";
+        h.innerHTML=`<div>${n.icon} ${n.title}</div><div class="chev">▾</div>`;
         h.addEventListener("click",()=>{ const open=!g.classList.contains("collapsed"); if(open) g.classList.add("collapsed"); else g.classList.remove("collapsed"); setGroupState(n.key,!open) });
         const b=document.createElement("div"); b.className="group-body";
-        (n.items||[]).forEach(it=>{ if(it.ownerOnly && roleLS!=="owner") return; const a=document.createElement("a"); a.href=it.link; a.innerHTML=`<span class="ico">${it.icon}</span><span class="label">${it.label}</span>`; if(isActive(it.link)) a.classList.add("active"); b.appendChild(a) });
+        (n.items||[]).forEach(it=>{
+          if(it.ownerOnly && roleLS!=="owner") return;
+          const a=document.createElement("a"); a.href=it.link; a.textContent=`${it.icon} ${it.label}`;
+          if(isActive(it.link)) a.classList.add("active");
+          b.appendChild(a);
+        });
         g.appendChild(h); g.appendChild(b); nav.appendChild(g);
       }
     })
 
-    // Logout visual (footer)
+    // Logout visual
     document.getElementById('lnk-logout-visual').addEventListener('click', async (e)=>{
       e.preventDefault();
       await supabase.auth.signOut();
@@ -937,13 +1005,18 @@
     sidebarEl.classList.toggle('open', willOpen);
     overlayEl.classList.toggle('show', willOpen);
     document.body.classList.toggle('noscroll', willOpen);
-    if(btnHamb) btnHamb.setAttribute('aria-expanded', String(willOpen));
+    btnHamb?.setAttribute('aria-expanded', String(willOpen));
   }
   btnHamb?.addEventListener('click', ()=> toggleSidebar());
   overlayEl?.addEventListener('click', ()=> toggleSidebar(false));
   window.addEventListener('keyup', (e)=>{ if(e.key==='Escape') toggleSidebar(false); });
+
+  // Optimistic highlight & tutup dengan delay kecil agar tap tidak ketahan
   document.addEventListener('click', (e)=>{
-    const a = e.target.closest('.sidebar a'); if(!a) return; toggleSidebar(false);
+    const a = e.target.closest('.sidebar a'); if(!a) return;
+    document.querySelectorAll('.sidebar .nav a.active').forEach(el=>el.classList.remove('active'));
+    a.classList.add('active');
+    setTimeout(()=>toggleSidebar(false),120);
   });
 
   // Start
