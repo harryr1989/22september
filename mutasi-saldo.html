@@ -6,28 +6,75 @@
   <title>Mutasi Saldo | AMKO</title>
   <style>
     :root{
+      /* Layout */
       --sidebar-w:240px;
-      --bg:#f6f8fb; --sb:#0d1b2a; --sbfg:#cbd5e1; --pri:#0b63f3;
+
+      /* Palet umum */
+      --bg:#f6f8fb; --pri:#0b63f3;
       --card:#fff; --bd:#e5e7eb; --txt:#0f172a; --ring:#93c5fd33;
       --pos:#16a34a; --neg:#dc2626; --neu:#ca8a04; --blue:#0b63f3;
+
+      /* Sidebar (selaras gaya Master Saldo Akun) */
+      --sb:#0f172a;        /* latar sidebar */
+      --sbfg:#e5e7eb;      /* teks menu */
+      --sb-brand:#0a5eb6;  /* bar brand atas */
+      --sb-active:#0b3a66; /* latar item aktif */
     }
+
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt);font-size:15px;line-height:1.5}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,Segoe UI,Arial;
+      background:var(--bg); color:var(--txt);
+      font-size:15px; line-height:1.5;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     .layout{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh}
 
-    .sidebar{background:var(--sb);color:var(--sbfg);padding:16px 14px;position:relative;z-index:20}
-    .brand{color:#fff;font-weight:800;font-size:20px;margin-bottom:12px}
-    .nav{padding:0;display:flex;flex-direction:column;gap:6px}
-    .nav a{display:flex;align-items:center;gap:10px;color:var(--sbfg);text-decoration:none;padding:10px 12px;border-radius:10px;line-height:1.3;min-height:36px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .nav a:hover{background:rgba(255,255,255,.08)}
-    .nav a.active{background:#0b3a66;color:#fff}
-    .group{margin-top:10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden}
-    .group-hd{padding:8px 10px;background:#0f2238;color:#cfe0f3;font-size:12px;font-weight:800;display:flex;justify-content:space-between;align-items:center;letter-spacing:.2px;text-transform:uppercase}
-    .group-bd{padding:8px;background:#0f253f;display:flex;flex-direction:column;gap:6px}
-    .sidebar-footer{margin-top:auto;padding-top:10px;font-size:11px;color:#93a3b8}
+    /* ===== SIDEBAR (gaya baru) ===== */
+    .sidebar{
+      background:var(--sb); color:var(--sbfg);
+      display:flex; flex-direction:column;
+      transition:left .25s ease;
+      padding:0; /* nol agar sama dengan referensi */
+      position:relative; z-index:20;
+    }
+    .brand{
+      background:var(--sb-brand); color:#fff;
+      font-weight:800; font-size:15px;
+      padding:12px 14px; margin:0;
+    }
+    .nav{ padding:6px; display:flex; flex-direction:column; gap:0; overflow:auto }
+    .nav a{
+      display:block; text-decoration:none; color:var(--sbfg);
+      font-size:13px; font-weight:400;
+      padding:8px 10px; border-radius:8px; line-height:1.2;
+    }
+    .nav a:hover{ background:rgba(255,255,255,.10) }
+    .nav a.active{ background:var(--sb-active); color:#fff }
+
+    /* Grup collapsible */
+    .group{
+      margin-top:6px;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:8px; overflow:hidden;
+    }
+    .group-hd{
+      padding:8px 10px; background:#0e223a; color:#cfe0f3;
+      font-size:12px; font-weight:400;
+      display:flex; justify-content:space-between; align-items:center;
+      cursor:pointer;
+    }
+    .group-hd .chev{ transition:transform .2s ease }
+    .group.collapsed .group-hd .chev{ transform:rotate(-90deg) }
+    .group-bd{ padding:6px; background:#0f253f }
+    .group.collapsed .group-bd{ display:none }
+
+    .sidebar-footer{margin-top:auto;padding:8px 8px 10px;font-size:11px;color:#93a3b8}
     .logout{display:block;margin-top:8px;background:#fecdd3;color:#7f1d1d;text-align:center;border-radius:10px;padding:9px 10px;font-weight:800;text-decoration:none}
 
+    /* ===== Header / Topbar (tetap) ===== */
     header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
     .hdr-left{display:flex;align-items:center;gap:12px;flex:1 1 auto;min-width:300px}
     .hdr-right{display:flex;align-items:center;gap:8px}
@@ -64,7 +111,7 @@
     .field label{font-size:12px;color:#475569}
     #filterInfo, #lastUpdateInfo { white-space: nowrap; }
 
-    /* Tombol aksi cepat di samping filter (tinted) */
+    /* Tombol aksi cepat (tetap) */
     .mutasi-actions{
       margin-left:auto; display:flex; gap:6px; flex-wrap:wrap; align-items:center;
     }
@@ -78,6 +125,7 @@
     .mutasi-actions .act.pindah{ background:#fffbeb;color:var(--neu);border-color:#fde68a; }
     .mutasi-actions .act.pindah:hover{ background:#ca8a04;color:#fff;border-color:#ca8a04; }
 
+    /* Hamburger + overlay */
     .hamburger{font-size:22px;background:none;border:none;cursor:pointer;padding:8px;display:none}
     .overlay{position:fixed;inset:0;background:rgba(2,6,23,.45);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:19}
     .overlay.show{opacity:1;pointer-events:auto}
@@ -85,13 +133,14 @@
 
     @media (max-width: 980px){
       .layout{grid-template-columns:1fr}
-      .sidebar{ position:fixed;left:-240px;top:0;bottom:0;width:var(--sidebar-w); transition:left .25s ease; }
+      .sidebar{ position:fixed;left:-240px;top:0;bottom:0;width:var(--sidebar-w); }
       .sidebar.open{ left:0; }
       .hamburger{ display:block; }
       .fab{ display:flex; }
     }
     @media (max-width:560px){ .mutasi-actions{ display:none; } }
 
+    /* Dialog & util (tetap) */
     dialog{border:none;border-radius:16px;box-shadow:0 10px 30px rgba(2,6,23,.25);padding:0;max-width:640px;width:96%}
     .dlg-hd{padding:14px 16px;border-bottom:1px solid var(--bd);font-weight:800}
     .dlg-bd{padding:16px;display:grid;gap:10px}
@@ -122,6 +171,7 @@
 <body>
 <div class="layout">
 
+  <!-- ===== SIDEBAR BARU ===== -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">Amko MiniLink</div>
 
@@ -129,8 +179,8 @@
       <a href="dashboard.html">📊 Dashboard</a>
       <a href="transaksi-mini-atm.html">🧮 Transaksi Mini ATM</a>
 
-      <div class="group">
-        <div class="group-hd"><span>MASTER DATA</span><span>▾</span></div>
+      <div class="group" data-key="grp_master">
+        <div class="group-hd"><span>📂 Master Data</span><span class="chev">▾</span></div>
         <div class="group-bd">
           <a href="master-saldo-akun.html">💰 Master Saldo Akun</a>
           <a class="active" href="mutasi-saldo.html">🔄 Mutasi Saldo</a>
@@ -138,13 +188,15 @@
         </div>
       </div>
 
-      <div class="group">
-        <div class="group-hd"><span>LAPORAN</span><span>▾</span></div>
-        <div class="group-bd"><a href="laporan.html">📘 Laporan MiniLink</a></div>
+      <div class="group" data-key="grp_laporan">
+        <div class="group-hd"><span>📘 Laporan</span><span class="chev">▾</span></div>
+        <div class="group-bd">
+          <a href="laporan.html">📘 Laporan MiniLink</a>
+        </div>
       </div>
 
-      <div class="group">
-        <div class="group-hd"><span>PENGATURAN</span><span>▾</span></div>
+      <div class="group" data-key="grp_pengaturan">
+        <div class="group-hd"><span>⚙️ Pengaturan</span><span class="chev">▾</span></div>
         <div class="group-bd">
           <a href="manajemen-pengguna.html">👥 Manajemen Pengguna</a>
           <a href="hak-akses.html">🔑 Hak Akses</a>
@@ -159,8 +211,10 @@
     </div>
   </aside>
 
+  <!-- Overlay untuk mobile -->
   <div id="overlay" class="overlay" aria-hidden="true"></div>
 
+  <!-- ===== KONTEN (tetap dari file asli) ===== -->
   <div>
     <header>
       <div class="hdr-left">
@@ -276,7 +330,7 @@
 
       <div class="row hidden" id="rowAdmin">
         <label for="admin">Admin Bank (Rp)</label>
-        <input id="admin" name="admin" class="input w100" placeholder="cth 2.500" value="0">
+        <input id="admin" name="admin" class="input W100" placeholder="cth 2.500" value="0">
       </div>
 
       <div class="row">
@@ -419,6 +473,7 @@
     $('formMutasi').addEventListener('submit', onSaveMutasi);
 
     initSidebarToggler();
+    initSidebarGroups();  // collapse state
 
     // Binding 4 tombol aksi cepat
     document.querySelectorAll('#mutasiActions [data-jenis]').forEach(btn=>{
@@ -586,7 +641,7 @@
     }
   }
 
-  /* ===== Sidebar ===== */
+  /* ===== Sidebar: toggler & collapse groups ===== */
   function initSidebarToggler(){
     const sidebarEl = document.getElementById('sidebar');
     const overlayEl = document.getElementById('overlay');
@@ -607,7 +662,22 @@
     });
   }
 
-  /* ====== KPI (menghormati filter tanggal & cabang) ====== */
+  function getGroupState(k){ const st=JSON.parse(localStorage.getItem("sidebar_groups_state")||"{}"); return st[k]!==false; }
+  function setGroupState(k,open){ const st=JSON.parse(localStorage.getItem("sidebar_groups_state")||"{}"); st[k]=!!open; localStorage.setItem("sidebar_groups_state",JSON.stringify(st)); }
+  function initSidebarGroups(){
+    document.querySelectorAll('.sidebar .group').forEach(g=>{
+      const key = g.getAttribute('data-key')||'';
+      if(key && !getGroupState(key)) g.classList.add('collapsed');
+      const hd = g.querySelector('.group-hd');
+      hd?.addEventListener('click', ()=>{
+        const open = !g.classList.contains('collapsed');
+        if(open) g.classList.add('collapsed'); else g.classList.remove('collapsed');
+        if(key) setGroupState(key, !open);
+      });
+    });
+  }
+
+  /* ===== KPI & Riwayat ===== */
   async function loadKPI(){
     const { from, to } = getDateRange();
 
@@ -639,7 +709,6 @@
     $('kpiNet').textContent    = fmt(totalTambah - totalKurang);
   }
 
-  /* ====== Riwayat (VIEW + fallback) ====== */
   async function loadRiwayat(){
     const { from, to } = getDateRange();
 
@@ -665,34 +734,28 @@
       tb.innerHTML = (data||[]).map((r, i)=>{
         const jenis = String(r.jenis||'').toLowerCase();
 
-        // LOGIKA SUMBER/TUJUAN SESUAI KEBUTUHAN
+        // LOGIKA SUMBER/TUJUAN
         const sumberNama = (jenis === 'pindah') ? (r.sumber_name || '-') : (r.akun_name || '-');
         const sumberId   = (jenis === 'pindah') ? (r.sumber_id || '')   : (r.akun_id || '');
         const tujuanNama = (jenis === 'pindah') ? (r.tujuan_name || '-') : '-';
         const tujuanId   = (jenis === 'pindah') ? (r.tujuan_id || '')    : '';
 
-        // Pewarnaan & ikon jenis (seragam)
         const jenisClass = jenis==='tambah' ? 'jenis-tambah'
                          : (jenis==='kurang' || jenis==='operasional') ? 'jenis-kurang'
-                         : jenis==='pindah' ? 'jenis-pindah'
-                         : '';
+                         : jenis==='pindah' ? 'jenis-pindah' : '';
         const jenisIcon = jenis==='tambah' ? '➕'
                          : jenis==='kurang' ? '➖'
                          : jenis==='operasional' ? '🧾'
-                         : jenis==='pindah' ? '🔁'
-                         : '';
+                         : jenis==='pindah' ? '🔁' : '';
 
-        // Nama biru + tanggal normal + waktu dari created_at
         const creatorName = (r.created_by_name || r.created_by || '');
         const creatorId   = (r.created_by || '');
         const tgl = (r.tanggal || (r.created_at ? String(r.created_at).slice(0,10) : ''));
         const jam = toLocalTimeStr(r.created_at);
 
-        // Saldo awal/akhir jika ada; jika tidak ada tampil '-'
         const sa = (r.saldo_awal!=null) ? fmt(Number(r.saldo_awal)) : '-';
         const sk = (r.saldo_akhir!=null) ? fmt(Number(r.saldo_akhir)) : '-';
 
-        /* mini badge nominal di kolom Jenis (berwarna sesuai jenis) */
         const nominal = Number(r.nominal||0);
         let miniClass = 'mini-plusminus', signed = '±';
         if (jenis==='tambah'){ miniClass='mini-plus'; signed='+'; }
@@ -778,7 +841,7 @@
     $('nominal').value = (r.nominal||0).toLocaleString('id-ID');
     $('keterangan').value = r.keterangan||'';
 
-    // Tandai sedang edit (kalau nanti mau dipakai update)
+    // Tandai sedang edit (opsional)
     const dlg = document.getElementById('modalMutasi');
     dlg.dataset.editId = id;
   }
