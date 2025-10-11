@@ -6,174 +6,182 @@
   <title>Transaksi Mini-ATM | Amko MiniLink</title>
   <style>
     :root{
-      --bg:#f6f8fb; --card:#fff; --txt:#0f172a;
-      --shadow:0 6px 18px rgba(15,23,42,.08);
-      --H_BAR:46px; --sidebar-w:240px;
+      --navy1:#0b2a5b; --navy2:#123b7a;
+      --bg:#f3f6fb; --card:#ffffff; --txt:#0f172a;
+      --border:#e6ebf3; --shadow:0 6px 18px rgba(2,8,23,.06);
+      --sidebar-w:260px; --H_BAR:48px;
 
-      /* Warna sidebar (disamakan dgn dashboard) */
-      --sb:#0f172a;      /* latar sidebar */
-      --sb-fg:#e5e7eb;  /* teks menu */
-      --sb-brand:#0a5eb6; /* bar brand */
-      --sb-active:#0b3a66; /* menu aktif */
+      /* KPI colors */
+      --kpi-blue:#1976d2;   /* Transfer */
+      --kpi-green:#2e7d32;  /* Tarik */
+      --kpi-amber:#ffb300;  /* Omset */
+      --kpi-orange:#fb8c00; /* Adm Bank / Fee */
+      --kpi-profit:#43a047; /* Profit */
+      --kpi-brown:#99501d;  /* Operasional */
 
-      /* Lainnya yg sudah ada */
-      --muted:#8aa0be;
+      /* Chip saldo */
+      --chip1:#6f3bf1; --chip2:#7a4df3;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt)}
+    body{
+      margin:0;background:var(--bg);color:var(--txt);
+      font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+    }
+
+    /* ===== LAYOUT ===== */
     .layout{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh}
 
-    /* ===== SIDEBAR (match dashboard) ===== */
+    /* ===== SIDEBAR ===== */
     .sidebar{
-      position:sticky; top:0; align-self:start; height:100vh;
-      width:var(--sidebar-w);
-      background:var(--sb); color:var(--sb-fg);
-      display:flex; flex-direction:column;
-      transition:left .25s ease;
-      z-index:10001;              /* di atas overlay */
-      pointer-events:auto;
-      padding:0;                  /* nol seperti dashboard */
-      border-right:0;
+      position:sticky; top:0; height:100vh; z-index:10001;
+      background:linear-gradient(180deg,var(--navy1),var(--navy2));
+      color:#eaf2ff; display:flex; flex-direction:column; box-shadow:var(--shadow);
     }
-    .brand{
-      background:var(--sb-brand);
-      color:#fff;
-      font-weight:800; font-size:15px;
-      padding:12px 14px; letter-spacing:0;
-    }
-    .nav{
-      padding:6px; display:flex; flex-direction:column; gap:0; /* tanpa gap agar rapi seperti dashboard */
-      overflow:auto;
-    }
-    .nav a{
-      display:block;
-      text-decoration:none;
-      color:var(--sb-fg);
-      font-size:13px;              /* ✅ ukuran menu */
-      font-weight:400;             /* normal (dashboard) */
-      padding:8px 10px;            /* ✅ padding menu */
-      border-radius:8px;           /* ✅ radius */
-      min-height:unset;
-    }
-    .nav a:hover{background:rgba(255,255,255,.06)}
-    .nav a.active{background:var(--sb-active); color:#fff}
-
-    .group{
-      margin:6px;                  /* ringkas mirip dashboard */
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:8px;
-      background:transparent;
-      overflow:hidden;
-    }
-    .group-header{
-      display:flex; align-items:center; justify-content:space-between;
-      padding:8px 10px;
-      background:#0e223a;          /* seperti dashboard */
-      color:#c6d3e1;
-      font-size:12px; font-weight:400;
-      cursor:pointer;
-    }
-    .group-body{
-      padding:6px; background:#0f253f;
-      display:flex; flex-direction:column; gap:0;
-    }
+    .brand{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08);font-weight:800}
+    .nav{padding:10px}
+    .nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:#eaf2ff;text-decoration:none;font-weight:600}
+    .nav a:hover,.nav a.active{background:rgba(255,255,255,.10)}
+    .group{margin-top:12px;border:1px solid rgba(255,255,255,.10);border-radius:10px;overflow:hidden}
+    .group-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,.06);cursor:pointer}
+    .group-body{padding:8px;display:flex;flex-direction:column;gap:4px}
     .group.collapsed .group-body{display:none}
-    .footer{
-      margin-top:auto; padding:8px; color:#93a3b8; font-size:11px; display:flex; flex-direction:column; gap:8px;
-    }
-    .logout{
-      display:block; text-align:center; text-decoration:none;
-      margin-top:6px; padding:8px 10px; border-radius:8px;
-      background:#e11d48; color:#fff; border:none; font-weight:700;
-    }
-    .logout:hover{filter:brightness(.98)}
-    .ver{opacity:.9; padding:0 4px}
+    .footer{margin-top:auto;padding:12px}
+    .logout{width:100%;border:0;border-radius:10px;background:#ef4444;color:#fff;padding:10px 12px;font-weight:800;text-align:center;text-decoration:none;display:block}
 
-    /* ===== BRANCH BAR (HEADER) ===== */
+    /* ===== HEADER ===== */
     .branchbar{
-      position:sticky; top:0; z-index:55;
-      display:flex; justify-content:space-between; align-items:center; gap:10px;
-      padding:10px 12px; background:#eef2f7; border-bottom:1px solid #dbe0e6;
-      min-height:var(--H_BAR);
+      position:sticky; top:0; z-index:55; min-height:var(--H_BAR);
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+      padding:10px 16px; background:#fff; border-bottom:1px solid var(--border);
     }
-    .bb-left{ display:flex; gap:10px; align-items:center; flex-wrap:wrap }
-    .bb-right{ display:flex; gap:6px; align-items:center; flex-wrap:wrap }
-    .bb-select{min-width:260px;height:36px;border:1px solid #cfd6de;border-radius:8px;padding:0 10px;background:#fff;outline:none;font-size:14px}
-    .bb-now{font-size:14px;color:#1f2a37}
-    .bb-now strong{font-weight:900}
-    .user-role{font-size:14px;font-weight:900;color:#2563eb; text-transform:uppercase; letter-spacing:.2px}
+    .bb-select{min-width:260px;height:38px;border:1px solid var(--border);border-radius:10px;padding:0 10px;background:#fff;font-weight:700}
+    .bb-now{font-weight:800;background:#eef2ff;border:1px solid var(--border);border-radius:999px;padding:6px 10px}
+    .user-role{margin-left:auto;font-weight:900;color:#1e293b}
+    .hamburger{display:none;place-items:center;width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:#fff}
+
+    /* ====== TICKER ====== */
+    .ticker{
+      background:#2a44a5; color:#eaf2ff;
+      border-bottom:1px solid #1e2f84;
+      overflow:hidden; position:relative; padding:8px 0;
+      --ticker-gap: 20px;
+      --ticker-speed: 16s;
+      --ticker-shift: 200px;
+    }
+    .ticker-rail{
+      display:flex; align-items:center; width:max-content; will-change:transform;
+      gap:var(--ticker-gap);
+      animation: ticker-marquee var(--ticker-speed) linear infinite;
+    }
+    .ticker-chunk{ white-space:nowrap; font-weight:200; letter-spacing:.2px; font-size:13px }
+    @keyframes ticker-marquee{
+      from{ transform:translateX(0) }
+      to  { transform:translateX(calc(-1 * var(--ticker-shift))) }
+    }
+    @media (prefers-reduced-motion: reduce){ .ticker-rail{ animation:none } }
 
     /* ===== CONTENT ===== */
-    .grid{display:grid;grid-template-columns:1fr;gap:12px;margin:12px 16px}
-    .card{background:var(--card);border:1px solid #e2e8f0;border-radius:16px;box-shadow:var(--shadow);padding:14px}
-    .card h3{margin:0 0 8px 0}
+    .grid{display:grid;grid-template-columns:1fr;gap:14px;margin:14px 18px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:14px}
+    .card h3{margin:0 0 10px 0}
 
-    /* KPI */
-    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;align-items:stretch}
-    .kpi-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:var(--shadow);padding:10px;display:flex;flex-direction:column;gap:2px}
-    .kpi-title{font-size:11px;color:#475569}
-    .kpi-value{font-size:16px;font-weight:800;line-height:1.1}
-    .kpi-card.kpi-omset{border-left:4px solid #2563eb;background:linear-gradient(180deg,#dbeafe,#fff 58%)}
-    .kpi-card.kpi-profit{border-left:4px solid #16a34a;background:linear-gradient(180deg,#f0fdf4,#fff 58%)}
+    /* ===== KPI TRANSAKSI ===== */
+    .kpi-grid{
+      display:grid;
+      grid-template-columns:repeat(6,1fr);
+      gap:12px;
+    }
+    .kpi{
+      border-radius:16px;box-shadow:var(--shadow);padding:12px 14px;
+      color:#fff; display:flex; gap:12px; align-items:center; min-height:76px
+    }
+    .kpi .ic{
+      width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
+      background:rgba(255,255,255,.18);font-weight:900;font-size:18px
+    }
+    .kpi .meta{display:flex;flex-direction:column}
+    .kpi .meta h4{margin:0;font-size:12px;color:#eef3ff;letter-spacing:.3px}
+    .kpi .meta .val{font-weight:900;font-size:18px;line-height:1.1}
 
-    /* Asset bar */
-    .asset-main{display:flex;align-items:center;justify-content:space-between;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:10px 12px}
+    .kpi.blue   {background:linear-gradient(180deg,var(--kpi-blue),#155a9b)}
+    .kpi.green  {background:linear-gradient(180deg,var(--kpi-green),#205b24)}
+    .kpi.amber  {background:linear-gradient(180deg,var(--kpi-amber),#c08a00)}
+    .kpi.orange {background:linear-gradient(180deg,var(--kpi-orange),#d27100)}
+    .kpi.profit {background:linear-gradient(180deg,var(--kpi-profit),#2e6f33)}
+    .kpi.brown  {background:linear-gradient(180deg,var(--kpi-brown),#6b3512)}
+
+    /* TOTAL ASSET */
+    .asset-main{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--border);border-radius:16px;padding:12px 16px;box-shadow:var(--shadow)}
     .asset-label{font-size:12px;font-weight:800;color:#334155}
-    .asset-value{font-size:18px;font-weight:900;color:#16a34a}
+    .asset-value{font-size:20px;font-weight:900;color:#16a34a}
 
-    /* Table */
-    table{width:100%;border-collapse:collapse;background:#fff}
-    th,td{padding:10px;border:1px solid #e2e8f0;font-size:14px;text-align:left;vertical-align:top}
-    th{background:#f8fafc}
+    /* ===== KPI SALDO CHIP (scroll) ===== */
+    #kpiSaldoWrap{
+      display:flex !important; gap:10px !important; overflow-x:auto !important; overflow-y:hidden !important;
+      padding:8px 6px 10px !important; scroll-snap-type:x mandatory !important; -webkit-overflow-scrolling:touch !important;
+      border-radius:16px !important; background:#fff !important; border:1px solid var(--border) !important; box-shadow:var(--shadow) !important;
+    }
+    #kpiSaldoWrap > .kpi-card{
+      flex:0 0 auto !important; min-width:210px !important; max-width:260px !important; scroll-snap-align:start !important;
+      border-radius:999px !important; padding:10px 16px !important;
+      background:linear-gradient(180deg,var(--chip1),var(--chip2)) !important; color:#fff !important;
+      border:0 !important; display:flex !important; align-items:center !important; justify-content:space-between !important;
+      box-shadow:var(--shadow) !important;
+    }
+    #kpiSaldoWrap .kpi-title{color:#fff !important;font-weight:800 !important}
+    #kpiSaldoWrap .kpi-value{color:#fff !important}
 
-    /* Filters & buttons */
-    .filters{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:6px 0 10px 0}
-    .sel,.date-input{height:36px;padding:6px 8px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;font:inherit}
-    .btn-sm{height:36px;padding:6px 10px;border-radius:10px;font-weight:700;cursor:pointer}
-    .btn-primary{background:#0b63f3;color:#fff}
+    /* TABEL */
+    table{width:100%;border-collapse:separate;border-spacing:0;min-width:1100px;background:#fff}
+    thead th{position:sticky;top:0;background:#eef2ff;border-bottom:1px solid var(--border);padding:12px;font-size:13px;text-align:left;color:#1f2937}
+    tbody td{border-bottom:1px solid var(--border);padding:10px 12px}
+    tbody tr:hover{background:#f8fafc}
+
+    /* FILTERS & BUTTONS */
+    .filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0}
+    .sel,.date-input{height:38px;padding:0 10px;border:1px solid var(--border);border-radius:10px;background:#fff;font-weight:700}
+    .btn-sm{height:38px;padding:0 12px;border-radius:10px;font-weight:800;cursor:pointer;border:1px solid var(--border);background:#fff}
+    .btn-primary{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
     .btn-ghost{background:#f1f5f9}
-    .btn-danger{background:#fee2e2;color:#991b1b}
-    .btn-wa{background:#22c55e;color:#fff}
-    .btn-excel{background:#0ea5e9;color:#fff}
+    .btn-danger{background:#fee2e2;color:#991b1b;border-color:#fee2e2}
+    .btn-wa{background:#15803d;color:#fff;border-color:#15803d}
+    .btn-excel{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
     .btn-sm:disabled{opacity:.5;cursor:not-allowed}
 
-    /* Modal */
+    /* MODAL */
     .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:100}
     .modal.show{display:flex}
-    .dialog{width:min(1024px,100%);background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:92vh}
+    .dialog{width:min(1024px,100%);background:#fff;border-radius:16px;border:1px solid var(--border);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:92vh}
     .dlg-hd{background:#0ea5e9;color:#fff;padding:12px 16px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
     .dlg-bd{padding:14px;display:grid;gap:12px;overflow:auto}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     label{font-size:12px;color:#475569;margin-bottom:6px;display:block}
-    .icon-input{display:flex;gap:8px;align-items:center;border:1px solid #e2e8f0;border-radius:12px;padding:12px;background:#fff;min-height:50px}
+    .icon-input{display:flex;gap:8px;align-items:center;border:1px solid var(--border);border-radius:12px;padding:12px;background:#fff;min-height:50px}
     .icon-input input,.icon-input select,.icon-input textarea{border:none;outline:none;flex:1;font-size:16px;background:transparent}
     .icon-input textarea{min-height:96px;resize:vertical}
-    .dlg-ft{position:sticky;bottom:0;background:#fff;border-top:1px solid #e2e8f0;padding:12px 16px;display:flex;gap:8px;justify-content:flex-end}
+    .dlg-ft{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:8px;justify-content:flex-end}
 
-    /* Laci status */
-    .kpi-card.laci-low{border-left:4px solid #ef4444;background:linear-gradient(180deg,#fee2e2,#ffffff 58%)}
-    .kpi-card.laci-mid{border-left:4px solid #f59e0b;background:linear-gradient(180deg,#fef3c7,#ffffff 58%)}
-    .kpi-card.laci-high{border-left:4px solid #16a34a;background:linear-gradient(180deg,#dcfce7,#ffffff 58%)}
-
-    /* ===== Hamburger & Overlay (mobile) ===== */
-    .hamburger{font-size:22px;background:none;border:none;cursor:pointer;padding:8px;display:none}
-    .overlay{
-      position:fixed; inset:0; background:rgba(2,6,23,.45);
-      opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:10000; /* di bawah sidebar */
-    }
-    .overlay.show{opacity:1; pointer-events:auto}
-    body.noscroll{overflow:hidden}
-
-    /* ===== Responsive ===== */
-    @media (max-width:980px){
+    /* ======= RESPONSIVE BREAKPOINTS =======
+       Desktop: 6 kolom
+       Tablet:  3 kolom
+       Mobile:  2 kolom (seperti screenshot eLink)
+       Very small: 1 kolom
+    */
+    @media (max-width:1080px){ .kpi-grid{grid-template-columns:repeat(3,1fr)} }
+    @media (max-width:2200px){
       .layout{grid-template-columns:1fr}
-      .sidebar{
-        position:fixed; left:calc(-1 * var(--sidebar-w)); top:0; bottom:0; width:var(--sidebar-w);
-      }
-      .sidebar.open{ left:0; }
-      .hamburger{ display:block; }
+      .sidebar{position:fixed;left:calc(-1 * var(--sidebar-w));top:0;bottom:0;width:var(--sidebar-w);border-right:1px solid rgba(255,255,255,.12)}
+      .sidebar.open{left:0}
+      .hamburger{display:grid}
       .row{grid-template-columns:1fr}
+      .kpi-grid{grid-template-columns:repeat(2,1fr)}
+      .kpi{min-height:72px;padding:12px}
+      .kpi .meta .val{font-size:17px}
+    }
+    @media (max-width:420px){
+      .kpi-grid{grid-template-columns:1fr}
+      .kpi .meta .val{font-size:16px}
     }
   </style>
 </head>
@@ -182,57 +190,73 @@
   <!-- ===== Sidebar ===== -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">Amko MiniLink</div>
-
     <nav class="nav" id="menuList"></nav>
-
     <div class="footer">
-      <div class="ver">© Amko MiniLink • v1</div>
       <a href="#" id="lnk-logout-visual" class="logout">🚪 Logout</a>
     </div>
   </aside>
-
-  <!-- Overlay (mobile) -->
-  <div id="overlay" class="overlay" aria-hidden="true"></div>
 
   <!-- ===== Main ===== -->
   <div>
     <!-- HEADER / BRANCH BAR -->
     <div id="branchTopBar" class="branchbar">
-      <div class="bb-left">
-        <!-- Hamburger untuk mobile -->
-        <button id="toggleSidebar" class="hamburger" aria-label="Toggle Sidebar" aria-controls="sidebar" aria-expanded="false">☰</button>
+      <button id="toggleSidebar" class="hamburger" aria-label="Toggle Sidebar" aria-controls="sidebar" aria-expanded="false">☰</button>
+      <select id="branchTopSelect" class="bb-select"><option value="">-- Pilih Toko --</option></select>
+      <span class="bb-now">TOKO: <strong id="bbNowName">-</strong></span>
+      <span id="userRole" class="user-role">-</span>
+    </div>
 
-        <select id="branchTopSelect" class="bb-select"><option value="">-- Pilih Toko --</option></select>
-        <span class="bb-now">TOKO SEKARANG: <strong id="bbNowName">-</strong></span>
-      </div>
-      <div class="bb-right">
-        <span id="userRole" class="user-role">-</span>
+    <!-- === TEKS BERJALAN (MOTIVASI) === -->
+    <div class="ticker" id="tickerBar" aria-live="polite">
+      <div class="ticker-rail" id="tickerRail">
+        <span class="ticker-chunk" id="tickerA">Memuat motivasi…</span>
+        <span class="ticker-chunk" id="tickerB">Memuat motivasi…</span>
       </div>
     </div>
 
     <!-- Content -->
     <div class="grid">
-      <!-- KPI -->
+      <!-- KPI Transaksi -->
       <div class="card">
-        <h3>KPI Transaksi <span id="kpiTglLabel" class="pill" style="margin-left:8px">Hari ini</span></h3>
+        <h3>KPI Transaksi <span id="kpiTglLabel" class="bb-now" style="margin-left:8px">Hari ini</span></h3>
         <div class="kpi-grid">
-          <div class="kpi-card kpi-omset"><div class="kpi-title">Omset</div><div id="kpi_omset" class="kpi-value">Rp 0</div></div>
-          <div class="kpi-card"><div class="kpi-title">Tarik</div><div id="kpi_tarik" class="kpi-value">Rp 0</div></div>
-          <div class="kpi-card"><div class="kpi-title">Transfer</div><div id="kpi_transfer" class="kpi-value">Rp 0</div></div>
-          <div class="kpi-card"><div class="kpi-title">Fee Bank</div><div id="kpi_fee" class="kpi-value">Rp 0</div></div>
-          <div class="kpi-card kpi-profit" id="kpi_profit_wrap" style="display:none"><div class="kpi-title">Profit</div><div id="kpi_profit" class="kpi-value">Rp 0</div></div>
+          <!-- urutan dibuat mirip eLink -->
+          <div class="kpi blue">
+            <div class="ic">🔁</div>
+            <div class="meta"><h4>TRANSFER</h4><div class="val" id="kpi_transfer">Rp 0</div></div>
+          </div>
+          <div class="kpi green">
+            <div class="ic">💵</div>
+            <div class="meta"><h4>TARIK TUNAI</h4><div class="val" id="kpi_tarik">Rp 0</div></div>
+          </div>
+          <div class="kpi amber">
+            <div class="ic">📊</div>
+            <div class="meta"><h4>OMSET</h4><div class="val" id="kpi_omset">Rp 0</div></div>
+          </div>
+          <div class="kpi orange">
+            <div class="ic">🏦</div>
+            <div class="meta"><h4>ADM BANK</h4><div class="val" id="kpi_fee">Rp 0</div></div>
+          </div>
+          <div class="kpi brown">
+            <div class="ic">⚙️</div>
+            <div class="meta"><h4>OPERASIONAL</h4><div class="val" id="kpi_opr">Rp 0</div></div>
+          </div>
+          <div class="kpi profit" id="kpi_profit_wrap" style="display:none">
+            <div class="ic">💹</div>
+            <div class="meta"><h4>PROFIT</h4><div class="val" id="kpi_profit">Rp 0</div></div>
+          </div>
         </div>
       </div>
 
       <!-- Asset bar -->
       <div class="card">
         <div class="asset-main">
-          <div class="asset-label">TOTAL ASSET</div>
+          <div class="asset-label">TOTAL ASET</div>
           <div class="asset-value" id="assetTotalValue">Rp 0</div>
         </div>
       </div>
 
-      <!-- KPI Saldo akun -->
+      <!-- KPI Saldo akun (chip scroll) -->
       <div class="card">
         <h3>KPI Master Saldo Akun</h3>
         <div id="kpiSaldoWrap" class="kpi-grid"></div>
@@ -263,30 +287,32 @@
 
         <div id="totalTransaksi" style="margin:6px 0;font-weight:bold;">Jumlah Total Transaksi = 0</div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>No urut</th>
-              <th>User & Tanggal</th>
-              <th>ID Trx</th>
-              <th>Sumber Dana</th>
-              <th>Jenis</th>
-              <th>Saldo Awal</th>
-              <th>Nominal</th>
-              <th>Admin Dalam</th>
-              <th>Admin Luar</th>
-              <th>Fee Bank</th>
-              <th>Saldo Akhir</th>
-              <th>Keterangan</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="tb"></tbody>
-        </table>
+        <div style="overflow:auto;border:1px solid var(--border);border-radius:12px">
+          <table>
+            <thead>
+              <tr>
+                <th>No urut</th>
+                <th>User & Tanggal</th>
+                <th>ID Trx</th>
+                <th>Sumber Dana</th>
+                <th>Jenis</th>
+                <th>Saldo Awal</th>
+                <th>Nominal</th>
+                <th>Admin Dalam</th>
+                <th>Admin Luar</th>
+                <th>Fee Bank</th>
+                <th>Saldo Akhir</th>
+                <th>Keterangan</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tb"></tbody>
+          </table>
+        </div>
 
         <div style="margin-top:10px;display:flex;gap:8px;align-items:center;justify-content:center;">
           <button class="btn-sm btn-ghost" id="btnPrev">⟨ Prev</button>
-          <span class="pill" id="pageInfo">Hal 1</span>
+          <span class="bb-now" id="pageInfo">Hal 1</span>
           <button class="btn-sm btn-ghost" id="btnNext">Next ⟩</button>
         </div>
       </div>
@@ -294,7 +320,7 @@
   </div>
 </div>
 
-<!-- ===== Modals (no change) ===== -->
+<!-- ===== Modals ===== -->
 <div class="modal" id="modalJenis">
   <div class="dialog">
     <div class="dlg-hd">
@@ -411,7 +437,6 @@
   const fmtNum = n => new Intl.NumberFormat('id-ID').format(Number(n||0))
   const parseNum = v => Number(String(v||'').replace(/[^0-9]/g,''))||0
 
-  // Active branch helpers
   const getActive = ()=>({ code: localStorage.getItem('current_branch_code')||'', name: localStorage.getItem('current_branch_name')||'' })
   const setActive = (code,name)=>{ localStorage.setItem('current_branch_code',code||''); localStorage.setItem('current_branch_name',name||'') }
 
@@ -423,7 +448,7 @@
   // Pagination
   let page=0, pageSize=25, totalRows=0
 
-  // Range tanggal (single date)
+  // Range tanggal
   let range={from:null,to:null}
   const toISODate = d => new Date(d).toISOString().slice(0,10)
   const startOfDayISO = d=>{const x=new Date(d);x.setHours(0,0,0,0);return x.toISOString()}
@@ -431,15 +456,62 @@
   const fmtHuman = d=> new Date(d).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
   const fmtHumanDateOnly = d => new Date(d).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})
 
-  // Filters model
   const flt = { user:'', jenis:'', acc:'' }
 
-  // KPI transaksi (untuk tampilan)
-  const kpi = { omset:0, tarik:0, transfer:0, fee:0, profit:0 }
-
-  // Rekap saldo untuk WA
+  // WA summary
   const saldoSum = { cash:0, rek:0, asset:0, server:0 }
   let waRekeningList = [], waServerList = [], waCashList = []
+
+  /* ====== Ticker Motivasi (rapi) ====== */
+  const TICKER_QUOTES = [
+    "Fokus pada proses, hasil akan menyusul",
+    "Disiplin kecil hari ini jadi lompatan besar esok",
+    "Bekerja jujur, rezeki bertemu jalan",
+    "Konsisten lebih kuat dari motivasi sesaat",
+    "Belajar dari data, bergerak dengan hati",
+    "Progress lebih penting daripada perfect",
+    "Kerja tuntas, tidur nyenyak",
+    "Kepercayaan dibangun dari akurasi",
+    "Setiap angka bercerita—baca, pahami, bertindak",
+    "Tidak ada alasan, yang ada solusi"
+  ]
+  const TICKER_DURATION_S = 6
+  const TICKER_GAP_PX = 10
+  let _tickerIndex = 0
+
+  function buildQuoteLine(){
+    const MAX_PER_LOOP = 2;  // tampilkan 4 quote per putaran (biar tidak kepanjangan)
+    const ordered=[]
+    for(let i=0;i<MAX_PER_LOOP;i++){
+      ordered.push(TICKER_QUOTES[(_tickerIndex+i)%TICKER_QUOTES.length])
+    }
+    return ordered.join('   •   ')
+  }
+  function adjustTickerLayout(){
+    const rail = document.getElementById('tickerRail')
+    const a = document.getElementById('tickerA')
+    if(!rail || !a) return
+    const shift = a.offsetWidth + TICKER_GAP_PX
+    rail.style.setProperty('--ticker-shift', shift + 'px')
+    rail.style.setProperty('--ticker-speed', TICKER_DURATION_S + 's')
+  }
+  function updateTicker(){
+    const a = document.getElementById('tickerA')
+    const b = document.getElementById('tickerB')
+    const rail = document.getElementById('tickerRail')
+    if(!a || !b || !rail) return
+    const msg = buildQuoteLine()
+    a.textContent = msg; b.textContent = msg
+    rail.style.animation = 'none'; void rail.offsetWidth
+    adjustTickerLayout()
+    rail.style.animation = `ticker-marquee var(--ticker-speed) linear infinite`
+    _tickerIndex = (_tickerIndex + 1) % TICKER_QUOTES.length
+  }
+  function startTickerRotation(){
+    updateTicker()
+    window.addEventListener('resize', adjustTickerLayout)
+    setInterval(updateTicker, TICKER_DURATION_S * 500)
+  }
 
   // Mask angka
   ;(()=>{['f_nom','f_admin_dalam','f_admin_luar','f_admin_luar_only','f_fee_bank','f_modal','f_jual'].forEach(id=>{
@@ -475,7 +547,6 @@
     gRole = (prof?.role||'').toLowerCase() || (localStorage.getItem('user_role')||'kasir')
     gBranch = (prof?.branch_code||'').trim()
 
-    // Non-owner wajib ikut cabang profil
     if ((gRole||'') !== 'owner') {
       setActive(gBranch, gBranch)
       viewBranch = gBranch
@@ -484,12 +555,9 @@
       viewBranch = saved.code || gBranch || ''
     }
 
-    // Set nama-role kanan (biru, uppercase)
     const nm = (prof?.full_name || prof?.email || '-').split(' ')[0].toUpperCase()
-    const roleUp = (gRole||'').toUpperCase()
-    $('userRole').textContent = `${nm}–${roleUp}`
-
-    $('kpi_profit_wrap').style.display = (gRole==='owner') ? 'block' : 'none'
+    $('userRole').textContent = `${nm}–${(gRole||'').toUpperCase()}`
+    $('kpi_profit_wrap').style.display = (gRole==='owner') ? 'flex' : 'none'
 
     await initSidebar()
     await initBranchBar()
@@ -502,6 +570,7 @@
     $('btnWA').addEventListener('click', sendWhatsAppSummary)
 
     await refreshByRange()
+    startTickerRotation()
   }
 
   async function refreshByRange(){
@@ -543,19 +612,23 @@
       .select('jenis, nominal, admin_dalam, admin_luar, fee_bank, branch_code, created_at')
       .eq('branch_code', viewBranch).gte('created_at', tmin).lte('created_at', tmax)
 
-    let omset=0, tarik=0, transfer=0, fee=0, profit=0
+    let omset=0, tarik=0, transfer=0, fee=0, profit=0, opr=0
     for(const r of (data||[])){
       const n=+r.nominal||0, ad=+r.admin_dalam||0, al=+r.admin_luar||0, fb=+r.fee_bank||0
-      omset+=n; fee+=fb; if(r.jenis==='tarik') tarik+=n; if(r.jenis==='transfer') transfer+=n; profit += (ad+al-fb)
+      if(r.jenis==='tarik')     tarik+=n
+      else if(r.jenis==='transfer') transfer+=n
+      else if(r.jenis==='jasa') opr += al
+      omset+=n; fee+=fb; profit += (ad+al-fb)
     }
     $('kpi_omset').textContent=fmtRp(omset)
     $('kpi_tarik').textContent=fmtRp(tarik)
     $('kpi_transfer').textContent=fmtRp(transfer)
     $('kpi_fee').textContent=fmtRp(fee)
+    $('kpi_opr').textContent=fmtRp(opr)
     if(gRole==='owner') $('kpi_profit').textContent=fmtRp(profit)
   }
 
-  // Asset bar & KPI saldo
+  // Asset & saldo
   function updateAssetBar(list){
     const totalAsset = (list||[]).reduce((s,a)=> s + Number(a.saldo||0), 0)
     saldoSum.asset = totalAsset
@@ -586,23 +659,12 @@
     const rek=(list||[]).filter(a=> a.account_type==='rekening').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
     const srv=(list||[]).filter(a=> a.account_type==='server_pulsa').sort((a,b)=>(a.name||'').localeCompare(b.name||''))
 
-    const laciClass = (a)=>{
-      const s = Number(a.saldo||0)
-      if (s < 10_000_000) return 'laci-low'
-      if (s < 20_000_000) return 'laci-mid'
-      return 'laci-high'
-    }
-    const card = a => {
-      const isLaci = (a.account_type==='cash' && /laci/i.test(a.name||''))
-      const extraClass = isLaci ? (' ' + laciClass(a)) : ''
-      return `
-        <div class="kpi-card${extraClass}" title="ID: ${a.id}">
-          <div class="kpi-title">${a.name|| (a.account_type||'').toUpperCase()}</div>
-          <div class="kpi-value">${fmtRp(a.saldo||0)}</div>
-        </div>
-      `
-    }
-
+    const card = a => `
+      <div class="kpi-card" title="ID: ${a.id}">
+        <div class="kpi-title">${a.name|| (a.account_type||'').toUpperCase()}</div>
+        <div class="kpi-value">${fmtRp(a.saldo||0)}</div>
+      </div>
+    `
     let html=''
     laci.forEach(a=> html+=card(a))
     rek.forEach(a=> html+=card(a))
@@ -611,7 +673,7 @@
     wrap.innerHTML=html
   }
 
-  // ===== CSV =====
+  // CSV export
   function csvEscape(v){ if(v==null) return ''; const s=String(v).replace(/\r?\n/g,' ').replace(/\s+/g,' ').trim(); return /[",;]/.test(s)?`"${s.replace(/"/g,'""')}"`:s }
   function updateExportState(){ const hasData = (lastRiwayatRows||[]).length > 0; $('btnExport').disabled = !hasData }
   function exportCSV(){
@@ -631,14 +693,11 @@
   }
   $('btnExport').onclick=exportCSV
 
-  // ===== WhatsApp summary =====
+  // WA summary
   function fmtMakassar(dt=new Date()){
-    const tz='Asia/Makassar'
-    const pad = n => String(n).padStart(2,'0')
-    const z = new Date(dt.toLocaleString('en-US', { timeZone: tz }))
-    const dd = pad(z.getDate()), MM = pad(z.getMonth()+1), yyyy=z.getFullYear()
-    const HH = pad(z.getHours()), mm=pad(z.getMinutes()), ss=pad(z.getSeconds())
-    return `${dd}-${MM}-${yyyy} ${HH}:${mm}:${ss}`
+    const tz='Asia/Makassar', pad=n=>String(n).padStart(2,'0')
+    const z=new Date(dt.toLocaleString('en-US',{timeZone:tz}))
+    return `${pad(z.getDate())}-${pad(z.getMonth()+1)}-${z.getFullYear()} ${pad(z.getHours())}:${pad(z.getMinutes())}:${pad(z.getSeconds())}`
   }
   function buildWhatsAppText(){
     const cab = localStorage.getItem('current_branch_name') || viewBranch || '-'
@@ -663,7 +722,7 @@
     window.open(url, '_blank')
   }
 
-  // ===== Riwayat & CRUD =====
+  // Riwayat
   const saldoBlock = (srcName, srcVal, dstName, dstVal) => {
     const fmt = v => (v ?? null) !== null ? fmtNum(v) : '-'
     let html = ''
@@ -680,7 +739,6 @@
       lastRiwayatRows=[]; updateExportState(); return
     }
 
-    // COUNT
     let qCount = supabase.from('v_tx_summary').select('*',{ count:'exact', head:true })
       .eq('branch_code', viewBranch).gte('created_at', tmin).lte('created_at', tmax)
     if(flt.jenis) qCount = qCount.eq('jenis', flt.jenis)
@@ -690,7 +748,6 @@
     totalRows = cnt || 0
     $('totalTransaksi').textContent = 'Jumlah Total Transaksi = ' + totalRows
 
-    // DATA
     let dataQuery = supabase.from('v_tx_summary').select(`
       id, id_trx, jenis, src_account_id, src_account_name, dst_account_id, dst_account_name,
       nominal, admin_dalam, admin_luar, fee_bank,
@@ -797,11 +854,11 @@
     }
   }
 
-  // Admin dalam/luar eksklusif untuk TARIK
+  // Eksklusif admin dalam/luar untuk TARIK
   $('f_admin_dalam').addEventListener('input',()=>{ if(parseNum($('f_admin_dalam').value)>0) $('f_admin_luar').value='' })
   $('f_admin_luar').addEventListener('input',()=>{ if(parseNum($('f_admin_luar').value)>0) $('f_admin_dalam').value='' })
 
-  // CRUD click (edit/delete)
+  // CRUD
   document.addEventListener('click', async (e)=>{
     const actBtn = e.target.closest('button[data-act]')
     if(!actBtn) return
@@ -883,7 +940,7 @@
     }
   }
 
-  // ===== Branch bar =====
+  // Branch bar
   async function initBranchBar(){
     const sel=$('branchTopSelect'), lbl=$('bbNowName')
     const { data:{ session } } = await supabase.auth.getSession()
@@ -930,20 +987,15 @@
     }
   }
 
-  /* ===== Sidebar builder (struktur sama + highlight robust seperti dashboard) ===== */
-  function normPath(u){
-    return (u||'').toLowerCase().split('/').pop().replace(/[#?].*$/,'') || 'index.html';
-  }
+  /* Sidebar builder */
+  function normPath(u){ return (u||'').toLowerCase().split('/').pop().replace(/[#?].*$/,'') || 'index.html' }
   function isActive(link){
-    const current = normPath(location.pathname);
-    const target  = normPath(link);
-    const EQUIV = new Set(['das.html','dashboard.html','index.html','']);
-    const curSet = EQUIV.has(current) ? EQUIV : new Set([current]);
-    const tgtSet = EQUIV.has(target)  ? EQUIV : new Set([target]);
-    for(const v of curSet){ if(tgtSet.has(v)) return true; }
-    return false;
+    const current = normPath(location.pathname), target = normPath(link)
+    const EQUIV = new Set(['das.html','dashboard.html','index.html',''])
+    const curSet = EQUIV.has(current) ? EQUIV : new Set([current])
+    const tgtSet = EQUIV.has(target)  ? EQUIV : new Set([target])
+    for(const v of curSet){ if(tgtSet.has(v)) return true } return false
   }
-
   async function initSidebar(){
     const roleLS=(localStorage.getItem("user_role")||gRole||"kasir").toLowerCase();
     const menuModel=[
@@ -966,10 +1018,8 @@
     menuModel.forEach(n=>{
       if(n.ownerOnly && roleLS!=="owner") return;
       if(n.type==="item"){
-        const a=document.createElement("a"); a.href=n.link;
-        a.textContent=`${n.icon} ${n.label}`;
-        if(isActive(n.link)) a.classList.add("active");
-        nav.appendChild(a);
+        const a=document.createElement("a"); a.href=n.link; a.textContent=`${n.icon} ${n.label}`;
+        if(isActive(n.link)) a.classList.add("active"); nav.appendChild(a);
       }else{
         const g=document.createElement("div"); g.className="group"; if(!getGroupState(n.key)) g.classList.add("collapsed");
         const h=document.createElement("div"); h.className="group-header";
@@ -979,44 +1029,41 @@
         (n.items||[]).forEach(it=>{
           if(it.ownerOnly && roleLS!=="owner") return;
           const a=document.createElement("a"); a.href=it.link; a.textContent=`${it.icon} ${it.label}`;
-          if(isActive(it.link)) a.classList.add("active");
-          b.appendChild(a);
+          if(isActive(it.link)) a.classList.add("active"); b.appendChild(a);
         });
         g.appendChild(h); g.appendChild(b); nav.appendChild(g);
       }
     })
 
-    // Logout visual
     document.getElementById('lnk-logout-visual').addEventListener('click', async (e)=>{
-      e.preventDefault();
-      await supabase.auth.signOut();
-      localStorage.removeItem('current_branch_code');
-      localStorage.removeItem('current_branch_name');
+      e.preventDefault(); await supabase.auth.signOut();
+      localStorage.removeItem('current_branch_code'); localStorage.removeItem('current_branch_name');
       location.href='login.html';
     })
   }
 
-  // ===== Hamburger + Overlay (mobile) =====
+  // Hamburger + overlay
   const sidebarEl = document.getElementById('sidebar');
-  const overlayEl = document.getElementById('overlay');
+  const overlayEl = document.createElement('div'); overlayEl.className='overlay';
+  Object.assign(overlayEl.style,{position:'fixed',inset:'0',background:'rgba(2,6,23,.45)',opacity:'0',pointerEvents:'none',transition:'opacity .25s ease',zIndex:'9999'});
+  document.body.appendChild(overlayEl);
   const btnHamb = document.getElementById('toggleSidebar');
   function toggleSidebar(open){
     const willOpen = (typeof open==='boolean') ? open : !sidebarEl.classList.contains('open');
     sidebarEl.classList.toggle('open', willOpen);
-    overlayEl.classList.toggle('show', willOpen);
-    document.body.classList.toggle('noscroll', willOpen);
+    overlayEl.style.opacity = willOpen ? '1':'0';
+    overlayEl.style.pointerEvents = willOpen ? 'auto':'none';
+    document.body.style.overflow = willOpen ? 'hidden':'auto';
     btnHamb?.setAttribute('aria-expanded', String(willOpen));
   }
   btnHamb?.addEventListener('click', ()=> toggleSidebar());
   overlayEl?.addEventListener('click', ()=> toggleSidebar(false));
   window.addEventListener('keyup', (e)=>{ if(e.key==='Escape') toggleSidebar(false); });
 
-  // Optimistic highlight & tutup dengan delay kecil agar tap tidak ketahan
   document.addEventListener('click', (e)=>{
     const a = e.target.closest('.sidebar a'); if(!a) return;
     document.querySelectorAll('.sidebar .nav a.active').forEach(el=>el.classList.remove('active'));
-    a.classList.add('active');
-    setTimeout(()=>toggleSidebar(false),120);
+    a.classList.add('active'); setTimeout(()=>toggleSidebar(false),120);
   });
 
   // Start
