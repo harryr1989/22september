@@ -21,7 +21,30 @@
 
       /* Chip saldo */
       --chip1:#6f3bf1; --chip2:#7a4df3;
+
+      /* Modal + anim */
+      --modal-bg:#f9fafb;
+      --fade-in: fadeIn .28s ease forwards;
+
+      /* Loading overlay */
+      --loading-backdrop: rgba(2,6,23,.35);
+      --loading-card-bg: #ffffff;
     }
+
+    /* ===== Animations ===== */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulseSoft {
+      0% { transform: scale(1); box-shadow: 0 8px 26px rgba(0,0,0,.06); }
+      50%{ transform: scale(1.02); box-shadow: 0 12px 30px rgba(0,0,0,.10); }
+      100%{ transform: scale(1); box-shadow: 0 8px 26px rgba(0,0,0,.06); }
+    }
+    @keyframes spinner {
+      to { transform: rotate(360deg); }
+    }
+
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
@@ -40,31 +63,43 @@
     }
     .brand{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08);font-weight:800}
     .nav{padding:10px}
-    .nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:#eaf2ff;text-decoration:none;font-weight:600}
-    .nav a:hover,.nav a.active{background:rgba(255,255,255,.10)}
-    .group{margin-top:12px;border:1px solid rgba(255,255,255,.10);border-radius:10px;overflow:hidden}
+    .nav a{
+      display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+      color:#eaf2ff;text-decoration:none;font-weight:600;transition:all .18s ease;
+    }
+    .nav a:hover,.nav a.active{background:rgba(255,255,255,.10);transform:translateX(2px)}
+    .group{margin-top:12px;border:1px solid rgba(255,255,255,.10);border-radius:10px;overflow:hidden;transition:box-shadow .18s ease}
+    .group:hover{box-shadow:0 4px 16px rgba(0,0,0,.12)}
     .group-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,.06);cursor:pointer}
     .group-body{padding:8px;display:flex;flex-direction:column;gap:4px}
     .group.collapsed .group-body{display:none}
     .footer{margin-top:auto;padding:12px}
-    .logout{width:100%;border:0;border-radius:10px;background:#ef4444;color:#fff;padding:10px 12px;font-weight:800;text-align:center;text-decoration:none;display:block}
+    .logout{
+      width:100%;border:0;border-radius:10px;background:#ef4444;color:#fff;
+      padding:10px 12px;font-weight:800;text-align:center;text-decoration:none;display:block;
+      transition:all .18s ease;
+    }
+    .logout:hover{background:#dc2626;transform:scale(1.03);box-shadow:0 6px 18px rgba(220,38,38,.35)}
 
     /* ===== HEADER ===== */
     .branchbar{
       position:sticky; top:0; z-index:55; min-height:var(--H_BAR);
       display:flex; align-items:center; gap:10px; flex-wrap:wrap;
       padding:10px 16px; background:#fff; border-bottom:1px solid var(--border);
+      backdrop-filter: saturate(180%) blur(3px);
     }
-    .bb-select{min-width:260px;height:38px;border:1px solid var(--border);border-radius:10px;padding:0 10px;background:#fff;font-weight:700}
+    .bb-select{min-width:260px;height:38px;border:1px solid var(--border);border-radius:10px;padding:0 10px;background:#fff;font-weight:700;transition:box-shadow .18s ease}
+    .bb-select:focus{box-shadow:0 0 0 3px rgba(29,78,216,.15)}
     .bb-now{font-weight:800;background:#eef2ff;border:1px solid var(--border);border-radius:999px;padding:6px 10px}
     .user-role{margin-left:auto;font-weight:900;color:#1e293b}
-    .hamburger{display:none;place-items:center;width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:#fff}
+    .hamburger{display:none;place-items:center;width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:#fff;transition:all .18s ease}
+    .hamburger:hover{transform:scale(1.05);box-shadow:0 6px 18px rgba(0,0,0,.08)}
 
     /* ====== TICKER ====== */
     .ticker{
       background:#2a44a5; color:#eaf2ff;
-      border-bottom:1px solid #1e2f84;
-      overflow:hidden; position:relative; padding:8px 0;
+      border-bottom:2px solid #1e2f84;
+      overflow:hidden; position:relative; padding:18px 0;
       --ticker-gap: 20px;
       --ticker-speed: 16s;
       --ticker-shift: 200px;
@@ -74,7 +109,7 @@
       gap:var(--ticker-gap);
       animation: ticker-marquee var(--ticker-speed) linear infinite;
     }
-    .ticker-chunk{ white-space:nowrap; font-weight:200; letter-spacing:.2px; font-size:13px }
+    .ticker-chunk{ white-space:nowrap; font-weight:600; letter-spacing:.2px; font-size:18px }
     @keyframes ticker-marquee{
       from{ transform:translateX(0) }
       to  { transform:translateX(calc(-1 * var(--ticker-shift))) }
@@ -83,26 +118,32 @@
 
     /* ===== CONTENT ===== */
     .grid{display:grid;grid-template-columns:1fr;gap:14px;margin:14px 18px}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:14px}
+    .card{
+      background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:14px;
+      transition: box-shadow .18s ease, transform .18s ease;
+    }
+    .card:hover{ box-shadow:0 10px 26px rgba(2,8,23,.08); transform:translateY(-1px) }
     .card h3{margin:0 0 10px 0}
 
     /* ===== KPI TRANSAKSI ===== */
     .kpi-grid{
-      display:grid;
+      display:left-grid;
       grid-template-columns:repeat(6,1fr);
-      gap:12px;
+      gap:20px;
     }
     .kpi{
-      border-radius:16px;box-shadow:var(--shadow);padding:12px 14px;
-      color:#fff; display:flex; gap:12px; align-items:center; min-height:76px
+      border-radius:16px;box-shadow:var(--shadow);padding:16x 18px;
+      color:#fff; display:flex; gap:14px; align-items:center; min-height:76px;
+      transition:transform .18s ease, box-shadow .18s ease;
     }
+    .kpi:hover{ transform:translateY(-2px); box-shadow:0 14px 60px rgba(0,0,0,.12) }
     .kpi .ic{
       width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
       background:rgba(255,255,255,.18);font-weight:900;font-size:18px
     }
     .kpi .meta{display:flex;flex-direction:column}
-    .kpi .meta h4{margin:0;font-size:12px;color:#eef3ff;letter-spacing:.3px}
-    .kpi .meta .val{font-weight:900;font-size:18px;line-height:1.1}
+    .kpi .meta h4{margin:0;font-size:40px;color:#fff;letter-spacing:.1px}
+    .kpi .meta .val{font-weight:900;font-size:18px;line-height:1.5}
 
     .kpi.blue   {background:linear-gradient(180deg,var(--kpi-blue),#155a9b)}
     .kpi.green  {background:linear-gradient(180deg,var(--kpi-green),#205b24)}
@@ -127,32 +168,42 @@
       border-radius:999px !important; padding:10px 16px !important;
       background:linear-gradient(180deg,var(--chip1),var(--chip2)) !important; color:#fff !important;
       border:0 !important; display:flex !important; align-items:center !important; justify-content:space-between !important;
-      box-shadow:var(--shadow) !important;
+      box-shadow:var(--shadow) !important; transition:transform .18s ease, box-shadow .18s ease;
     }
+    #kpiSaldoWrap > .kpi-card:hover{ transform:translateY(-2px); box-shadow:0 14px 30px rgba(0,0,0,.12) }
     #kpiSaldoWrap .kpi-title{color:#fff !important;font-weight:800 !important}
     #kpiSaldoWrap .kpi-value{color:#fff !important}
 
-    /* TABEL */
-    table{width:100%;border-collapse:separate;border-spacing:0;min-width:1100px;background:#fff}
-    thead th{position:sticky;top:0;background:#eef2ff;border-bottom:1px solid var(--border);padding:12px;font-size:13px;text-align:left;color:#1f2937}
-    tbody td{border-bottom:1px solid var(--border);padding:10px 12px}
-    tbody tr:hover{background:#f8fafc}
-
-    /* FILTERS & BUTTONS */
+    /* ===== FILTERS & BUTTONS ===== */
     .filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0}
-    .sel,.date-input{height:38px;padding:0 10px;border:1px solid var(--border);border-radius:10px;background:#fff;font-weight:700}
-    .btn-sm{height:38px;padding:0 12px;border-radius:10px;font-weight:800;cursor:pointer;border:1px solid var(--border);background:#fff}
+    .sel,.date-input{height:38px;padding:0 10px;border:1px solid var(--border);border-radius:10px;background:#fff;font-weight:700;transition:box-shadow .18s ease}
+    .sel:focus,.date-input:focus{box-shadow:0 0 0 3px rgba(29,78,216,.15)}
+    .btn-sm{
+      height:38px;padding:0 12px;border-radius:10px;font-weight:800;cursor:pointer;border:1px solid var(--border);background:#fff;
+      transition:transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
+    }
+    .btn-sm:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.10)}
     .btn-primary{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
     .btn-ghost{background:#f1f5f9}
     .btn-danger{background:#fee2e2;color:#991b1b;border-color:#fee2e2}
     .btn-wa{background:#15803d;color:#fff;border-color:#15803d}
     .btn-excel{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
-    .btn-sm:disabled{opacity:.5;cursor:not-allowed}
+    .btn-sm:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
 
-    /* MODAL */
-    .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:100}
-    .modal.show{display:flex}
-    .dialog{width:min(1024px,100%);background:#fff;border-radius:16px;border:1px solid var(--border);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:92vh}
+    /* ===== MODAL ===== */
+    .modal{
+      position:fixed;inset:0;background:rgba(2,6,23,.45);
+      display:none;align-items:center;justify-content:center;
+      padding:12px;z-index:100;
+    }
+    .modal.show{display:flex;animation:var(--fade-in)}
+    .dialog{
+      width:min(1024px,100%);
+      background:var(--modal-bg);
+      border-radius:16px;border:1px solid var(--border);
+      overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);
+      display:flex;flex-direction:column;max-height:92vh
+    }
     .dlg-hd{background:#0ea5e9;color:#fff;padding:12px 16px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
     .dlg-bd{padding:14px;display:grid;gap:12px;overflow:auto}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -162,12 +213,81 @@
     .icon-input textarea{min-height:96px;resize:vertical}
     .dlg-ft{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:8px;justify-content:flex-end}
 
-    /* ======= RESPONSIVE BREAKPOINTS =======
-       Desktop: 6 kolom
-       Tablet:  3 kolom
-       Mobile:  2 kolom (seperti screenshot eLink)
-       Very small: 1 kolom
-    */
+    /* ===== Sticky Header Tabel ===== */
+    table{width:100%;border-collapse:separate;border-spacing:0;min-width:1100px;background:#fff}
+    thead th{
+      position:sticky;top:0;background:#eef2ff;border-bottom:1px solid var(--border);
+      padding:12px;font-size:13px;text-align:left;color:#1f2937;z-index:2;
+      box-shadow: 0 1px 0 rgba(0,0,0,.03);
+    }
+    tbody td{border-bottom:1px solid var(--border);padding:10px 12px}
+    tbody tr:hover{background:#f8fafc}
+
+/* === Border tabel penuh === */
+table { border-collapse: collapse !important; }
+th, td { border: 1px solid var(--border) !important; }
+
+    /* ===== Responsive Table (HP) ===== */
+    @media (max-width: 980px) {
+      table { font-size: 12px; min-width: 1100px; }
+      thead th, tbody td { padding: 6px 8px; }
+      .card > div[style*="overflow:auto"] {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+      }
+    }
+
+    /* ===== Responsive Modal ===== */
+    @media (max-width:980px){
+      .dialog{ width:75%; max-width:480px; border-radius:14px; }
+      .dlg-hd{font-size:15px;padding:10px 14px}
+      .dlg-bd{padding:10px;gap:8px}
+      .dlg-ft{padding:10px 14px}
+      label{font-size:12.5px}
+      .icon-input{padding:10px;min-height:44px}
+      .icon-input input,.icon-input select,.icon-input textarea{font-size:14px}
+      .btn-sm{font-size:13px;height:36px}
+      .row{grid-template-columns:1fr}
+    }
+
+    /* ===== Loading Overlay Modern ===== */
+    .loading-overlay{
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:9998;
+      background: var(--loading-backdrop); backdrop-filter: blur(2px);
+    }
+    .loading-overlay.show{ display:flex; animation: fadeIn .22s ease }
+    .loading-card{
+      background:var(--loading-card-bg); border-radius:16px; padding:14px 16px; border:1px solid var(--border);
+      box-shadow: 0 14px 32px rgba(0,0,0,.18); display:flex; align-items:center; gap:12px;
+      animation: pulseSoft 1.2s ease-in-out infinite;
+    }
+    .spinner{
+      width:22px; height:22px; border-radius:50%;
+      border:3px solid #cbd5e1; border-top-color:#1d4ed8; animation: spinner .8s linear infinite;
+    }
+    .loading-text{ font-weight:800; color:#1e293b }
+    .loading-sub{ font-size:12px; color:#475569 }
+    
+    /* === PATCH FINAL: SCROLLBAR TABEL RIWAYAT TRANSAKSI (HP) === */
+    @media (max-width:980px){
+      .card > div[style*="overflow"] {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        display: block !important;
+        width: 100% !important;
+      }
+      .card > div[style*="overflow"] > table {
+        min-width: 1100px !important;
+        width: 1100px !important;
+        white-space: nowrap !important;
+      }
+      .card > div[style*="overflow"]::-webkit-scrollbar { height: 10px; }
+      .card > div[style*="overflow"]::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 5px; }
+      .card > div[style*="overflow"]::-webkit-scrollbar-track { background:#f1f5f9; }
+    }
+
+    /* ===== Breakpoints grid KPI ===== */
     @media (max-width:1080px){ .kpi-grid{grid-template-columns:repeat(3,1fr)} }
     @media (max-width:2200px){
       .layout{grid-template-columns:1fr}
@@ -182,8 +302,1144 @@
     @media (max-width:420px){
       .kpi-grid{grid-template-columns:1fr}
       .kpi .meta .val{font-size:16px}
+      .branchbar .bb-now{font-size:13px;padding:4px 8px}
     }
-  </style>
+  /* === Warna Merah Header Tabel === */
+thead th {
+  color: #b91c1c !important;
+  font-weight: 700 !important;
+}
+/* === Toast Notification === */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #16a34a;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all .3s ease;
+  z-index: 9999;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.toast.error {
+  background: #dc2626;
+}
+
+
+/* ===== Responsive Filter & Tombol (HP) v2 ===== */
+@media (max-width: 980px) {
+  .filters {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px !important;
+    margin-top: 4px !important;
+    margin-bottom: 10px !important;
+    width: 100% !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    box-sizing: border-box !important;
+  }
+  .filters .sel,
+  .filters .date-input,
+  .filters .btn-sm {
+    width: 100% !important;
+  }
+  .filters button {
+    height: 42px !important;
+    font-size: 14px !important;
+  }
+
+  /* Urutan tombol di HP: WA → Excel → Tambah */
+  #btnWA { order: 1; background:#15803d !important; color:#fff !important; border-color:#15803d !important; }
+  #btnExport { order: 2; background:#0ea5e9 !important; color:#fff !important; border-color:#0ea5e9 !important; }
+  #btnTambah { order: 3; background:#1d4ed8 !important; color:#fff !important; border-color:#1d4ed8 !important; }
+
+  /* Perapian margin bawah tabel dan card */
+  .card {
+    padding: 10px !important;
+    border-radius: 14px !important;
+    margin-left: 8px !important;
+    margin-right: 8px !important;
+  }
+  #totalTransaksi {
+    margin-top: 8px !important;
+    margin-bottom: 4px !important;
+    font-size: 13px !important;
+  }
+  table {
+    font-size: 12px !important;
+  }
+
+  /* Scroll aman untuk kontainer utama */
+  .grid {
+    overflow-x: hidden !important;
+  }
+}
+
+
+/* === Scroll sempurna KPI & Tabel di layar HP (v4) === */
+@media (max-width:980px){
+  /* Pastikan card KPI saldo bisa scroll penuh */
+  #kpiSaldoWrap {
+    overflow-x: auto !important;
+    display: flex !important;
+    gap: 10px !important;
+    padding-bottom: 8px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  #kpiSaldoWrap::-webkit-scrollbar {
+    height: 6px;
+  }
+  #kpiSaldoWrap::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+  }
+  .kpi-card {
+    flex: 0 0 auto;
+    min-width: 160px !important;
+    scroll-snap-align: start;
+  }
+
+  /* Tambahkan pembungkus tabel agar scroll lebih stabil */
+  .table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    display: block !important;
+    width: 100% !important;
+    margin-left: 8px !important;
+    margin-right: 8px !important;
+  }
+  .table-wrapper table {
+    min-width: 1100px !important;
+  }
+  .table-wrapper::-webkit-scrollbar {
+    height: 8px;
+  }
+  .table-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.25);
+    border-radius: 10px;
+  }
+}
+
+
+/* --- Compact Form Style (v10) --- */
+.form-grid {
+  display: grid;
+  gap: 8px;
+}
+.form-grid label {
+  font-size: 0.9rem;
+  color: #0f172a;
+  margin-bottom: 2px;
+}
+.form-grid input, .form-grid select {
+  padding: 6px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+.form-grid input:focus, .form-grid select:focus {
+  outline: 2px solid #3b82f6;
+  border-color: #3b82f6;
+}
+.modal-content form {
+  display: grid;
+  gap: 10px;
+  padding: 8px 12px;
+}
+</style>
+
+<style id="v7-compact">
+/* === v7 Compact Modern (Flat + Floating Labels) === */
+:root{
+  --primary:#2274e0;
+  --label:#666;
+}
+/* Modal overlay darker */
+.modal { background: rgba(0,0,0,0.35); }
+/* Dialog animation */
+.modal .dialog {
+  max-width: 480px;
+  width: calc(100% - 24px);
+  border-radius: 14px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+  transform: scale(0.95);
+  opacity: 0;
+  transition: transform .18s ease, opacity .18s ease;
+}
+.modal.show .dialog { transform: scale(1); opacity: 1; }
+
+/* Header modal with icon & compact padding */
+.dlg-hd{
+  background: var(--primary);
+  color:#fff;
+  padding:10px 14px;
+  border-top-left-radius:14px;
+  border-top-right-radius:14px;
+  display:flex; align-items:center; justify-content:space-between;
+  font-weight:600;
+}
+.dlg-hd span { display:flex; align-items:center; gap:8px; font-size:14px; }
+
+/* Body compact */
+.dlg-bd{ padding:12px 14px; }
+/* Grid rows compact */
+.dlg-bd .row{ display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px; }
+@media (max-width: 600px){
+  .dlg-bd .row{ grid-template-columns: 1fr; }
+}
+
+/* Floating label container */
+.dlg-bd .row > div{
+  position: relative;
+  padding-top: 14px; /* space for floating label */
+}
+
+/* Hide original labels positioning and turn into floating */
+.dlg-bd .row > div > label{
+  position:absolute;
+  top: 18px;
+  left: 10px;
+  font-size: 12px;
+  color: var(--label);
+  pointer-events:none;
+  transition: all .2s ease;
+  background: transparent;
+  padding: 0 2px;
+}
+
+/* Inputs & selects compact */
+.dlg-bd .row .icon-input,
+.dlg-bd .row .icon-input select,
+.dlg-bd .row .icon-input input{
+  font-size:13px;
+}
+.dlg-bd .row .icon-input{
+  display:block;
+  background:#fff;
+  border:1px solid #d7d7d7;
+  border-radius:8px;
+  padding: 6px 10px;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.dlg-bd .row .icon-input:focus-within{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(34,116,224,0.12);
+}
+.dlg-bd .row .icon-input input,
+.dlg-bd .row .icon-input select{
+  width:100%;
+  outline:none;
+  border:none;
+  background:transparent;
+  padding:2px 0;
+}
+
+/* Floating behavior when focused or filled */
+.dlg-bd .row > div.filled > label,
+.dlg-bd .row > div:focus-within > label{
+  top: 2px;
+  left: 8px;
+  font-size: 10px;
+  color: var(--primary);
+  background: #fff;
+}
+
+/* Fee-only field label adjustment */
+#labelNominal { /* preserved text content, but hidden in floating layout */
+  visibility:hidden; height:0; margin:0; padding:0;
+}
+
+/* Admin-only single row style */
+#rowAdminLuarOnly .icon-input { padding:6px 10px; }
+
+/* Buttons compact */
+.btn, .btn-sm, .btn-primary{
+  border-radius:10px;
+}
+.btn-primary{
+  background: var(--primary);
+  color:#fff;
+  border: none;
+}
+.btn-primary:hover{ filter: brightness(0.95); }
+
+/* Footer compact */
+.dlg-ft{ padding:10px 14px; display:flex; justify-content:flex-end; gap:8px; }
+
+/* Make modal full-height on tiny screens while keeping whitespace */
+@media (max-width: 420px){
+  .modal .dialog{ width: calc(100% - 16px); }
+  .dlg-bd{ padding:10px 12px; }
+  .dlg-hd{ padding:9px 12px; }
+  .dlg-ft{ padding:9px 12px; }
+}
+
+/* --- Compact Form Style (v10) --- */
+.form-grid {
+  display: grid;
+  gap: 8px;
+}
+.form-grid label {
+  font-size: 0.9rem;
+  color: #0f172a;
+  margin-bottom: 2px;
+}
+.form-grid input, .form-grid select {
+  padding: 6px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+.form-grid input:focus, .form-grid select:focus {
+  outline: 2px solid #3b82f6;
+  border-color: #3b82f6;
+}
+.modal-content form {
+  display: grid;
+  gap: 10px;
+  padding: 8px 12px;
+}
+</style>
+
+
+<!-- v25-FORM-ModernUI-Dual-Color (scoped to modal form only) -->
+<style>
+:root { --accent: #2196f3; } /* default (Transfer blue) */
+
+@media (prefers-color-scheme: dark) {
+  #modalForm {
+    --bg: #1b1d1f;
+    --text: #eaeaea;
+    --input-bg: #2a2d31;
+  }
+}
+@media (prefers-color-scheme: light) {
+  #modalForm {
+    --bg: #ffffff;
+    --text: #222;
+    --input-bg: #f9f9f9;
+  }
+}
+
+/* Scope all styles to modal form only */
+#modalForm {
+  color: var(--text);
+  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+#modalForm .dlg, #modalForm .modal, #modalForm .dialog {
+  background: var(--bg);
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+}
+
+/* Inputs */
+#modalForm input, 
+#modalForm select, 
+#modalForm textarea {
+  background: var(--input-bg);
+  color: var(--text);
+  border: none;
+  border-bottom: 2px solid var(--accent);
+  border-radius: 8px 8px 0 0;
+  padding: 10px 12px;
+  transition: box-shadow .2s ease, border-color .2s ease, background .2s ease;
+  width: 100%;
+  outline: none;
+}
+#modalForm input:focus, 
+#modalForm select:focus, 
+#modalForm textarea:focus {
+  box-shadow: 0 2px 0 0 var(--accent), 0 0 0 2px color-mix(in oklab, var(--accent) 20%, transparent);
+}
+
+/* Labels */
+#modalForm label {
+  font-weight: 600;
+  opacity: .92;
+}
+
+/* Buttons */
+#modalForm button, 
+#modalForm .btn-primary {
+  background: var(--accent);
+  color:#fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: transform .15s ease, opacity .2s ease, background .2s ease;
+}
+#modalForm button:hover, 
+#modalForm .btn-primary:hover {
+  transform: translateY(-1px);
+  opacity: .95;
+}
+
+/* Modal fade-in */
+@keyframes v25_fadeInScale {
+  0% { opacity: 0; transform: scale(.96); }
+  100% { opacity: 1; transform: scale(1); }
+}
+#modalForm.show .dlg, 
+#modalForm.show .modal, 
+#modalForm.show .dialog {
+  animation: v25_fadeInScale .25s ease-out;
+}
+
+/* Grid spacing */
+#modalForm #rowSumber,
+#modalForm #rowAdminDua,
+#modalForm #rowPulsa {
+  gap: 12px;
+}
+#modalForm .row, 
+#modalForm [class*='row'] {
+  margin-bottom: 10px;
+}
+</style>
+
+
+<!-- v26 FORM FLOATING DUAL (FAST-DANA) -->
+<style>
+:root { --accent: #2196f3; }
+
+/* Scope ONLY to modal form area so other pages remain untouched */
+#modalForm { font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+
+/* Container for floating labels */
+#modalForm .v26-field { position: relative; margin-top: 18px; }
+
+/* Controls */
+#modalForm .v26-field input,
+#modalForm .v26-field select,
+#modalForm .v26-field textarea {
+  width: 100%;
+  padding: 12px 10px 6px 10px;
+  font-size: 14px;
+  color: var(--text, #222);
+  background: transparent;
+  border: none;
+  border-bottom: 2.5px solid var(--accent);
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  border-radius: 8px 8px 0 0;
+}
+
+/* Accent glow on focus (soft) */
+#modalForm .v26-field input:focus,
+#modalForm .v26-field select:focus,
+#modalForm .v26-field textarea:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+/* Labels - fast floating (DANA style) */
+#modalForm .v26-field > label {
+  position: absolute;
+  top: 13px;
+  left: 10px;
+  font-size: 14px;
+  color: var(--text, #222);
+  opacity: 0.7;
+  pointer-events: none;
+  transition: all .15s ease;
+}
+#modalForm .v26-field:has(input:focus) > label,
+#modalForm .v26-field:has(select:focus) > label,
+#modalForm .v26-field:has(textarea:focus) > label,
+#modalForm .v26-field:has(input:not(:placeholder-shown)) > label,
+#modalForm .v26-field:has(textarea:not(:placeholder-shown)) > label,
+#modalForm .v26-field:has(select[data-hasvalue="1"]) > label {
+  top: -6px;
+  left: 8px;
+  font-size: 12px;
+  color: var(--accent); /* label uses accent color */
+  opacity: 1;
+}
+
+/* More rounded buttons */
+#modalForm button,
+#modalForm .btn-primary {
+  border-radius: 16px !important;
+}
+
+/* Keep dual mode variables (fallbacks) */
+@media (prefers-color-scheme: dark) {
+  #modalForm {
+    --bg: #1b1d1f; --text: #eaeaea; --input-bg: #2a2d31;
+  }
+}
+@media (prefers-color-scheme: light) {
+  #modalForm {
+    --bg: #ffffff; --text: #222; --input-bg: #f9f9f9;
+  }
+}
+
+/* Fade-in modal */
+@keyframes v26_fadeInScale { 0% { opacity: 0; transform: scale(.96); } 100% { opacity: 1; transform: scale(1); } }
+#modalForm.show .dlg, #modalForm.show .modal, #modalForm.show .dialog { animation: v26_fadeInScale .25s ease-out; }
+</style>
+
+
+<!-- v27 FORM FLOATING REFINED (DELUXE+WIDE+FOCUS OVERLAY) -->
+<style>
+/* ===== Labels: ALL UPPERCASE + better contrast ===== */
+@media (prefers-color-scheme: light) {
+  #modalForm .v26-field > label { color:#444; }
+}
+@media (prefers-color-scheme: dark) {
+  #modalForm .v26-field > label { color:#ccc; }
+}
+#modalForm .v26-field > label {
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-weight: 600;
+}
+
+/* ===== Buttons: stronger weight + taller padding + soft hover shadow ===== */
+#modalForm button,
+#modalForm .btn-primary {
+  font-weight: 600;
+  padding: 12px 18px; /* taller for touch */
+}
+#modalForm button:hover,
+#modalForm .btn-primary:hover {
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+/* ===== Inputs: instant 4px underline on focus (no transition delay) ===== */
+#modalForm .v26-field input:focus,
+#modalForm .v26-field select:focus,
+#modalForm .v26-field textarea:focus {
+  border-bottom-width: 4px;
+  transition: none; /* instant feel */
+}
+
+/* ===== Icon & text spacing (sidebar/buttons) ===== */
+.sidebar-menu i, .nav-item i { margin-right:6px; vertical-align:middle; }
+#modalForm button i { margin-right:6px; vertical-align:middle; }
+
+/* ===== Modal: widen ~10% and elegant global shadow ===== */
+#modalForm .dlg, #modalForm .modal, #modalForm .dialog {
+  max-width: 704px; /* ~10% wider than common 640px */
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  position: relative;
+  z-index: 9999;
+}
+
+/* ===== Focus overlay: darker background with fade ===== */
+#modalForm.show::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 9998;
+  animation: v27_overlayFade .25s ease-out;
+}
+@keyframes v27_overlayFade {
+  from { opacity: 0; } to { opacity: 1; }
+}
+
+/* Keep the modal entrance animation from v26 */
+</style>
+
+
+<!-- v28 FORM COMPACT (PADAT + LEMBUT + PROPORSIONAL) -->
+<style>
+/* ===== Compact Field Layout ===== */
+#modalForm .v26-field {
+  margin-top: 8px !important;
+  margin-bottom: 6px !important;
+}
+#modalForm .form-group {
+  margin-bottom: 10px !important;
+}
+#modalForm input,
+#modalForm select,
+#modalForm textarea {
+  padding: 10px 8px 4px 8px !important;
+}
+
+/* ===== Modal Proporsional + Rounded ===== */
+#modalForm .dlg, #modalForm .modal, #modalForm .dialog {
+  max-width: 704px;       /* +10% wider */
+  max-height: 95%;        /* -5% shorter */
+  border-radius: 12px;    /* smoother corners */
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  position: relative;
+  z-index: 9999;
+}
+
+/* ===== Overlay Fokus (Fade Lembut) ===== */
+#modalForm.show::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 9998;
+  animation: v28_overlayFade .25s ease-out;
+}
+@keyframes v28_overlayFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Keep modal fade+scale animation from previous version */
+</style>
+
+
+<!-- v29 FORM MOBILE RESPONSIVE -->
+<style>
+/* ===== Responsive Adjustments for Mobile (max-width: 600px) ===== */
+@media (max-width: 600px) {
+  #modalForm .dlg, #modalForm .modal, #modalForm .dialog {
+    width: 94% !important;
+    max-width: 600px !important;
+    max-height: 92vh !important;
+    border-radius: 14px !important;
+  }
+  #modalForm .v26-field {
+    margin-top: 6px !important;
+    margin-bottom: 5px !important;
+  }
+  #modalForm input,
+  #modalForm select,
+  #modalForm textarea {
+    padding: 8px 6px 3px 6px !important;
+    font-size: 14px !important;
+  }
+  #modalForm .v26-field > label {
+    font-size: 14px !important;
+  }
+  #modalForm button,
+  #modalForm .btn-primary {
+    font-size: 14px !important;
+    padding: 10px 14px !important;
+    border-radius: 14px !important;
+  }
+  #modalForm textarea {
+    min-height: 70px !important;
+  }
+  #modalForm {
+    font-size: 14px !important;
+  }
+}
+</style>
+
+
+<!-- v30 FORM LABEL ICONFIX -->
+<style>
+/* ===== Rapikan ikon & teks label agar tidak saling menimpa ===== */
+#modalForm .v26-field label i {
+  margin-right: 6px;           /* jarak antara ikon dan teks */
+  vertical-align: middle;      /* sejajarkan tengah */
+  position: relative;
+  top: -1px;                   /* sedikit naik agar sejajar sempurna */
+  font-size: 15px;             /* ukuran proporsional */
+  opacity: 0.9;                /* ikon sedikit lebih lembut */
+}
+
+/* Gunakan flex agar ikon dan teks tidak saling tumpang tindih */
+#modalForm .v26-field > label {
+  display: flex;
+  align-items: center;
+  gap: 6px;                    /* jarak antar ikon dan teks */
+  line-height: 1.2;
+  white-space: nowrap;
+}
+</style>
+
+
+<!-- v33 FINAL ACCENT COMPLETE (Hover + Focus Ring + Button Glow + Dynamic Button Color) -->
+<style>
+/* ===== HOVER ACCENT on label icons (Desktop only) ===== */
+@media (min-width: 768px) {
+  #modalForm[data-jenis="tarik"] .v26-field label i:hover { color:#4CAF50; filter:brightness(1.2) saturate(1.3); transition:color .2s ease,filter .2s ease; }
+  #modalForm[data-jenis="transfer"] .v26-field label i:hover { color:#2196F3; filter:brightness(1.2) saturate(1.3); transition:color .2s ease,filter .2s ease; }
+  #modalForm[data-jenis="pulsa"] .v26-field label i:hover { color:#9C27B0; filter:brightness(1.2) saturate(1.3); transition:color .2s ease,filter .2s ease; }
+  #modalForm[data-jenis="fee brilink"] .v26-field label i:hover { color:#FFC107; filter:brightness(1.2) saturate(1.3); transition:color .2s ease,filter .2s ease; }
+  #modalForm[data-jenis="jasa"] .v26-field label i:hover { color:#607D8B; filter:brightness(1.2) saturate(1.3); transition:color .2s ease,filter .2s ease; }
+}
+
+/* ===== FOCUS RING ACCENT (Soft 3px, 25%) ===== */
+#modalForm[data-jenis="tarik"] .v26-field input:focus,
+#modalForm[data-jenis="tarik"] .v26-field select:focus,
+#modalForm[data-jenis="tarik"] .v26-field textarea:focus { box-shadow:0 0 0 3px color-mix(in srgb, #4CAF50 25%, transparent); transition:box-shadow .15s ease-in-out; }
+#modalForm[data-jenis="transfer"] .v26-field input:focus,
+#modalForm[data-jenis="transfer"] .v26-field select:focus,
+#modalForm[data-jenis="transfer"] .v26-field textarea:focus { box-shadow:0 0 0 3px color-mix(in srgb, #2196F3 25%, transparent); transition:box-shadow .15s ease-in-out; }
+#modalForm[data-jenis="pulsa"] .v26-field input:focus,
+#modalForm[data-jenis="pulsa"] .v26-field select:focus,
+#modalForm[data-jenis="pulsa"] .v26-field textarea:focus { box-shadow:0 0 0 3px color-mix(in srgb, #9C27B0 25%, transparent); transition:box-shadow .15s ease-in-out; }
+#modalForm[data-jenis="fee brilink"] .v26-field input:focus,
+#modalForm[data-jenis="fee brilink"] .v26-field select:focus,
+#modalForm[data-jenis="fee brilink"] .v26-field textarea:focus { box-shadow:0 0 0 3px color-mix(in srgb, #FFC107 25%, transparent); transition:box-shadow .15s ease-in-out; }
+#modalForm[data-jenis="jasa"] .v26-field input:focus,
+#modalForm[data-jenis="jasa"] .v26-field select:focus,
+#modalForm[data-jenis="jasa"] .v26-field textarea:focus { box-shadow:0 0 0 3px color-mix(in srgb, #607D8B 25%, transparent); transition:box-shadow .15s ease-in-out; }
+
+/* ===== BUTTON Dynamic Accent + Glow on hover/focus ===== */
+#modalForm button,
+#modalForm .btn-primary {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border: none !important;
+}
+#modalForm button:hover, #modalForm button:focus,
+#modalForm .btn-primary:hover, #modalForm .btn-primary:focus {
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 25%, transparent);
+  filter: brightness(1.02);
+}
+#modalForm .btn-secondary, #modalForm .btn-close {
+  background: transparent !important;
+  color: var(--accent) !important;
+  border: 1.5px solid var(--accent) !important;
+}
+#modalForm .btn-secondary:hover, #modalForm .btn-close:hover {
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+/* keep everything else untouched */
+</style>
+
+<style>
+/* v34-validation.css */
+:root {
+  --v34-danger: #ef4444;
+  --v34-danger-ring: rgba(239, 68, 68, 0.25);
+}
+.v34-invalid {
+  border-color: var(--v34-danger) !important;
+  box-shadow: 0 0 0 3px var(--v34-danger-ring) !important;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+.v34-shake {
+  animation: v34-shake 0.25s ease;
+}
+@keyframes v34-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-2px); }
+  40% { transform: translateX(2px); }
+  60% { transform: translateX(-1.5px); }
+  80% { transform: translateX(1.5px); }
+}
+.v34-label-invalid {
+  color: var(--v34-danger) !important;
+}
+.v34-error {
+  font-size: 12px;
+  color: var(--v34-danger);
+  margin-top: 4px;
+  display: none;
+}
+.v34-error.show {
+  display: block;
+}
+</style>
+<style>
+/* v35-success-pulse.css */
+@keyframes successPulse {
+  0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
+  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+}
+.success-pulse {
+  animation: successPulse 0.8s ease-out;
+  border-color: #22c55e !important;
+}
+.success-icon {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  color: #22c55e;
+  font-size: 22px;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.3s ease;
+}
+.success-icon.show {
+  opacity: 1;
+  transform: scale(1);
+}
+</style>
+
+<style>
+body {
+  background: #f2f6fb !important;
+}
+
+.main-container {
+  width: clamp(92%, 94%, 96%);
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: clamp(14px, 1.8vw, 24px);
+}
+@media (max-width: 1024px) {
+  .main-container {
+    width: 96%;
+    padding: 12px;
+  }
+}
+@media (max-width: 768px) {
+  .main-container {
+    width: 98%;
+    padding: 8px;
+  }
+}
+
+.card {
+  border-radius: 12px !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
+}
+</style>
+
+
+<style>
+/* === PATCH LAYOUT PROPORSIONAL FINAL === */
+.main-container {
+  width: 90% !important;
+  max-width: 1280px !important;
+  margin-left: 40px !important;
+  margin-right: auto !important;
+  padding: 20px !important;
+}
+
+/* Responsif otomatis */
+@media (max-width: 1280px) {
+  .main-container {
+    width: 94% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding: 16px !important;
+  }
+}
+@media (max-width: 768px) {
+  .main-container {
+    width: 98% !important;
+    margin: 0 auto !important;
+    padding: 10px !important;
+  }
+}
+</style>
+
+
+<style>
+
+/* === KPI MASTER SALDO AKUN === */
+.kpi-saldo-akun {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 6px;
+  scroll-behavior: smooth;
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.kpi-saldo-akun::-webkit-scrollbar {
+  display: none; /* auto-hide scrollbar (modern style) */
+}
+
+/* === JARAK ANTAR BAGIAN === */
+section {
+  margin-bottom: 12px;
+}
+
+/* === TITLE SALDO AKUN === */
+.kpi-saldo-title {
+  background: #f7f9fb;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+/* === KPI MASTER SALDO AKUN (tetap auto-hide scroll) === */
+.kpi-saldo-akun {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 6px;
+  scroll-behavior: smooth;
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.kpi-saldo-akun::-webkit-scrollbar {
+  display: none; /* auto-hide scrollbar (modern style) */
+}
+
+/* === SPASI ANTAR BAGIAN === */
+section {
+  margin-bottom: 12px;
+}
+
+/* === TITLE SALDO AKUN === */
+.kpi-saldo-title {
+  background: #f7f9fb;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+</style>
+
+
+<style>
+
+
+/* === KEEP KPI SALDO AUTO SCROLL === */
+.kpi-saldo-akun {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 6px;
+  scroll-behavior: smooth;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.kpi-saldo-akun::-webkit-scrollbar {
+  display: none;
+}
+
+/* === SPACING BETWEEN SECTIONS === */
+section {
+  margin-bottom: 12px;
+}
+
+/* === TITLE SALDO AKUN === */
+.kpi-saldo-title {
+  background: #f7f9fb;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+</style>
+
+
+<style>
+/* === TOPBAR MENGERUCUT RESPONSIF (v35n) === */
+.branchbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 6px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  transition: all 0.3s ease;
+}
+
+.bb-select, .bb-now {
+  flex-shrink: 0;
+}
+
+.user-role {
+  flex: 1 1 auto;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: clamp(120px, 30%, 220px);
+}
+
+/* === LAYAR SEDANG (tablet) === */
+@media (max-width: 1024px) {
+  .branchbar {
+    padding: 6px 14px;
+    gap: 8px;
+  }
+  .bb-select, .bb-now {
+    font-size: 14px;
+  }
+  .user-role {
+    font-size: 13px;
+    max-width: 160px;
+  }
+}
+
+/* === LAYAR KECIL (HP) === */
+@media (max-width: 768px) {
+  .branchbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 10px;
+  }
+  .bb-select, .bb-now {
+    font-size: 13px;
+  }
+  .user-role {
+    text-align: left;
+    font-size: 12px;
+    max-width: 140px;
+  }
+}
+</style>
+
+
+<style>
+/* === v35o — RESPONSIVE FULL LAYOUT PATCH === */
+
+/* 0) Global container guard */
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+  transition: all 0.3s ease;
+}
+@media (max-width: 768px) {
+  .main-container { padding: 0 8px; }
+}
+
+/* 1) KPI Transaksi — support both .kpi-transaksi and legacy .kpi-grid */
+.kpi-transaksi, .kpi-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(25px, 1fr)) !important;
+  gap: 12px !important;
+  max-width: 1170px !important;
+  margin: 0 auto !important;
+  transition: all 0.3s ease;
+}
+@media (max-width: 1024px) {
+  .kpi-transaksi, .kpi-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+  }
+}
+@media (max-width: 768px) {
+  .kpi-transaksi, .kpi-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
+  }
+}
+
+/* 2) Total Aset — handle multiple naming variants */
+.total-aset, .total-asset, .totalAset {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 8px 16px;
+  transition: all 0.3s ease;
+}
+@media (max-width: 768px) {
+  .total-aset, .total-asset, .totalAset {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+}
+
+/* 3) KPI Master Saldo Akun — horizontal scroll + responsive sizing */
+.kpi-saldo-akun, .kpiSaldoAkun, .saldo-akun-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 6px;
+  scroll-behavior: smooth;
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.kpi-saldo-akun::-webkit-scrollbar,
+.kpiSaldoAkun::-webkit-scrollbar,
+.saldo-akun-strip::-webkit-scrollbar { display: none; }
+
+/* item di dalam saldo akun (klausa generik agar kompatibel) */
+.kpi-saldo-akun > *, .kpiSaldoAkun > *, .saldo-akun-strip > * {
+  flex: 0 0 auto;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+@media (max-width: 768px) {
+  .kpi-saldo-akun > *, .kpiSaldoAkun > *, .saldo-akun-strip > * {
+    padding: 4px 10px;
+    font-size: 13px;
+  }
+}
+
+/* 4) Tabel Riwayat — responsive font + safe horizontal scroll */
+.table-riwayat, .tx-table-wrap, .history-table-wrap {
+  overflow-x: auto;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.table-riwayat table, .tx-table-wrap table, .history-table-wrap table, .main-container table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+@media (max-width: 768px) {
+  .table-riwayat table, .tx-table-wrap table, .history-table-wrap table, .main-container table {
+    font-size: 13px;
+  }
+  .table-riwayat th, .table-riwayat td,
+  .tx-table-wrap th, .tx-table-wrap td,
+  .history-table-wrap th, .history-table-wrap td {
+    padding: 6px;
+  }
+}
+
+/* 5) Topbar from v35n stays responsive (no change); ensure it centers within 1200px */
+.branchbar {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+</style>
+
+
+<style>
+/* v35p4: Table border tegas biru Amko + jarak ticker */
+table, th, td { border: 1.0px solid #1d4ed8 !important; border-collapse: collapse !important; }
+.card + .ticker { margin-top: 12px !important; }
+</style>
+
+
+<style>
+/* v35p5: teks tabel jelas + hover lembut */
+thead th { color: #b91c1c !important; font-weight: 700 !important; }
+tbody td { color: #111827 !important; font-weight: 600 !important; }
+tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s ease; }
+</style>
+
+
+
+<style>
+/* === PATCH v35p9: Ticker Biru Muda & Spasi Lega === */
+.ticker {
+  background: #fff;
+  color: #222222 !important; /* light blue */
+  font-weight: 800 !important;
+  font-size: 16px !important;
+  border-bottom: 2px solid #60a5fa !important;
+  padding: 10px 0 !important;
+  margin-bottom: 16px !important;
+}
+.ticker-rail {
+  gap: 40px !important;
+}
+.asset-main {
+  margin-top: 10px !important;
+  margin-bottom: 18px !important;
+}
+#kpiSaldoWrap {
+  margin-top: 14px !important;
+}
+</style>
+
 </head>
 <body>
 <div class="layout">
@@ -206,21 +1462,15 @@
       <span id="userRole" class="user-role">-</span>
     </div>
 
-    <!-- === TEKS BERJALAN (MOTIVASI) === -->
-    <div class="ticker" id="tickerBar" aria-live="polite">
-      <div class="ticker-rail" id="tickerRail">
-        <span class="ticker-chunk" id="tickerA">Memuat motivasi…</span>
-        <span class="ticker-chunk" id="tickerB">Memuat motivasi…</span>
-      </div>
-    </div>
+    <!-- === TEKS BERJALAN (MOTIVASI) === --></div>
 
     <!-- Content -->
-    <div class="grid">
+    <div class="main-container">
+  <div class="grid">
       <!-- KPI Transaksi -->
       <div class="card">
         <h3>KPI Transaksi <span id="kpiTglLabel" class="bb-now" style="margin-left:8px">Hari ini</span></h3>
         <div class="kpi-grid">
-          <!-- urutan dibuat mirip eLink -->
           <div class="kpi blue">
             <div class="ic">🔁</div>
             <div class="meta"><h4>TRANSFER</h4><div class="val" id="kpi_transfer">Rp 0</div></div>
@@ -247,6 +1497,14 @@
           </div>
         </div>
       </div>
+
+      
+    <div class="ticker" id="tickerBar" aria-live="polite">
+      <div class="ticker-rail" id="tickerRail">
+        <span class="ticker-chunk" id="tickerA">Memuat motivasi…</span>
+        <span class="ticker-chunk" id="tickerB">Memuat motivasi…</span>
+      </div>
+    
 
       <!-- Asset bar -->
       <div class="card">
@@ -275,6 +1533,7 @@
             <option value="transfer">Transfer</option>
             <option value="pulsa">Pulsa / Kuota</option>
             <option value="jasa">Jasa ATM</option>
+            <option value="fee_brilink">Fee Brilink</option>
           </select>
           <select id="fltRek" class="sel"><option value="">Semua Rek/Server</option></select>
 
@@ -287,7 +1546,7 @@
 
         <div id="totalTransaksi" style="margin:6px 0;font-weight:bold;">Jumlah Total Transaksi = 0</div>
 
-        <div style="overflow:auto;border:1px solid var(--border);border-radius:12px">
+        <div class="table-wrapper" style="border:1px solid var(--border);border-radius:12px">
           <table>
             <thead>
               <tr>
@@ -319,13 +1578,25 @@
     </div>
   </div>
 </div>
+</div>
+
+<!-- ===== Loading Overlay (global) ===== -->
+<div class="loading-overlay" id="loadingOverlay" aria-live="polite" aria-busy="true">
+  <div class="loading-card">
+    <div class="spinner" aria-hidden="true"></div>
+    <div>
+      <div class="loading-text">Memuat data…</div>
+      <div class="loading-sub" id="loadingSub">Mengambil riwayat transaksi</div>
+    </div>
+  </div>
+</div>
 
 <!-- ===== Modals ===== -->
 <div class="modal" id="modalJenis">
   <div class="dialog">
     <div class="dlg-hd">
       <span>Pilih Jenis Transaksi</span>
-      <button class="btn btn-ghost" id="xJenis" style="height:40px">✖</button>
+      <button class="btn btn-ghost btn-sm" id="xJenis" style="height:40px">✖</button>
     </div>
     <div class="dlg-bd" style="padding:16px">
       <div style="display:grid;gap:10px">
@@ -333,6 +1604,7 @@
         <button class="btn-sm btn-ghost" style="height:48px;font-size:15px" data-pilih="transfer">Transfer</button>
         <button class="btn-sm btn-ghost" style="height:48px;font-size:15px" data-pilih="pulsa">Pulsa / Kuota</button>
         <button class="btn-sm btn-ghost" style="height:48px;font-size:15px" data-pilih="jasa">Jasa ATM</button>
+        <button class="btn-sm btn-ghost" style="height:48px;font-size:15px" data-pilih="fee_brilink">Fee Brilink</button>
       </div>
     </div>
   </div>
@@ -342,9 +1614,9 @@
   <div class="dialog">
     <div class="dlg-hd">
       <span id="dlgTitle">Form Transaksi</span>
-      <button class="btn btn-ghost" id="xForm" style="height:40px">✖</button>
+      <button class="btn btn-ghost btn-sm" id="xForm" style="height:40px">✖</button>
     </div>
-    <div class="dlg-bd">
+    <div class="dlg-bd" data-validate="true">
       <div id="msgErr" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:10px;border-radius:10px"></div>
 
       <div class="row">
@@ -361,18 +1633,18 @@
       <div class="row" id="rowSumber">
         <div>
           <label>Sumber Dana</label>
-          <div class="icon-input"><span>↗️</span><select id="f_sumber"></select></div>
+          <div class="icon-input"><span>↗️</span><select id="f_sumber" required></select></div>
         </div>
         <div>
           <label>Terima Dana</label>
-          <div class="icon-input"><span>↘️</span><select id="f_terima"></select></div>
+          <div class="icon-input"><span>↘️</span><select id="f_terima" required></select></div>
         </div>
       </div>
 
       <div class="row" id="rowNominal">
         <div>
           <label id="labelNominal">Nominal (Rp)</label>
-          <div class="icon-input"><span>Rp</span><input id="f_nom" inputmode="numeric" placeholder="0" /></div>
+          <div class="icon-input"><span>Rp</span><input id="f_nom" required inputmode="numeric" placeholder="0" /></div>
         </div>
       </div>
 
@@ -414,12 +1686,12 @@
 
       <div>
         <label>Keterangan (wajib diisi, mis. No HP / No Ref)</label>
-        <div class="icon-input"><input id="f_ket" type="text" maxlength="50" placeholder="contoh: 081234567890" required /></div>
+        <div class="icon-input"><input id="f_ket" required type="text" maxlength="50" placeholder="contoh: 081234567890" required /></div>
       </div>
     </div>
     <div class="dlg-ft">
-      <button class="btn btn-ghost" id="batalForm">Batal</button>
-      <button class="btn btn-primary" id="simpanForm">Simpan</button>
+      <button class="btn btn-ghost btn-sm" id="batalForm">Batal</button>
+      <button class="btn btn-primary btn-sm" id="simpanForm">Simpan</button>
     </div>
   </div>
 </div>
@@ -436,6 +1708,14 @@
   const fmtRp  = n => "Rp " + new Intl.NumberFormat('id-ID').format(Number(n||0))
   const fmtNum = n => new Intl.NumberFormat('id-ID').format(Number(n||0))
   const parseNum = v => Number(String(v||'').replace(/[^0-9]/g,''))||0
+
+  // === Generator ID Trx 9 karakter ===
+  function genIdTrx() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let id = '';
+    for (let i = 0; i < 9; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
+    return id;
+  }
 
   const getActive = ()=>({ code: localStorage.getItem('current_branch_code')||'', name: localStorage.getItem('current_branch_name')||'' })
   const setActive = (code,name)=>{ localStorage.setItem('current_branch_code',code||''); localStorage.setItem('current_branch_name',name||'') }
@@ -462,7 +1742,27 @@
   const saldoSum = { cash:0, rek:0, asset:0, server:0 }
   let waRekeningList = [], waServerList = [], waCashList = []
 
-  /* ====== Ticker Motivasi (rapi) ====== */
+  /* ===== Loading Overlay Helpers ===== */
+  function showLoading(on=true, sub='Memuat data…'){
+    const ol = $('loadingOverlay'); if(!ol) return
+    $('loadingSub').textContent = sub || 'Memuat data…'
+    ol.classList.toggle('show', !!on)
+    document.body.style.overflow = on ? 'hidden' : 'auto'
+  }
+
+  
+
+/* ===== Toast Notification ===== */
+function showToast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ====== Ticker Motivasi ====== */
   const TICKER_QUOTES = [
     "Fokus pada proses, hasil akan menyusul",
     "Disiplin kecil hari ini jadi lompatan besar esok",
@@ -480,7 +1780,7 @@
   let _tickerIndex = 0
 
   function buildQuoteLine(){
-    const MAX_PER_LOOP = 2;  // tampilkan 4 quote per putaran (biar tidak kepanjangan)
+    const MAX_PER_LOOP = 2;
     const ordered=[]
     for(let i=0;i<MAX_PER_LOOP;i++){
       ordered.push(TICKER_QUOTES[(_tickerIndex+i)%TICKER_QUOTES.length])
@@ -497,11 +1797,10 @@
   }
   function updateTicker(){
     const a = document.getElementById('tickerA')
+    a.textContent = buildQuoteLine()
     const b = document.getElementById('tickerB')
+    b.textContent = a.textContent
     const rail = document.getElementById('tickerRail')
-    if(!a || !b || !rail) return
-    const msg = buildQuoteLine()
-    a.textContent = msg; b.textContent = msg
     rail.style.animation = 'none'; void rail.offsetWidth
     adjustTickerLayout()
     rail.style.animation = `ticker-marquee var(--ticker-speed) linear infinite`
@@ -575,9 +1874,12 @@
 
   async function refreshByRange(){
     page=0
+    showLoading(true, 'Menghitung KPI & memuat saldo akun')
     await loadKPITransaksi()
     await loadKPISaldo()
+    showLoading(true, 'Mengambil riwayat transaksi')
     await loadRiwayat()
+    showLoading(false)
   }
 
   async function loadAccounts(){
@@ -618,6 +1920,9 @@
       if(r.jenis==='tarik')     tarik+=n
       else if(r.jenis==='transfer') transfer+=n
       else if(r.jenis==='jasa') opr += al
+      /* Fee Brilink tidak memengaruhi omset/transfer/tarik, hanya cash-in ke laci:
+         bisa dibiarkan di luar KPI utama agar tidak bias. */
+      if(r.jenis==='fee_brilink'){ /* optional akumulasi khusus jika ingin ditampilkan */ }
       omset+=n; fee+=fb; profit += (ad+al-fb)
     }
     $('kpi_omset').textContent=fmtRp(omset)
@@ -810,8 +2115,8 @@
   }
 
   // Pagination
-  $('btnPrev').onclick=async()=>{ if(page>0){ page--; await loadRiwayat() } }
-  $('btnNext').onclick=async()=>{ if((page+1)*pageSize < totalRows){ page++; await loadRiwayat() } }
+  $('btnPrev').onclick=async()=>{ if(page>0){ page--; showLoading(true,'Memuat halaman sebelumnya'); await loadRiwayat(); showLoading(false) } }
+  $('btnNext').onclick=async()=>{ if((page+1)*pageSize < totalRows){ page++; showLoading(true,'Memuat halaman berikutnya'); await loadRiwayat(); showLoading(false) } }
 
   // Modal jenis
   document.getElementById('btnTambah').onclick=()=>$('modalJenis').classList.add('show')
@@ -823,42 +2128,160 @@
 
   // Helpers form
   function fillSelect(sel, items){ sel.innerHTML=(items||[]).map(i=>`<option value="${i.id}">${i.name}</option>`).join('') || '<option value="">(Tidak ada opsi)</option>' }
-  const findLaci = ()=> (cacheAcc.cash||[]).find(a=>/laci/i.test(a.name||'')) || null
+  const findLaci = ()=> {
+  const all = (cacheAcc.cash||[]);
+  return all.find(a=>/laci|cash/i.test(a.name||'')) || all[0] || null;
+}
 
-  function setupForm(jenis){
-    $('dlgTitle').textContent=`Form ${jenis.toUpperCase()}`
-    $('f_jenis').value=jenis; $('f_branch').value=viewBranch
-    ;['f_nom','f_admin_dalam','f_admin_luar','f_admin_luar_only','f_fee_bank','f_ket','f_modal','f_jual'].forEach(id=>{const el=$(id); if(el) el.value=''})
+  
+  
 
-    const sumber=$('f_sumber'), terima=$('f_terima'), laci=findLaci()
-    $('rowNominal').style.display='none'; $('rowAdminDua').style.display='none'; $('rowAdminLuarOnly').style.display='none'; $('rowFeeBank').style.display='none'; $('rowPulsa').style.display='none'; $('rowSumber').style.display='grid'; $('labelNominal').textContent='Nominal (Rp)'
 
-    if(jenis==='tarik'){
-      fillSelect(sumber, laci?[laci]:[]); sumber.disabled=true
-      fillSelect(terima, cacheAcc.rekening||[]); terima.disabled=false
-      $('rowNominal').style.display='grid'; $('rowAdminDua').style.display='grid'
-    }else if(jenis==='transfer'){
-      const sumberList=[...(cacheAcc.rekening||[]), ...(cacheAcc.server_pulsa||[])]
-      fillSelect(sumber, sumberList); sumber.disabled=false
-      fillSelect(terima, laci?[laci]:[]); terima.disabled=true
-      $('rowNominal').style.display='grid'; $('rowAdminLuarOnly').style.display='grid'; $('rowFeeBank').style.display='grid'
-    }else if(jenis==='pulsa'){
-      const sumberList=[...(cacheAcc.rekening||[]), ...(cacheAcc.server_pulsa||[])]
-      fillSelect(sumber, sumberList); sumber.disabled=false
-      fillSelect(terima, laci?[laci]:[]); terima.disabled=true
-      $('rowPulsa').style.display='grid'
-    }else if(jenis==='jasa'){
-      $('rowSumber').style.display='none'
-      if(laci){ terima.innerHTML=`<option value="${laci.id}">${laci.name}</option>` }
-      $('rowAdminLuarOnly').style.display='grid'
+
+async function setupForm(jenis){
+  try {
+    if ((!cacheAcc.cash?.length || !cacheAcc.rekening?.length || !cacheAcc.server_pulsa?.length) && typeof loadAccounts === 'function') {
+      await loadAccounts();
+    }
+
+    $('dlgTitle').textContent = ({
+      transfer: '💸 Form TRANSFER',
+      tarik: '🏧 Form TARIK',
+      jasa: '⚙️ Form JASA',
+      pulsa: '📱 Form PULSA',
+      fee_brilink: '🏦 Form FEE BRILINK'
+    }[jenis] || ('Form ' + (jenis||'').toUpperCase()));
+
+    
+    
+    // v33: dynamic accent + data-jenis attribute for CSS targeting
+    try {
+      const accentColors = {
+        tarik: '#4CAF50',
+        transfer: '#2196F3',
+        pulsa: '#9C27B0',
+        'fee brilink': '#FFC107',
+        jasa: '#607D8B'
+      };
+      const color = accentColors[jenis] || '#2196F3';
+      document.documentElement.style.setProperty('--accent', color);
+      const modalEl = document.getElementById('modalForm');
+      if (modalEl) modalEl.setAttribute('data-jenis', String(jenis).toLowerCase());
+    } catch (_) {}
+// v25: dynamic accent color per jenis
+    try {
+      const accentColors = {
+        tarik: '#4CAF50',
+        transfer: '#2196F3',
+        pulsa: '#9C27B0',
+        fee_brilink: '#FFC107',
+        jasa: '#607D8B'
+      };
+      const color = accentColors[jenis] || '#2196F3';
+      document.documentElement.style.setProperty('--accent', color);
+    } catch (_) {}
+$('f_jenis').value = jenis;
+    $('f_branch').value = viewBranch;
+
+    ['f_nom','f_admin_dalam','f_admin_luar','f_admin_luar_only','f_fee_bank','f_ket','f_modal','f_jual']
+      .forEach(id => { const el = $(id); if (el) el.value = ''; });
+
+    const sumber = $('f_sumber');
+    const terima = $('f_terima');
+    const laci = (cacheAcc.cash || []).find(a => /laci|cash/i.test(a.name||'')) || (cacheAcc.cash||[])[0] || null;
+
+    // Reset default
+    $('rowSumber').style.display = 'grid';
+    $('rowNominal').style.display = 'none';
+    $('rowAdminDua').style.display = 'none';
+    $('rowAdminLuarOnly').style.display = 'none';
+    $('rowFeeBank').style.display = 'none';
+    $('rowPulsa').style.display = 'none';
+    $('labelNominal').textContent = 'Nominal (Rp)';
+    sumber.innerHTML = '<option value="">(Pilih akun sumber)</option>';
+    terima.innerHTML = '<option value="">(Pilih akun tujuan)</option>';
+    if (sumber) sumber.disabled = false;
+    if (terima) terima.disabled = false;
+    document.querySelectorAll('#rowSumber div').forEach(d => d.style.display = '');
+
+    // === TRANSFER ===
+    if (jenis === 'transfer') {
+      const sumberList = [...(cacheAcc.rekening||[]), ...(cacheAcc.server_pulsa||[])];
+      fillSelect(sumber, sumberList);
+      if (laci) {
+        terima.innerHTML = `<option value="${laci.id}">${laci.name}</option>`;
+        terima.disabled = true;
+      }
+      $('rowNominal').style.display = 'grid';
+      $('rowAdminDua').style.display = 'grid';
+      const adDalam = document.querySelector('#rowAdminDua div:first-child');
+      if (adDalam) adDalam.style.display = 'none';
+      $('rowFeeBank').style.display = 'grid';
+    }
+    // === TARIK ===
+    else if (jenis === 'tarik') {
+      fillSelect(sumber, (cacheAcc.cash||[]));
+      const dstList = [...(cacheAcc.rekening||[]), ...(cacheAcc.server_pulsa||[])];
+      fillSelect(terima, dstList);
+      $('rowNominal').style.display = 'grid';
+      $('rowAdminDua').style.display = 'grid';
+      // ✅ Pastikan kedua kolom Admin Dalam & Admin Luar muncul
+      const adDalam = document.querySelector('#rowAdminDua div:first-child');
+      const adLuar  = document.querySelector('#rowAdminDua div:last-child');
+      if (adDalam) adDalam.style.display = '';
+      if (adLuar)  adLuar.style.display = '';
+    }
+    // === JASA ===
+    else if (jenis === 'jasa') {
+      $('rowSumber').style.display = 'none';
+      $('rowNominal').style.display = 'none';
+      $('rowAdminLuarOnly').style.display = 'grid';
+      if (laci) {
+        terima.innerHTML = `<option value="${laci.id}">${laci.name}</option>`;
+        terima.disabled = true;
+      }
+    }
+    // === PULSA ===
+    else if (jenis === 'pulsa') {
+      fillSelect(sumber, (cacheAcc.server_pulsa||[]));
+      if (laci) {
+        terima.innerHTML = `<option value="${laci.id}">${laci.name}</option>`;
+        terima.disabled = true;
+      }
+      $('rowPulsa').style.display = 'grid';
+    }
+    // === FEE BRILINK ===
+    else if (jenis === 'fee_brilink') {
+      $('rowSumber').style.display = 'grid';
+      const srcField = document.querySelector('#rowSumber div:first-child');
+      if (srcField) srcField.style.display = 'none';
+      const dstField = document.querySelector('#rowSumber div:last-child');
+      if (dstField) dstField.style.display = '';
+      fillSelect(terima, (cacheAcc.rekening || []));
+      terima.disabled = false;
+      $('rowNominal').style.display = 'grid';
+      $('labelNominal').textContent = 'Nominal Fee (Rp)';
+    }
+
+  } catch (e) {
+    console.error('setupForm error:', e);
+    const box = $('msgErr');
+    if (box) {
+      box.style.display = 'block';
+      box.textContent = 'Gagal membuka form: ' + (e && e.message ? e.message : e);
     }
   }
+}
+
+
+
+
 
   // Eksklusif admin dalam/luar untuk TARIK
   $('f_admin_dalam').addEventListener('input',()=>{ if(parseNum($('f_admin_dalam').value)>0) $('f_admin_luar').value='' })
   $('f_admin_luar').addEventListener('input',()=>{ if(parseNum($('f_admin_luar').value)>0) $('f_admin_dalam').value='' })
 
-  // CRUD
+  // CRUD (edit/hapus)
   document.addEventListener('click', async (e)=>{
     const actBtn = e.target.closest('button[data-act]')
     if(!actBtn) return
@@ -878,67 +2301,91 @@
       $('f_nom').value=fmtNum(row.nominal||0); $('f_admin_dalam').value=fmtNum(row.admin_dalam||0); $('f_admin_luar').value=fmtNum(row.admin_luar||0); $('f_fee_bank').value=fmtNum(row.fee_bank||0); $('f_ket').value=row.note||''
       if(row.jenis==='pulsa'){ $('f_modal').value=fmtNum(row.nominal||0); $('f_jual').value=fmtNum((row.nominal||0)+(row.admin_luar||0)) }
       if(row.jenis==='jasa'){ $('f_admin_luar_only').value=fmtNum(row.admin_luar||0) }
+      if(row.jenis==='fee_brilink'){ /* tak perlu field tambahan */ }
       $('modalForm').classList.add('show')
     }
   })
 
-  // Simpan
+  // Simpan (insert/update)
+  
   $('simpanForm').onclick = async ()=>{
     const jenis=$('f_jenis').value, branch=viewBranch, sumber=$('f_sumber').value||null, terima=$('f_terima').value||null, note=$('f_ket').value.trim()
-    const findLaci=()=> (cacheAcc.cash||[]).find(a=>/laci/i.test(a.name||''))||null
+    const findLaci = ()=> {
+  const all = (cacheAcc.cash||[]);
+  return all.find(a=>/laci|cash/i.test(a.name||'')) || all[0] || null;
+}
     try{
       if(!note) throw new Error('Keterangan wajib diisi (mis. No HP / No Ref).')
-      let row={ branch_code:branch, jenis, src_account_id:sumber, dst_account_id:terima, nominal:0, admin_dalam:0, admin_luar:0, fee_bank:0, note }
+      const laci=findLaci()
+      let row={ id: genIdTrx(), branch_code:branch, jenis, src_account_id:null, dst_account_id:null, nominal:0, admin_dalam:0, admin_luar:0, fee_bank:0, note }
 
-      if(jenis==='tarik'){
-        if(!terima) throw new Error('Terima Dana (rekening) wajib diisi.')
-        const laci=findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai.')
-        row.src_account_id=laci.id
-        const nominal=parseNum($('f_nom').value), ad=parseNum($('f_admin_dalam').value), al=parseNum($('f_admin_luar').value)
-        if(nominal<=0) throw new Error('Nominal harus > 0.')
-        if(ad>0 && al>0) throw new Error('Isi salah satu: Admin Dalam ATAU Admin Luar.')
-        row.nominal=nominal; row.admin_dalam=ad>0?ad:0; row.admin_luar=al>0?al:0; row.fee_bank=0
-      }
-      else if(jenis==='transfer'){
-        if(!sumber) throw new Error('Sumber Dana (rekening/server) wajib diisi.')
-        const laci=findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai.')
-        row.dst_account_id=laci.id
+      if(jenis==='transfer'){
+        if(!sumber) throw new Error('Sumber Dana (rekening/server) wajib dipilih.')
+        if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai.')
+        row.src_account_id=sumber; row.dst_account_id=laci.id
         const nominal=parseNum($('f_nom').value), al=parseNum($('f_admin_luar_only').value), fb=parseNum($('f_fee_bank').value)
         if(nominal<=0) throw new Error('Nominal harus > 0.')
-        row.nominal=nominal; row.admin_dalam=0; row.admin_luar=al; row.fee_bank=fb
+        row.nominal=nominal; row.admin_luar=al>0?al:0; row.fee_bank=fb>0?fb:0; row.admin_dalam=0
       }
+      // v35p10-patch-start
+else if (jenis==='tarik'){
+  if(!terima) throw new Error('Terima Dana wajib dipilih.');
+  if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai.');
+  const nominal=parseNum($('f_nom').value);
+  const ad=parseNum($('f_admin_dalam').value);
+  const al=parseNum($('f_admin_luar').value);
+  if(ad>0 && al>0) throw new Error('Isi salah satu: Admin Dalam ATAU Admin Luar.');
+  if(nominal<=0) throw new Error('Nominal harus > 0.');
+
+  // 🧩 Admin Dalam — fee dipotong dari saldo pelanggan
+  if(ad>0){
+    row.src_account_id=laci.id;
+    row.dst_account_id=terima;
+    row.nominal=nominal;
+    row.admin_dalam=ad;
+    // Laci -500k, Rekening +505k, Profit +5k
+  }
+  // 🧮 Admin Luar — fee dibayar tunai oleh pelanggan
+  else if(al>0){
+    row.src_account_id=laci.id;
+    row.dst_account_id=terima;
+    row.nominal=nominal;
+    row.admin_luar=al;
+    // Laci -500k +5k cash = net -495k, Rekening +500k, Profit +5k
+  }
+}
+// v35p10-patch-end
+else if(jenis==='jasa'){
+  if(laci){ fillSelect(terima,[laci]); terima.disabled=true }
+  $('rowNominal').style.display='none'       // sembunyikan kolom nominal
+  $('rowAdminLuarOnly').style.display='grid' // tampilkan hanya admin luar
+}
       else if(jenis==='pulsa'){
-        if(!sumber) throw new Error('Sumber Dana (rekening/server) wajib diisi.')
-        const laci=findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai.')
-        row.dst_account_id=laci.id
+        if(!sumber) throw new Error('Sumber Dana (rekening/server) wajib dipilih.')
+        if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai.')
         const modal=parseNum($('f_modal').value), jual=parseNum($('f_jual').value)
         if(modal<=0) throw new Error('Modal harus > 0.')
         if(jual<modal) throw new Error('Jual tidak boleh kurang dari Modal.')
         const margin=Math.max(jual-modal,0)
+        row.src_account_id=sumber; row.dst_account_id=laci.id
         row.nominal=modal; row.admin_dalam=0; row.admin_luar=margin; row.fee_bank=0
       }
-      else if(jenis==='jasa'){
-        const laci=findLaci(); if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai.')
-        row.src_account_id=null; row.dst_account_id=laci.id
-        const al=parseNum($('f_admin_luar_only').value)
-        if(al<=0) throw new Error('Fee Admin (Admin Luar) harus > 0.')
-        row.nominal=0; row.admin_luar=al; row.admin_dalam=0; row.fee_bank=0
-      }
-
-      if(editMode && editId){
-        const { error:delErr } = await supabase.from('transactions').delete().eq('id',editId)
-        if(delErr) throw new Error('Gagal hapus data lama: '+delErr.message)
+      else if(jenis==='fee_brilink'){
+        if(!terima) throw new Error('Terima Dana wajib dipilih.')
+        row.src_account_id=null; row.dst_account_id=terima
+        const fee=parseNum($('f_nom').value)
+        if(fee<=0) throw new Error('Nominal Fee harus > 0.')
+        row.nominal=0; row.admin_dalam=fee; row.admin_luar=0; row.fee_bank=0
       }
 
       const { error } = await supabase.from('transactions').insert(row)
       if(error) throw error
-
+      alert('Berhasil disimpan!')
       $('modalForm').classList.remove('show'); editMode=false; editId=null
       await refreshByRange()
-    }catch(e){
-      const m=$('msgErr'); m.textContent='Gagal simpan: '+(e.message||e); m.style.display='block'; setTimeout(()=>m.style.display='none',3000)
-    }
+    }catch(e){ alert('Gagal: '+(e.message||e)) }
   }
+
 
   // Branch bar
   async function initBranchBar(){
@@ -983,7 +2430,9 @@
       const name = sel.options[sel.selectedIndex]?.text || code
       if(!code) return
       setActive(code, name); lbl.textContent = name; viewBranch = code
+      showLoading(true,'Mengganti cabang & memuat data')
       await loadAccounts(); await populateFilterOptions(); await refreshByRange()
+      showLoading(false)
     }
   }
 
@@ -1069,5 +2518,302 @@
   // Start
   boot()
 </script>
+<div id="toast" class="toast"></div>
+
+<script id="v7-compact-js">
+// === v7 Floating Labels helpers ===
+function v7_markFilled(container){
+  const inp = container.querySelector('input, select, textarea');
+  if(!inp) return;
+  if((inp.tagName==='SELECT' && inp.value) || (inp.value && String(inp.value).trim()!=='')){
+    container.classList.add('filled');
+  }else{
+    container.classList.remove('filled');
+  }
+}
+function v7_applyFloating(){
+  // Each field container is .dlg-bd .row > div
+  document.querySelectorAll('#modalForm .dlg-bd .row > div').forEach(div=>{
+    const inp = div.querySelector('input, select, textarea');
+    if(!inp) return;
+    // add placeholder spacer for inputs to enable :placeholder-shown behavior if needed
+    if(inp.tagName==='INPUT' && !inp.getAttribute('placeholder')) inp.setAttribute('placeholder',' ');
+    // initial state
+    v7_markFilled(div);
+    // wire events
+    ['change','input','blur'].forEach(ev=> inp.addEventListener(ev, ()=>v7_markFilled(div)));
+  });
+}
+// run once on load
+document.addEventListener('DOMContentLoaded', ()=>{
+  v7_applyFloating();
+});
+</script>
+
+
+<!-- v26 helpers: floating labels + select value tracking -->
+<script>
+(function(){
+  // Called after setupForm renders fields
+  const initFloating = () => {
+    try {
+      const modal = document.getElementById('modalForm');
+      if (!modal) return;
+      const boxes = modal.querySelectorAll('#rowSumber > div, #rowAdminDua > div, #rowPulsa > div, #rowNominal, #rowAdminLuarOnly, #rowFeeBank, .form-group');
+      boxes.forEach(box => {
+        const lbl = box.querySelector('label');
+        const ctrl = box.querySelector('input, select, textarea');
+        if (!lbl || !ctrl) return;
+        box.classList.add('v26-field');
+        if ((ctrl.tagName === 'INPUT' || ctrl.tagName === 'TEXTAREA') && !ctrl.hasAttribute('placeholder')) {
+          ctrl.setAttribute('placeholder', ' ');
+        }
+        if (ctrl.tagName === 'SELECT') {
+          const setHasValue = () => {
+            if (ctrl.value && ctrl.value !== '') ctrl.setAttribute('data-hasvalue', '1');
+            else ctrl.setAttribute('data-hasvalue', '0');
+          };
+          ctrl.addEventListener('change', setHasValue);
+          setHasValue();
+        }
+      });
+    } catch (e) {
+      console.warn('v26 floating init error:', e);
+    }
+  };
+
+  // Expose/override hook used by previous versions
+  window.v7_applyFloating = initFloating;
+
+  // Also run once on DOM ready (in case modal initially open)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFloating);
+  } else {
+    initFloating();
+  }
+})();
+</script>
+
+<script>
+/* v34-validation.js */
+(function(){
+  function isVisible(el){
+    const s = getComputedStyle(el);
+    return s.display !== 'none' && s.visibility !== 'hidden' && el.offsetParent !== null;
+  }
+  function markInvalid(i,msg){
+    i.classList.add('v34-invalid','v34-shake');
+    let l=i.previousElementSibling;
+    if(l && l.tagName.toLowerCase()==='label') l.classList.add('v34-label-invalid');
+    let e=i.parentElement.querySelector('.v34-error');
+    if(!e){
+      e=document.createElement('div');
+      e.className='v34-error';
+      i.parentElement.appendChild(e);
+    }
+    e.textContent=msg||'Wajib diisi';
+    e.classList.add('show');
+    setTimeout(()=>i.classList.remove('v34-shake'),300);
+  }
+  function clearInvalid(i){
+    i.classList.remove('v34-invalid');
+    let l=i.previousElementSibling;
+    if(l) l.classList.remove('v34-label-invalid');
+    let e=i.parentElement.querySelector('.v34-error');
+    if(e) e.classList.remove('show');
+  }
+  function isRequired(i){
+    return i.hasAttribute('required') || i.dataset.required==='true';
+  }
+  function isEmpty(i){
+    if(i.disabled || i.readOnly || !isVisible(i)) return false;
+    return (i.value || '').trim() === '';
+  }
+  document.addEventListener('submit', e => {
+    const f = e.target;
+    if(!f.matches('[data-validate="true"]')) return;
+    let inv = null;
+    f.querySelectorAll('input,select,textarea').forEach(i => {
+      if(isRequired(i) && isEmpty(i)){
+        markInvalid(i);
+        if(!inv) inv = i;
+      } else clearInvalid(i);
+    });
+    if(inv){
+      e.preventDefault();
+      inv.focus();
+      f.classList.add('v34-shake');
+      setTimeout(()=>f.classList.remove('v34-shake'),300);
+    }
+  });
+  document.addEventListener('input', e => {
+    const i = e.target;
+    if(isRequired(i) && !isEmpty(i)) clearInvalid(i);
+  });
+})();
+</script>
+<script>
+/* v35-success-pulse.js */
+function showSuccessPulse(form) {
+  if (!form) return;
+  form.classList.add('success-pulse');
+  let icon = form.querySelector('.success-icon');
+  if (!icon) {
+    icon = document.createElement('div');
+    icon.className = 'success-icon';
+    icon.textContent = '✅';
+    form.appendChild(icon);
+  }
+  icon.classList.add('show');
+  setTimeout(() => {
+    icon.classList.remove('show');
+    form.classList.remove('success-pulse');
+  }, 800);
+}
+</script>
 </body>
 </html>
+
+<!-- v35p COMPACT CARD PATCH -->
+<style>
+/* === PATCH v35p: Card KPI kecil & proporsional === */
+.kpi, .kpi-card {
+  width: 160px !important;
+  height: 80px !important;
+  padding: 8px 10px !important;
+  border-radius: 10px !important;
+  margin: 4px !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.kpi:hover, .kpi-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+.kpi h4, .kpi-card .kpi-title {
+  font-size: 12px !important;
+  margin-bottom: 4px !important;
+}
+.kpi .val, .kpi-card .kpi-value {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+.kpi-grid {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  justify-content: center !important;
+}
+@media (max-width: 768px) {
+  .kpi, .kpi-card {
+    width: 130px !important;
+    height: 70px !important;
+    padding: 6px 8px !important;
+  }
+  .kpi h4, .kpi-card .kpi-title { font-size: 11px !important; }
+  .kpi .val, .kpi-card .kpi-value { font-size: 13px !important; }
+}
+</style>
+
+<!-- v35p.1 FIX SALDO AKUN STYLE (kotak kecil horizontal) -->
+<style>
+#kpiSaldoWrap {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  gap: 8px !important;
+  scroll-behavior: smooth !important;
+  padding: 8px !important;
+  border-radius: 14px !important;
+}
+#kpiSaldoWrap > .kpi-card {
+  flex: 0 0 auto !important;
+  min-width: 160px !important;
+  max-width: 180px !important;
+  height: 70px !important;
+  border-radius: 12px !important;
+  padding: 8px 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: linear-gradient(180deg, var(--chip1), var(--chip2)) !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+#kpiSaldoWrap > .kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+#kpiSaldoWrap::-webkit-scrollbar {
+  height: 6px;
+}
+#kpiSaldoWrap::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 10px;
+}
+#kpiSaldoWrap::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+@media (max-width: 768px) {
+  #kpiSaldoWrap > .kpi-card {
+    min-width: 130px !important;
+    height: 65px !important;
+    font-size: 12px !important;
+  }
+}
+</style>
+
+<!-- v35p.2 FIX SALDO AKUN RATA KIRI -->
+<style>
+#kpiSaldoWrap {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  justify-content: flex-start !important;
+  overflow-x: auto !important;
+  gap: 8px !important;
+  scroll-behavior: smooth !important;
+  padding: 8px !important;
+  border-radius: 14px !important;
+}
+#kpiSaldoWrap > .kpi-card {
+  flex: 0 0 auto !important;
+  min-width: 160px !important;
+  max-width: 180px !important;
+  height: 70px !important;
+  border-radius: 12px !important;
+  padding: 8px 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: linear-gradient(180deg, var(--chip1), var(--chip2)) !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+#kpiSaldoWrap > .kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+#kpiSaldoWrap::-webkit-scrollbar {
+  height: 6px;
+}
+#kpiSaldoWrap::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 10px;
+}
+#kpiSaldoWrap::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+@media (max-width: 768px) {
+  #kpiSaldoWrap > .kpi-card {
+    min-width: 130px !important;
+    height: 65px !important;
+    font-size: 12px !important;
+  }
+}
+</style>
