@@ -1169,7 +1169,7 @@ section {
   gap: 8px;
   overflow-x: auto;
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 20 auto;
   padding-bottom: 6px;
   scroll-behavior: smooth;
   -ms-overflow-style: none;  /* IE/Edge */
@@ -1440,6 +1440,120 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
 }
 </style>
 
+
+<!-- v35p17-patch-start: KPI Transaksi Proporsional Full -->
+<style>
+/* === PATCH v35p17: KPI Transaksi Proporsional === */
+.kpi-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
+  gap: 12px !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.card h3 + .kpi-grid {
+  margin-top: 10px !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  width: 100% !important;
+}
+@media (max-width: 768px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+}
+@media (max-width: 480px) {
+  .kpi-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+/* Sesuaikan padding card supaya isi benar-benar rapat kiri-kanan */
+.card {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+/* Ikon & teks agar tetap proporsional */
+.kpi .ic {
+  width: 36px !important;
+  height: 36px !important;
+}
+.kpi .meta h4 { font-size: 16px !important; }
+.kpi .meta .val { font-size: 15px !important; }
+</style>
+<!-- v35p17-patch-end -->
+
+
+<!-- v35p18-patch-fullwidth-tight -->
+<style>
+/* === PATCH v35p18: Hapus batas kiri–kanan agar benar-benar full === */
+.main-container,
+.kpi-grid,
+.kpi-transaksi,
+.card {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Pastikan branchbar juga menempel sisi kiri-kanan */
+.branchbar {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+/* Untuk HP */
+@media (max-width: 768px) {
+  .main-container, .branchbar {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+}
+</style>
+
+
+<!-- v35p19-patch-edge-flush -->
+<style>
+/* === PATCH v35p19: Hilangkan padding & radius pada card KPI Transaksi === */
+
+/* Hilangkan padding & border radius khusus card KPI Transaksi */
+.card:has(.kpi-grid) {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  width: 100% !important;
+}
+
+/* Pastikan grid di dalamnya rapat penuh */
+.kpi-grid {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 10px !important;
+}
+
+/* Untuk menjaga tampilan tetap rapi di HP */
+@media (max-width: 768px) {
+  .card:has(.kpi-grid) {
+    border-radius: 0 !important;
+    padding: 0 !important;
+  }
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div class="layout">
@@ -1533,7 +1647,6 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
             <option value="transfer">Transfer</option>
             <option value="pulsa">Pulsa / Kuota</option>
             <option value="jasa">Jasa ATM</option>
-            <option value="fee_brilink">Fee Brilink</option>
           </select>
           <select id="fltRek" class="sel"><option value="">Semua Rek/Server</option></select>
 
@@ -1604,7 +1717,7 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
         <button class="btn-sm btn-ghost" style="height:48px;font-size:15px" data-pilih="transfer">Transfer</button>
         <button class="btn-sm btn-ghost" style="height:48px;font-size:15px" data-pilih="pulsa">Pulsa / Kuota</button>
         <button class="btn-sm btn-ghost" style="height:48px;font-size:15px" data-pilih="jasa">Jasa ATM</button>
-        <button class="btn-sm btn-ghost" style="height:48px;font-size:15px" data-pilih="fee_brilink">Fee Brilink</button>
+        
       </div>
     </div>
   </div>
@@ -1876,7 +1989,7 @@ function showToast(msg, isError=false) {
     page=0
     showLoading(true, 'Menghitung KPI & memuat saldo akun')
     await loadKPITransaksi()
-    await loadKPISaldo()
+    await refreshSaldoAkun()
     showLoading(true, 'Mengambil riwayat transaksi')
     await loadRiwayat()
     showLoading(false)
@@ -1939,7 +2052,7 @@ function showToast(msg, isError=false) {
     saldoSum.asset = totalAsset
     $('assetTotalValue').textContent = fmtRp(totalAsset)
   }
-  async function loadKPISaldo(){
+  async function refreshSaldoAkun(){
     const { data } = await supabase.from('accounts').select('id,name,account_type,branch_code,saldo').eq('branch_code', viewBranch).order('name')
 
     const cashArr = (data||[]).filter(a=>a.account_type==='cash')
@@ -2328,33 +2441,84 @@ $('f_jenis').value = jenis;
         row.nominal=nominal; row.admin_luar=al>0?al:0; row.fee_bank=fb>0?fb:0; row.admin_dalam=0
       }
       // v35p10-patch-start
+// === v35p30: Tarik Tunai Fee Logic Fix ===
+// Admin Dalam → fee masuk ke akun BANK (terima dana), +profit
+// Admin Luar  → fee masuk ke LACI TUNAI, +profit
 else if (jenis==='tarik'){
   if(!terima) throw new Error('Terima Dana wajib dipilih.');
   if(!laci) throw new Error('Tidak ditemukan akun Laci Tunai.');
-  const nominal=parseNum($('f_nom').value);
-  const ad=parseNum($('f_admin_dalam').value);
-  const al=parseNum($('f_admin_luar').value);
-  if(ad>0 && al>0) throw new Error('Isi salah satu: Admin Dalam ATAU Admin Luar.');
-  if(nominal<=0) throw new Error('Nominal harus > 0.');
 
-  // 🧩 Admin Dalam — fee dipotong dari saldo pelanggan
-  if(ad>0){
-    row.src_account_id=laci.id;
-    row.dst_account_id=terima;
-    row.nominal=nominal;
-    row.admin_dalam=ad;
-    // Laci -500k, Rekening +505k, Profit +5k
+  const nominal = parseNum($('f_nom').value);
+  const ad = parseNum($('f_admin_dalam').value);
+  const al = parseNum($('f_admin_luar').value);
+
+  if (nominal <= 0) throw new Error('Nominal harus > 0.');
+
+  // Transaksi utama: Laci → Bank (nominal pokok)
+  row.src_account_id = laci.id;
+  row.dst_account_id = terima;
+  row.nominal = nominal;
+  row.admin_dalam = ad > 0 ? ad : 0;
+  row.admin_luar  = al > 0 ? al : 0;
+  row.fee_bank    = 0;
+
+  // --- Mutasi tambahan untuk fee ---
+  // 1) Admin Dalam: fee menambah saldo akun BANK (terima dana)
+  if (ad > 0 && typeof mutasiArray !== 'undefined') {
+    mutasiArray.push({
+      jenis: 'Tambah',
+      account: terima,
+      nominal: ad,
+      note: 'Fee Admin Dalam (Tarik Tunai)'
+    });
   }
-  // 🧮 Admin Luar — fee dibayar tunai oleh pelanggan
-  else if(al>0){
-    row.src_account_id=laci.id;
-    row.dst_account_id=terima;
-    row.nominal=nominal;
-    row.admin_luar=al;
-    // Laci -500k +5k cash = net -495k, Rekening +500k, Profit +5k
+
+  // 2) Admin Luar: fee menambah saldo Laci Tunai
+  if (al > 0 && typeof mutasiArray !== 'undefined') {
+    mutasiArray.push({
+      jenis: 'Tambah',
+      account: laci.id,
+      nominal: al,
+      note: 'Fee Admin Luar (Tarik Tunai)'
+    });
+  }
+
+  // Profit bertambah dari kedua fee
+  if (typeof totalProfit !== 'undefined') {
+    
+totalProfit += (ad + al);
+
+// === v35p33: Mutasi saldo fee admin ===
+if (ad > 0 && typeof supabase !== 'undefined') {
+  
+await supabase.from('mutasi_saldo').insert({
+    branch_code: branch,
+    jenis: 'Tambah',
+    account_id: terima,
+    nominal: ad,
+    note: 'Fee Admin Dalam (Tarik Tunai)'
+  });
+if (typeof loadKPISaldo === 'function') await refreshSaldoAkun();
+
+}
+
+if (al > 0 && typeof supabase !== 'undefined') {
+  
+await supabase.from('mutasi_saldo').insert({
+    branch_code: branch,
+    jenis: 'Tambah',
+    account_id: laci.id,
+    nominal: al,
+    note: 'Fee Admin Luar (Tarik Tunai)'
+  });
+if (typeof loadKPISaldo === 'function') await refreshSaldoAkun();
+
+}
+
   }
 }
 // v35p10-patch-end
+
 else if(jenis==='jasa'){
   if(laci){ fillSelect(terima,[laci]); terima.disabled=true }
   $('rowNominal').style.display='none'       // sembunyikan kolom nominal
@@ -2545,7 +2709,22 @@ function v7_applyFloating(){
   });
 }
 // run once on load
-document.addEventListener('DOMContentLoaded', ()=>{
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const dateInput = document.getElementById('fltDate');
+  if (dateInput) {
+    // Kosongkan dulu agar tidak pakai cache browser
+    dateInput.value = '';
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    dateInput.value = `${yyyy}-${mm}-${dd}`; // set ulang ke tanggal hari ini
+  }
+
+  }
+
   v7_applyFloating();
 });
 </script>
@@ -2671,7 +2850,443 @@ function showSuccessPulse(form) {
   }, 800);
 }
 </script>
+
+<!-- v35p23-clean-start -->
+<script>
+(function(){
+  if (typeof window.$ === 'undefined') window.$ = (sel)=>document.querySelector(sel);
+
+  if (typeof window.showToast !== 'function') {
+    window.showToast = function(msg, type){
+      try{
+        const el = document.createElement('div');
+        el.textContent = msg;
+        el.style.position = 'fixed';
+        el.style.left = '50%';
+        el.style.bottom = '24px';
+        el.style.transform = 'translateX(-50%)';
+        el.style.padding = '10px 16px';
+        el.style.borderRadius = '8px';
+        el.style.color = '#fff';
+        el.style.zIndex = 99999;
+        el.style.background = (type==='success'?'#16a34a': type==='error'?'#dc2626':'#2563eb');
+        el.style.boxShadow = '0 6px 24px rgba(0,0,0,.18)';
+        document.body.appendChild(el);
+        setTimeout(()=>{ el.remove(); }, 2200);
+      }catch(_){ alert(msg); }
+    };
+  }
+
+  if (window.supabase && typeof window.supabase.from === 'function') {
+    const origFrom = window.supabase.from.bind(window.supabase);
+    window.supabase.from = function(tableName){
+      const lower = String(tableName).toLowerCase();
+      const query = origFrom(tableName);
+
+       else {
+              const msg = res && res.error ? (res.error.message || 'Gagal menyimpan transaksi') : 'Gagal menyimpan transaksi';
+              window.showToast('❌ ' + msg, 'error');
+            }
+            return res;
+          }catch(err){
+            window.showToast('❌ ' + (err && err.message ? err.message : 'Gagal menyimpan transaksi'), 'error');
+            throw err;
+          }
+        };
+      }
+
+      return query;
+    };
+    console.log('✅ v35p23-clean aktif (blok mutasi_saldo, toast transactions)');
+  }
+})();
+</script>
+<!-- v35p23-clean-end -->
+
+
+<!-- v35p25-stable-fix-start -->
+<script>
+/**
+ * v35p25-stable-fix
+ * - Non-intrusive patch: DOES NOT modify existing handlers.
+ * - Normalizes payload for 'transactions.insert' ONLY when jenis = Fee Brilink.
+ * - Ensures dst_account_id and nominal are set; src_account_id stays null.
+ * - Keeps all dropdowns/buttons working.
+ */
+(function(){
+  const FEE_KEYS = ['fee brilink','fee_brilink','fee','brilink'];
+  const isFee = (j)=> FEE_KEYS.includes(String(j||'').toLowerCase().trim());
+
+  function pickDstAccountId(){
+    const candidates = [
+      '#dstAccountSelect',
+      '#dstAccount',
+      '[name="dst_account_id"]',
+      'select[name*="dst"]',
+      'select[id*="dst"]',
+      'select[id*="tujuan"]',
+      'select[name*="tujuan"]'
+    ];
+    for (const sel of candidates){
+      const el = document.querySelector(sel);
+      if (el && el.value) return el.value;
+    }
+    return null;
+  }
+
+  function pickNominal(){
+    const candidates = [
+      '#nominalInput',
+      '[name="nominal"]',
+      'input[id*="nominal" i]',
+      'input[name*="nominal" i]',
+      'input[id*="fee" i]',
+      'input[name*="fee" i]'
+    ];
+    for (const sel of candidates){
+      const el = document.querySelector(sel);
+      if (el && String(el.value).trim().length){
+        const n = parseFloat(String(el.value).replace(/[^0-9.]/g,''));
+        if (!Number.isNaN(n)) return n;
+      }
+    }
+    return null;
+  }
+
+  function normalizeOne(o){
+    if (!o || typeof o !== 'object') return o;
+    const jenis = o.jenis || o.jenis_transaksi || o.type;
+    if (isFee(jenis)){
+      if (!o.dst_account_id) o.dst_account_id = pickDstAccountId();
+      if (!o.nominal || Number(o.nominal) === 0){
+        const n = pickNominal();
+        if (n != null) o.nominal = n;
+      }
+      if (!('src_account_id' in o)) o.src_account_id = null;
+    }
+    return o;
+  }
+
+  // Guard: patch only if supabase client exists
+  if (window.supabase && typeof window.supabase.from === 'function'){
+    const origFrom = window.supabase.from.bind(window.supabase);
+    window.supabase.from = function(tableName){
+      const query = origFrom(tableName);
+      if (String(tableName).toLowerCase() === 'transactions' && typeof query.insert === 'function'){
+        const origInsert = query.insert.bind(query);
+        query.insert = async function(payload){
+          try{
+            if (Array.isArray(payload)) payload = payload.map(normalizeOne);
+            else payload = normalizeOne(payload);
+          }catch(e){ console.warn('v35p25 normalize error:', e); }
+          const res = await origInsert(payload);
+          try{
+            if (res && !res.error){
+              if (typeof window.showToast === 'function') window.showToast('✅ Transaksi berhasil disimpan', 'success');
+            } else {
+              const msg = (res && res.error && res.error.message) ? res.error.message : 'Gagal menyimpan transaksi';
+              if (typeof window.showToast === 'function') window.showToast('❌ ' + msg, 'error');
+            }
+          }catch(_e){}
+          return res;
+        };
+      }
+      return query;
+    };
+    console.log('✅ v35p25-stable-fix active: transactions.insert normalized for Fee Brilink');
+  } else {
+    console.warn('v35p25-stable-fix: supabase client not found.');
+  }
+})();
+</script>
+<!-- v35p25-stable-fix-end -->
+
+
+<!-- v35p26-fix-display-start -->
+<div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true" style="display:none">OK</div>
+<script>
+// === v35p26-fix-display.js ===
+function formatRupiah(v){
+  try {
+    if (v === null || v === undefined) return "Rp 0";
+    const num = typeof v === 'number' ? v : parseFloat(String(v).replace(/[^0-9.-]/g,'')) || 0;
+    return new Intl.NumberFormat('id-ID', { style:'currency', currency:'IDR', maximumFractionDigits:0 }).format(num);
+  } catch(e){ return 'Rp 0'; }
+}
+function showToast(msg, type='success'){
+  const el = document.getElementById('toast');
+  if(!el) return;
+  el.textContent = msg || 'Berhasil';
+  el.classList.remove('error');
+  if (type === 'error') el.classList.add('error');
+  el.style.display = 'block';
+  requestAnimationFrame(()=> el.classList.add('show'));
+  setTimeout(()=>{
+    el.classList.remove('show');
+    setTimeout(()=>{ el.style.display = 'none'; }, 300);
+  }, 2600);
+}
+function getFilters(){
+  return {
+    date: document.getElementById('fltDate'),
+    user: document.getElementById('fltUser'),
+    jenis: document.getElementById('fltJenis'),
+    rek:  document.getElementById('fltRek'),
+    total: document.getElementById('totalTransaksi'),
+    tbody: document.getElementById('tb')
+  };
+}
+async function loadTransactions(){
+  const F = getFilters();
+  if (!F.tbody) return console.warn('[v35p26] tbody#tb tidak ditemukan');
+  if (typeof supabase === 'undefined') {
+    console.error('[v35p26] Supabase client tidak tersedia');
+    F.tbody.innerHTML = '<tr><td colspan="13" style="color:#b91c1c;font-weight:700">Supabase client tidak ditemukan. Pastikan inisialisasi sudah benar.</td></tr>';
+    return;
+  }
+  let query = supabase.from('transactions').select('*').order('created_at', { ascending: false });
+  const dateVal = F.date && F.date.value ? F.date.value : '';
+  const userVal = F.user && F.user.value ? F.user.value : '';
+  const jenisVal = F.jenis && F.jenis.value ? F.jenis.value : '';
+  const rekVal  = F.rek && F.rek.value ? F.rek.value : '';
+  try {
+    if (dateVal) {
+      const start = new Date(dateVal + 'T00:00:00');
+      const end   = new Date(dateVal + 'T23:59:59');
+      query = query.gte('created_at', start.toISOString()).lte('created_at', end.toISOString());
+    }
+    if (userVal)  query = query.eq('user', userVal).or(`user_name.eq.${userVal}`);
+    if (jenisVal) query = query.ilike('jenis', jenisVal.replace('_',' ').replace('-',' '));
+    if (rekVal)   query = query.or(`src_account_id.eq.${rekVal},src_account.eq.${rekVal},src.eq.${rekVal}`);
+  } catch (e) { console.warn('[v35p26] Filter tidak diterapkan penuh:', e); }
+  const { data, error } = await query;
+  if (error) {
+    console.error('[v35p26] Gagal load transaksi:', error);
+    F.tbody.innerHTML = '<tr><td colspan="13" style="color:#b91c1c;font-weight:700">Gagal memuat transaksi: ' + (error.message||'') + '</td></tr>';
+    return;
+  }
+  F.tbody.innerHTML = '';
+  const rows = Array.isArray(data) ? data : [];
+  if (F.total) F.total.textContent = 'Jumlah Total Transaksi = ' + rows.length;
+  rows.forEach((trx, idx) => {
+    const tr = document.createElement('tr');
+    const userDisplay = (trx.user_name || trx.user || '-') + '<br><small>' + (trx.created_at ? new Date(trx.created_at).toLocaleString('id-ID') : '-') + '</small>';
+    const sumber = (trx.src_account || trx.src_account_id || trx.src || '-') + (trx.dst_account ? ' → ' + trx.dst_account : '');
+    const jenis = (trx.jenis || '-');
+    const nominal = formatRupiah(trx.nominal || 0);
+    const adminDalam = formatRupiah(trx.admin_dalam || trx.admin_dlm || 0);
+    const adminLuar  = formatRupiah(trx.admin_luar || trx.admin_lr || 0);
+    const feeBank    = formatRupiah(trx.fee_bank || trx.fee || 0);
+    const saldoAwal  = formatRupiah(trx.saldo_awal || 0);
+    const saldoAkhir = formatRupiah(trx.saldo_akhir || 0);
+    const ket = (trx.note || trx.keterangan || '');
+    tr.innerHTML = [
+      '<td>' + (idx+1) + '</td>',
+      '<td>' + userDisplay + '</td>',
+      '<td>' + (trx.id_trx || trx.id || '-') + '</td>',
+      '<td>' + sumber + '</td>',
+      '<td style="text-transform:uppercase;font-weight:800">' + jenis + '</td>',
+      '<td>' + saldoAwal + '</td>',
+      '<td>' + nominal + '</td>',
+      '<td>' + adminDalam + '</td>',
+      '<td>' + adminLuar + '</td>',
+      '<td>' + feeBank + '</td>',
+      '<td>' + saldoAkhir + '</td>',
+      '<td>' + ket + '</td>',
+      '<td>-</td>'
+    ].join('');
+    F.tbody.appendChild(tr);
+  });
+  if (rows.length === 0) {
+    F.tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;color:#475569;padding:10px">Belum ada transaksi untuk filter saat ini.</td></tr>';
+  }
+}
+window.afterInsertSuccess = async function(){
+  try {
+    if (typeof showToast === 'function') showToast('✅ Transaksi berhasil disimpan & ditampilkan di tabel');
+    await loadTransactions();
+  } catch (e) { console.error('[v35p26] afterInsertSuccess error:', e); }
+};
+(function wireCommonSubmit(){
+  const btn = document.getElementById('btnSubmit');
+  if (!btn) return;
+  if (btn.dataset.v35p26wired === '1') return;
+  btn.dataset.v35p26wired = '1';
+  btn.addEventListener('click', function(){
+    setTimeout(()=>{ loadTransactions(); }, 1000);
+  }, true);
+})();
+function wireFilters(){
+  const F = getFilters();
+  [F.date, F.user, F.jenis, F.rek].forEach(el => {
+    if (!el) return;
+    el.addEventListener('change', () => loadTransactions());
+  });
+}
+document.addEventListener('DOMContentLoaded', () => {
+  wireFilters();
+  loadTransactions();
+});
+</script>
+<!-- v35p26-fix-display-end -->
+
+<!-- v35p27-fix-fee-balance-start -->
+<script>
+// === v35p27-fix-fee-balance.js ===
+function v35_isFeeJenis(j){
+  const s = String(j||'').toLowerCase();
+  return s.includes('fee') || s.includes('brilink');
+}
+async function handleFeeBrilinkUpdate(row){
+  try{
+    if (!row || !row.dst_account_id) return;
+    const nominal = Number(row.nominal||0);
+    if (!(nominal>0)) return;
+    const { data: acc, error: e1 } = await supabase.from('accounts').select('saldo').eq('id', row.dst_account_id).single();
+    if (e1) { console.warn('[v35p27] gagal get saldo tujuan:', e1); return; }
+    const saldoLama = Number(acc && acc.saldo || 0);
+    const saldoBaru = saldoLama + nominal;
+    const { error: e2 } = await supabase.from('accounts').update({ saldo: saldoBaru }).eq('id', row.dst_account_id);
+    if (e2) { console.warn('[v35p27] gagal update saldo tujuan:', e2); return; }
+    if (typeof showToast === 'function') showToast('Saldo akun tujuan berhasil diperbarui.', 'success');
+    if (typeof loadKPISaldo === 'function') { try { await refreshSaldoAkun(); } catch(_){} }
+  }catch(err){
+    console.error('[v35p27] Exception handleFeeBrilinkUpdate:', err);
+  }
+}
+(function patchInsertForFee(){
+  if (!window.supabase || typeof window.supabase.from !== 'function') return;
+  const origFrom = window.supabase.from.bind(window.supabase);
+  window.supabase.from = function(tableName){
+    const q = origFrom(tableName);
+    if (String(tableName).toLowerCase() === 'transactions' && typeof q.insert === 'function'){
+      const _origInsert = q.insert.bind(q);
+      q.insert = async function(payload){
+        let feeRows = [];
+        try {
+          if (Array.isArray(payload)) feeRows = payload.filter(r=>v35_isFeeJenis(r && (r.jenis||r.type||r.jenis_transaksi)));
+          else if (payload && v35_isFeeJenis(payload.jenis || payload.type || payload.jenis_transaksi)) feeRows = [payload];
+        } catch(_){}
+        const res = await _origInsert(payload);
+        try {
+          if (res && !res.error && feeRows.length){
+            for (const r of feeRows){ await handleFeeBrilinkUpdate(r); }
+          }
+        } catch(e){ console.warn('[v35p27] post-insert fee update warning:', e); }
+        try { if (typeof window.afterInsertSuccess === 'function') await window.afterInsertSuccess(); } catch(_){}
+        return res;
+      };
+    }
+    return q;
+  };
+  console.log('✅ v35p27-fix-fee-balance active');
+})();
+</script>
+<!-- v35p27-fix-fee-balance-end -->
+
+<script>
+// === v35p36: refreshSaldoAkun ===
+async function refreshSaldoAkun(){
+  try{
+    const { data, error } = await supabase.from('accounts').select('*');
+    if (error) throw error;
+    const wrap = document.getElementById('kpiSaldoWrap');
+    if (!wrap) return;
+    wrap.innerHTML = data.map(a=>`
+      <div class="kpi-card">
+        <div class="kpi-title">${a.nama}</div>
+        <div class="kpi-value">Rp ${Number(a.saldo||0).toLocaleString('id-ID')}</div>
+      </div>`).join('');
+    console.log('[v35p36] KPI saldo akun diperbarui');
+  }catch(err){
+    console.error('[v35p36] Gagal refresh saldo akun:', err);
+  }
+}
+</script>
+
 </body>
+
+<style>
+/* v35p14-padding-fix-start */
+.container, .content, .main-wrapper {
+  padding-left: 6px !important;
+  padding-right: 6px !important;
+  margin: 0 auto !important;
+}
+.card, .kpi-card, .filter-box, .table-wrapper {
+  margin: 6px 4px !important;
+  padding: 8px 10px !important;
+}
+@media (max-width: 768px) {
+  .container, .content, .main-wrapper {
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+  }
+  .card, .kpi-card, .filter-box, .table-wrapper {
+    margin: 4px 2px !important;
+    padding: 6px 8px !important;
+  }
+}
+/* v35p14-padding-fix-end */
+
+/* v35p14-horizontal-tighten-start */
+.kpi-section,
+.kpi-grid,
+.kpi-card {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+.kpi-section {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+@media (min-width: 769px) {
+  .container, .main-wrapper, .content {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
+/* v35p14-horizontal-tighten-end */
+</style>
+
+
+<style>
+/* v35p15-fullwidth-fix */
+.main-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.kpi-grid, .kpi-transaksi, .card {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+@media (max-width: 768px) {
+  .main-container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+</style>
+
+
+<style>
+/* v35p16-branchbar-fullwidth-fix */
+.branchbar {
+  max-width: 97% !important;
+  margin: 20 !important;
+  padding-left: 20!important;
+  padding-right: 20 !important;
+  width: 97% !important;
+}
+</style>
+
 </html>
 
 <!-- v35p COMPACT CARD PATCH -->
