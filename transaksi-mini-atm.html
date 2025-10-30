@@ -11,27 +11,27 @@
       --border:#e6ebf3; --shadow:0 6px 18px rgba(2,8,23,.06);
       --sidebar-w:260px; --H_BAR:48px;
 
-      /* KPI colors */
-      --kpi-blue:#1976d2;   /* Transfer */
-      --kpi-green:#2e7d32;  /* Tarik */
-      --kpi-amber:#ffb300;  /* Omset */
-      --kpi-orange:#fb8c00; /* Adm Bank / Fee */
-      --kpi-profit:#43a047; /* Profit */
-      --kpi-brown:#99501d;  /* Operasional */
+      
+      --kpi-blue:#1976d2;   
+      --kpi-green:#2e7d32;  
+      --kpi-amber:#ffb300;  
+      --kpi-orange:#fb8c00; 
+      --kpi-profit:#43a047; 
+      --kpi-brown:#99501d;  
 
-      /* Chip saldo */
+      
       --chip1:#6f3bf1; --chip2:#7a4df3;
 
-      /* Modal + anim */
+      
       --modal-bg:#f9fafb;
       --fade-in: fadeIn .28s ease forwards;
 
-      /* Loading overlay */
+      
       --loading-backdrop: rgba(2,6,23,.35);
       --loading-card-bg: #ffffff;
     }
 
-    /* ===== Animations ===== */
+    
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-8px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -52,10 +52,10 @@
       font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
     }
 
-    /* ===== LAYOUT ===== */
+    
     .layout{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh}
 
-    /* ===== SIDEBAR ===== */
+    
     .sidebar{
       position:sticky; top:0; height:100vh; z-index:10001;
       background:linear-gradient(180deg,var(--navy1),var(--navy2));
@@ -81,7 +81,7 @@
     }
     .logout:hover{background:#dc2626;transform:scale(1.03);box-shadow:0 6px 18px rgba(220,38,38,.35)}
 
-    /* ===== HEADER ===== */
+    
     .branchbar{
       position:sticky; top:0; z-index:55; min-height:var(--H_BAR);
       display:flex; align-items:center; gap:10px; flex-wrap:wrap;
@@ -95,7 +95,7 @@
     .hamburger{display:none;place-items:center;width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:#fff;transition:all .18s ease}
     .hamburger:hover{transform:scale(1.05);box-shadow:0 6px 18px rgba(0,0,0,.08)}
 
-    /* ====== TICKER ====== */
+    
     .ticker{
       background:#2a44a5; color:#eaf2ff;
       border-bottom:2px solid #1e2f84;
@@ -116,7 +116,7 @@
     }
     @media (prefers-reduced-motion: reduce){ .ticker-rail{ animation:none } }
 
-    /* ===== CONTENT ===== */
+    
     .grid{display:grid;grid-template-columns:1fr;gap:14px;margin:14px 18px}
     .card{
       background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:14px;
@@ -125,7 +125,7 @@
     .card:hover{ box-shadow:0 10px 26px rgba(2,8,23,.08); transform:translateY(-1px) }
     .card h3{margin:0 0 10px 0}
 
-    /* ===== KPI TRANSAKSI ===== */
+    
     .kpi-grid{
       display:left-grid;
       grid-template-columns:repeat(6,1fr);
@@ -152,12 +152,12 @@
     .kpi.profit {background:linear-gradient(180deg,var(--kpi-profit),#2e6f33)}
     .kpi.brown  {background:linear-gradient(180deg,var(--kpi-brown),#6b3512)}
 
-    /* TOTAL ASSET */
+    
     .asset-main{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--border);border-radius:16px;padding:12px 16px;box-shadow:var(--shadow)}
     .asset-label{font-size:12px;font-weight:800;color:#334155}
     .asset-value{font-size:20px;font-weight:900;color:#16a34a}
 
-    /* ===== KPI SALDO CHIP (scroll) ===== */
+    
     #kpiSaldoWrap{
       display:flex !important; gap:10px !important; overflow-x:auto !important; overflow-y:hidden !important;
       padding:8px 6px 10px !important; scroll-snap-type:x mandatory !important; -webkit-overflow-scrolling:touch !important;
@@ -174,7 +174,7 @@
     #kpiSaldoWrap .kpi-title{color:#fff !important;font-weight:800 !important}
     #kpiSaldoWrap .kpi-value{color:#fff !important}
 
-    /* ===== FILTERS & BUTTONS ===== */
+    
     .filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0}
     .sel,.date-input{height:38px;padding:0 10px;border:1px solid var(--border);border-radius:10px;background:#fff;font-weight:700;transition:box-shadow .18s ease}
     .sel:focus,.date-input:focus{box-shadow:0 0 0 3px rgba(29,78,216,.15)}
@@ -190,7 +190,7 @@
     .btn-excel{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
     .btn-sm:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
 
-    /* ===== MODAL ===== */
+    
     .modal{
       position:fixed;inset:0;background:rgba(2,6,23,.45);
       display:none;align-items:center;justify-content:center;
@@ -213,7 +213,7 @@
     .icon-input textarea{min-height:96px;resize:vertical}
     .dlg-ft{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:8px;justify-content:flex-end}
 
-    /* ===== Sticky Header Tabel ===== */
+    
     table{width:100%;border-collapse:separate;border-spacing:0;min-width:1100px;background:#fff}
     thead th{
       position:sticky;top:0;background:#eef2ff;border-bottom:1px solid var(--border);
@@ -223,11 +223,11 @@
     tbody td{border-bottom:1px solid var(--border);padding:10px 12px}
     tbody tr:hover{background:#f8fafc}
 
-/* === Border tabel penuh === */
+
 table { border-collapse: collapse !important; }
 th, td { border: 1px solid var(--border) !important; }
 
-    /* ===== Responsive Table (HP) ===== */
+    
     @media (max-width: 980px) {
       table { font-size: 12px; min-width: 1100px; }
       thead th, tbody td { padding: 6px 8px; }
@@ -238,7 +238,7 @@ th, td { border: 1px solid var(--border) !important; }
       }
     }
 
-    /* ===== Responsive Modal ===== */
+    
     @media (max-width:980px){
       .dialog{ width:75%; max-width:480px; border-radius:14px; }
       .dlg-hd{font-size:15px;padding:10px 14px}
@@ -251,7 +251,7 @@ th, td { border: 1px solid var(--border) !important; }
       .row{grid-template-columns:1fr}
     }
 
-    /* ===== Loading Overlay Modern ===== */
+    
     .loading-overlay{
       position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:9998;
       background: var(--loading-backdrop); backdrop-filter: blur(2px);
@@ -269,7 +269,7 @@ th, td { border: 1px solid var(--border) !important; }
     .loading-text{ font-weight:800; color:#1e293b }
     .loading-sub{ font-size:12px; color:#475569 }
     
-    /* === PATCH FINAL: SCROLLBAR TABEL RIWAYAT TRANSAKSI (HP) === */
+    
     @media (max-width:980px){
       .card > div[style*="overflow"] {
         overflow-x: auto !important;
@@ -287,7 +287,7 @@ th, td { border: 1px solid var(--border) !important; }
       .card > div[style*="overflow"]::-webkit-scrollbar-track { background:#f1f5f9; }
     }
 
-    /* ===== Breakpoints grid KPI ===== */
+    
     @media (max-width:1080px){ .kpi-grid{grid-template-columns:repeat(3,1fr)} }
     @media (max-width:2200px){
       .layout{grid-template-columns:1fr}
@@ -304,12 +304,12 @@ th, td { border: 1px solid var(--border) !important; }
       .kpi .meta .val{font-size:16px}
       .branchbar .bb-now{font-size:13px;padding:4px 8px}
     }
-  /* === Warna Merah Header Tabel === */
+  
 thead th {
   color: #b91c1c !important;
   font-weight: 700 !important;
 }
-/* === Toast Notification === */
+
 .toast {
   position: fixed;
   bottom: 24px;
@@ -334,7 +334,7 @@ thead th {
 }
 
 
-/* ===== Responsive Filter & Tombol (HP) v2 ===== */
+
 @media (max-width: 980px) {
   .filters {
     flex-direction: column !important;
@@ -357,12 +357,12 @@ thead th {
     font-size: 14px !important;
   }
 
-  /* Urutan tombol di HP: WA → Excel → Tambah */
+  
   #btnWA { order: 1; background:#15803d !important; color:#fff !important; border-color:#15803d !important; }
   #btnExport { order: 2; background:#0ea5e9 !important; color:#fff !important; border-color:#0ea5e9 !important; }
   #btnTambah { order: 3; background:#1d4ed8 !important; color:#fff !important; border-color:#1d4ed8 !important; }
 
-  /* Perapian margin bawah tabel dan card */
+  
   .card {
     padding: 10px !important;
     border-radius: 14px !important;
@@ -378,16 +378,16 @@ thead th {
     font-size: 12px !important;
   }
 
-  /* Scroll aman untuk kontainer utama */
+  
   .grid {
     overflow-x: hidden !important;
   }
 }
 
 
-/* === Scroll sempurna KPI & Tabel di layar HP (v4) === */
+
 @media (max-width:980px){
-  /* Pastikan card KPI saldo bisa scroll penuh */
+  
   #kpiSaldoWrap {
     overflow-x: auto !important;
     display: flex !important;
@@ -409,7 +409,7 @@ thead th {
     scroll-snap-align: start;
   }
 
-  /* Tambahkan pembungkus tabel agar scroll lebih stabil */
+  
   .table-wrapper {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch !important;
@@ -431,7 +431,7 @@ thead th {
 }
 
 
-/* --- Compact Form Style (v10) --- */
+
 .form-grid {
   display: grid;
   gap: 8px;
@@ -459,14 +459,14 @@ thead th {
 </style>
 
 <style id="v7-compact">
-/* === v7 Compact Modern (Flat + Floating Labels) === */
+
 :root{
   --primary:#2274e0;
   --label:#666;
 }
-/* Modal overlay darker */
+
 .modal { background: rgba(0,0,0,0.35); }
-/* Dialog animation */
+
 .modal .dialog {
   max-width: 480px;
   width: calc(100% - 24px);
@@ -478,7 +478,7 @@ thead th {
 }
 .modal.show .dialog { transform: scale(1); opacity: 1; }
 
-/* Header modal with icon & compact padding */
+
 .dlg-hd{
   background: var(--primary);
   color:#fff;
@@ -490,21 +490,21 @@ thead th {
 }
 .dlg-hd span { display:flex; align-items:center; gap:8px; font-size:14px; }
 
-/* Body compact */
+
 .dlg-bd{ padding:12px 14px; }
-/* Grid rows compact */
+
 .dlg-bd .row{ display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px; }
 @media (max-width: 600px){
   .dlg-bd .row{ grid-template-columns: 1fr; }
 }
 
-/* Floating label container */
+
 .dlg-bd .row > div{
   position: relative;
-  padding-top: 14px; /* space for floating label */
+  padding-top: 14px; 
 }
 
-/* Hide original labels positioning and turn into floating */
+
 .dlg-bd .row > div > label{
   position:absolute;
   top: 18px;
@@ -517,7 +517,7 @@ thead th {
   padding: 0 2px;
 }
 
-/* Inputs & selects compact */
+
 .dlg-bd .row .icon-input,
 .dlg-bd .row .icon-input select,
 .dlg-bd .row .icon-input input{
@@ -544,7 +544,7 @@ thead th {
   padding:2px 0;
 }
 
-/* Floating behavior when focused or filled */
+
 .dlg-bd .row > div.filled > label,
 .dlg-bd .row > div:focus-within > label{
   top: 2px;
@@ -554,15 +554,15 @@ thead th {
   background: #fff;
 }
 
-/* Fee-only field label adjustment */
-#labelNominal { /* preserved text content, but hidden in floating layout */
+
+#labelNominal { 
   visibility:hidden; height:0; margin:0; padding:0;
 }
 
-/* Admin-only single row style */
+
 #rowAdminLuarOnly .icon-input { padding:6px 10px; }
 
-/* Buttons compact */
+
 .btn, .btn-sm, .btn-primary{
   border-radius:10px;
 }
@@ -573,10 +573,10 @@ thead th {
 }
 .btn-primary:hover{ filter: brightness(0.95); }
 
-/* Footer compact */
+
 .dlg-ft{ padding:10px 14px; display:flex; justify-content:flex-end; gap:8px; }
 
-/* Make modal full-height on tiny screens while keeping whitespace */
+
 @media (max-width: 420px){
   .modal .dialog{ width: calc(100% - 16px); }
   .dlg-bd{ padding:10px 12px; }
@@ -584,7 +584,7 @@ thead th {
   .dlg-ft{ padding:9px 12px; }
 }
 
-/* --- Compact Form Style (v10) --- */
+
 .form-grid {
   display: grid;
   gap: 8px;
@@ -612,9 +612,9 @@ thead th {
 </style>
 
 
-<!-- v25-FORM-ModernUI-Dual-Color (scoped to modal form only) -->
+
 <style>
-:root { --accent: #2196f3; } /* default (Transfer blue) */
+:root { --accent: #2196f3; } 
 
 @media (prefers-color-scheme: dark) {
   #modalForm {
@@ -631,7 +631,7 @@ thead th {
   }
 }
 
-/* Scope all styles to modal form only */
+
 #modalForm {
   color: var(--text);
   font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
@@ -642,7 +642,7 @@ thead th {
   box-shadow: 0 8px 28px rgba(0,0,0,0.22);
 }
 
-/* Inputs */
+
 #modalForm input, 
 #modalForm select, 
 #modalForm textarea {
@@ -662,13 +662,13 @@ thead th {
   box-shadow: 0 2px 0 0 var(--accent), 0 0 0 2px color-mix(in oklab, var(--accent) 20%, transparent);
 }
 
-/* Labels */
+
 #modalForm label {
   font-weight: 600;
   opacity: .92;
 }
 
-/* Buttons */
+
 #modalForm button, 
 #modalForm .btn-primary {
   background: var(--accent);
@@ -685,7 +685,7 @@ thead th {
   opacity: .95;
 }
 
-/* Modal fade-in */
+
 @keyframes v25_fadeInScale {
   0% { opacity: 0; transform: scale(.96); }
   100% { opacity: 1; transform: scale(1); }
@@ -696,7 +696,7 @@ thead th {
   animation: v25_fadeInScale .25s ease-out;
 }
 
-/* Grid spacing */
+
 #modalForm #rowSumber,
 #modalForm #rowAdminDua,
 #modalForm #rowPulsa {
@@ -709,17 +709,17 @@ thead th {
 </style>
 
 
-<!-- v26 FORM FLOATING DUAL (FAST-DANA) -->
+
 <style>
 :root { --accent: #2196f3; }
 
-/* Scope ONLY to modal form area so other pages remain untouched */
+
 #modalForm { font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
 
-/* Container for floating labels */
+
 #modalForm .v26-field { position: relative; margin-top: 18px; }
 
-/* Controls */
+
 #modalForm .v26-field input,
 #modalForm .v26-field select,
 #modalForm .v26-field textarea {
@@ -735,14 +735,14 @@ thead th {
   border-radius: 8px 8px 0 0;
 }
 
-/* Accent glow on focus (soft) */
+
 #modalForm .v26-field input:focus,
 #modalForm .v26-field select:focus,
 #modalForm .v26-field textarea:focus {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent);
 }
 
-/* Labels - fast floating (DANA style) */
+
 #modalForm .v26-field > label {
   position: absolute;
   top: 13px;
@@ -762,17 +762,17 @@ thead th {
   top: -6px;
   left: 8px;
   font-size: 12px;
-  color: var(--accent); /* label uses accent color */
+  color: var(--accent); 
   opacity: 1;
 }
 
-/* More rounded buttons */
+
 #modalForm button,
 #modalForm .btn-primary {
   border-radius: 16px !important;
 }
 
-/* Keep dual mode variables (fallbacks) */
+
 @media (prefers-color-scheme: dark) {
   #modalForm {
     --bg: #1b1d1f; --text: #eaeaea; --input-bg: #2a2d31;
@@ -784,15 +784,15 @@ thead th {
   }
 }
 
-/* Fade-in modal */
+
 @keyframes v26_fadeInScale { 0% { opacity: 0; transform: scale(.96); } 100% { opacity: 1; transform: scale(1); } }
 #modalForm.show .dlg, #modalForm.show .modal, #modalForm.show .dialog { animation: v26_fadeInScale .25s ease-out; }
 </style>
 
 
-<!-- v27 FORM FLOATING REFINED (DELUXE+WIDE+FOCUS OVERLAY) -->
+
 <style>
-/* ===== Labels: ALL UPPERCASE + better contrast ===== */
+
 @media (prefers-color-scheme: light) {
   #modalForm .v26-field > label { color:#444; }
 }
@@ -805,38 +805,38 @@ thead th {
   font-weight: 600;
 }
 
-/* ===== Buttons: stronger weight + taller padding + soft hover shadow ===== */
+
 #modalForm button,
 #modalForm .btn-primary {
   font-weight: 600;
-  padding: 12px 18px; /* taller for touch */
+  padding: 12px 18px; 
 }
 #modalForm button:hover,
 #modalForm .btn-primary:hover {
   box-shadow: 0 2px 6px color-mix(in srgb, var(--accent) 25%, transparent);
 }
 
-/* ===== Inputs: instant 4px underline on focus (no transition delay) ===== */
+
 #modalForm .v26-field input:focus,
 #modalForm .v26-field select:focus,
 #modalForm .v26-field textarea:focus {
   border-bottom-width: 4px;
-  transition: none; /* instant feel */
+  transition: none; 
 }
 
-/* ===== Icon & text spacing (sidebar/buttons) ===== */
+
 .sidebar-menu i, .nav-item i { margin-right:6px; vertical-align:middle; }
 #modalForm button i { margin-right:6px; vertical-align:middle; }
 
-/* ===== Modal: widen ~10% and elegant global shadow ===== */
+
 #modalForm .dlg, #modalForm .modal, #modalForm .dialog {
-  max-width: 704px; /* ~10% wider than common 640px */
+  max-width: 704px; 
   box-shadow: 0 6px 18px rgba(0,0,0,0.25);
   position: relative;
   z-index: 9999;
 }
 
-/* ===== Focus overlay: darker background with fade ===== */
+
 #modalForm.show::before {
   content: "";
   position: fixed;
@@ -849,13 +849,13 @@ thead th {
   from { opacity: 0; } to { opacity: 1; }
 }
 
-/* Keep the modal entrance animation from v26 */
+
 </style>
 
 
-<!-- v28 FORM COMPACT (PADAT + LEMBUT + PROPORSIONAL) -->
+
 <style>
-/* ===== Compact Field Layout ===== */
+
 #modalForm .v26-field {
   margin-top: 8px !important;
   margin-bottom: 6px !important;
@@ -869,17 +869,17 @@ thead th {
   padding: 10px 8px 4px 8px !important;
 }
 
-/* ===== Modal Proporsional + Rounded ===== */
+
 #modalForm .dlg, #modalForm .modal, #modalForm .dialog {
-  max-width: 704px;       /* +10% wider */
-  max-height: 95%;        /* -5% shorter */
-  border-radius: 12px;    /* smoother corners */
+  max-width: 704px;       
+  max-height: 95%;        
+  border-radius: 12px;    
   box-shadow: 0 6px 18px rgba(0,0,0,0.25);
   position: relative;
   z-index: 9999;
 }
 
-/* ===== Overlay Fokus (Fade Lembut) ===== */
+
 #modalForm.show::before {
   content: "";
   position: fixed;
@@ -893,13 +893,13 @@ thead th {
   to { opacity: 1; }
 }
 
-/* Keep modal fade+scale animation from previous version */
+
 </style>
 
 
-<!-- v29 FORM MOBILE RESPONSIVE -->
+
 <style>
-/* ===== Responsive Adjustments for Mobile (max-width: 600px) ===== */
+
 @media (max-width: 600px) {
   #modalForm .dlg, #modalForm .modal, #modalForm .dialog {
     width: 94% !important;
@@ -936,32 +936,32 @@ thead th {
 </style>
 
 
-<!-- v30 FORM LABEL ICONFIX -->
+
 <style>
-/* ===== Rapikan ikon & teks label agar tidak saling menimpa ===== */
+
 #modalForm .v26-field label i {
-  margin-right: 6px;           /* jarak antara ikon dan teks */
-  vertical-align: middle;      /* sejajarkan tengah */
+  margin-right: 6px;           
+  vertical-align: middle;      
   position: relative;
-  top: -1px;                   /* sedikit naik agar sejajar sempurna */
-  font-size: 15px;             /* ukuran proporsional */
-  opacity: 0.9;                /* ikon sedikit lebih lembut */
+  top: -1px;                   
+  font-size: 15px;             
+  opacity: 0.9;                
 }
 
-/* Gunakan flex agar ikon dan teks tidak saling tumpang tindih */
+
 #modalForm .v26-field > label {
   display: flex;
   align-items: center;
-  gap: 6px;                    /* jarak antar ikon dan teks */
+  gap: 6px;                    
   line-height: 1.2;
   white-space: nowrap;
 }
 </style>
 
 
-<!-- v33 FINAL ACCENT COMPLETE (Hover + Focus Ring + Button Glow + Dynamic Button Color) -->
+
 <style>
-/* ===== HOVER ACCENT on label icons (Desktop only) ===== */
+
 @media (min-width: 768px) {
   #modalForm[data-jenis="tarik"] .v26-field label i:hover { color:#4CAF50; filter:brightness(1.2) saturate(1.3); transition:color .2s ease,filter .2s ease; }
   #modalForm[data-jenis="transfer"] .v26-field label i:hover { color:#2196F3; filter:brightness(1.2) saturate(1.3); transition:color .2s ease,filter .2s ease; }
@@ -970,7 +970,7 @@ thead th {
   #modalForm[data-jenis="jasa"] .v26-field label i:hover { color:#607D8B; filter:brightness(1.2) saturate(1.3); transition:color .2s ease,filter .2s ease; }
 }
 
-/* ===== FOCUS RING ACCENT (Soft 3px, 25%) ===== */
+
 #modalForm[data-jenis="tarik"] .v26-field input:focus,
 #modalForm[data-jenis="tarik"] .v26-field select:focus,
 #modalForm[data-jenis="tarik"] .v26-field textarea:focus { box-shadow:0 0 0 3px color-mix(in srgb, #4CAF50 25%, transparent); transition:box-shadow .15s ease-in-out; }
@@ -987,7 +987,7 @@ thead th {
 #modalForm[data-jenis="jasa"] .v26-field select:focus,
 #modalForm[data-jenis="jasa"] .v26-field textarea:focus { box-shadow:0 0 0 3px color-mix(in srgb, #607D8B 25%, transparent); transition:box-shadow .15s ease-in-out; }
 
-/* ===== BUTTON Dynamic Accent + Glow on hover/focus ===== */
+
 #modalForm button,
 #modalForm .btn-primary {
   background: var(--accent) !important;
@@ -1008,11 +1008,11 @@ thead th {
   box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
-/* keep everything else untouched */
+
 </style>
 
 <style>
-/* v34-validation.css */
+
 :root {
   --v34-danger: #ef4444;
   --v34-danger-ring: rgba(239, 68, 68, 0.25);
@@ -1046,7 +1046,7 @@ thead th {
 }
 </style>
 <style>
-/* v35-success-pulse.css */
+
 @keyframes successPulse {
   0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.5); }
   70% { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
@@ -1104,7 +1104,7 @@ body {
 
 
 <style>
-/* === PATCH LAYOUT PROPORSIONAL FINAL === */
+
 .main-container {
   width: 90% !important;
   max-width: 1280px !important;
@@ -1113,7 +1113,7 @@ body {
   padding: 20px !important;
 }
 
-/* Responsif otomatis */
+
 @media (max-width: 1280px) {
   .main-container {
     width: 94% !important;
@@ -1134,7 +1134,7 @@ body {
 
 <style>
 
-/* === KPI MASTER SALDO AKUN === */
+
 .kpi-saldo-akun {
   display: flex;
   gap: 8px;
@@ -1143,19 +1143,19 @@ body {
   margin: 0 auto;
   padding-bottom: 6px;
   scroll-behavior: smooth;
-  -ms-overflow-style: none;  /* IE/Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none;  
+  scrollbar-width: none;     
 }
 .kpi-saldo-akun::-webkit-scrollbar {
-  display: none; /* auto-hide scrollbar (modern style) */
+  display: none; 
 }
 
-/* === JARAK ANTAR BAGIAN === */
+
 section {
   margin-bottom: 12px;
 }
 
-/* === TITLE SALDO AKUN === */
+
 .kpi-saldo-title {
   background: #f7f9fb;
   border-radius: 8px;
@@ -1163,7 +1163,7 @@ section {
   font-weight: 600;
   margin-bottom: 6px;
 }
-/* === KPI MASTER SALDO AKUN (tetap auto-hide scroll) === */
+
 .kpi-saldo-akun {
   display: flex;
   gap: 8px;
@@ -1172,19 +1172,19 @@ section {
   margin: 20 auto;
   padding-bottom: 6px;
   scroll-behavior: smooth;
-  -ms-overflow-style: none;  /* IE/Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none;  
+  scrollbar-width: none;     
 }
 .kpi-saldo-akun::-webkit-scrollbar {
-  display: none; /* auto-hide scrollbar (modern style) */
+  display: none; 
 }
 
-/* === SPASI ANTAR BAGIAN === */
+
 section {
   margin-bottom: 12px;
 }
 
-/* === TITLE SALDO AKUN === */
+
 .kpi-saldo-title {
   background: #f7f9fb;
   border-radius: 8px;
@@ -1198,7 +1198,7 @@ section {
 <style>
 
 
-/* === KEEP KPI SALDO AUTO SCROLL === */
+
 .kpi-saldo-akun {
   display: flex;
   gap: 8px;
@@ -1214,12 +1214,12 @@ section {
   display: none;
 }
 
-/* === SPACING BETWEEN SECTIONS === */
+
 section {
   margin-bottom: 12px;
 }
 
-/* === TITLE SALDO AKUN === */
+
 .kpi-saldo-title {
   background: #f7f9fb;
   border-radius: 8px;
@@ -1231,7 +1231,7 @@ section {
 
 
 <style>
-/* === TOPBAR MENGERUCUT RESPONSIF (v35n) === */
+
 .branchbar {
   display: flex;
   align-items: center;
@@ -1257,7 +1257,7 @@ section {
   max-width: clamp(120px, 30%, 220px);
 }
 
-/* === LAYAR SEDANG (tablet) === */
+
 @media (max-width: 1024px) {
   .branchbar {
     padding: 6px 14px;
@@ -1272,7 +1272,7 @@ section {
   }
 }
 
-/* === LAYAR KECIL (HP) === */
+
 @media (max-width: 768px) {
   .branchbar {
     flex-direction: column;
@@ -1294,9 +1294,9 @@ section {
 
 
 <style>
-/* === v35o — RESPONSIVE FULL LAYOUT PATCH === */
 
-/* 0) Global container guard */
+
+
 .main-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -1307,7 +1307,7 @@ section {
   .main-container { padding: 0 8px; }
 }
 
-/* 1) KPI Transaksi — support both .kpi-transaksi and legacy .kpi-grid */
+
 .kpi-transaksi, .kpi-grid {
   display: grid !important;
   grid-template-columns: repeat(auto-fit, minmax(25px, 1fr)) !important;
@@ -1327,7 +1327,7 @@ section {
   }
 }
 
-/* 2) Total Aset — handle multiple naming variants */
+
 .total-aset, .total-asset, .totalAset {
   max-width: 1200px;
   margin: 0 auto;
@@ -1341,7 +1341,7 @@ section {
   }
 }
 
-/* 3) KPI Master Saldo Akun — horizontal scroll + responsive sizing */
+
 .kpi-saldo-akun, .kpiSaldoAkun, .saldo-akun-strip {
   display: flex;
   gap: 8px;
@@ -1350,14 +1350,14 @@ section {
   margin: 0 auto;
   padding-bottom: 6px;
   scroll-behavior: smooth;
-  -ms-overflow-style: none;  /* IE/Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none;  
+  scrollbar-width: none;     
 }
 .kpi-saldo-akun::-webkit-scrollbar,
 .kpiSaldoAkun::-webkit-scrollbar,
 .saldo-akun-strip::-webkit-scrollbar { display: none; }
 
-/* item di dalam saldo akun (klausa generik agar kompatibel) */
+
 .kpi-saldo-akun > *, .kpiSaldoAkun > *, .saldo-akun-strip > * {
   flex: 0 0 auto;
   padding: 6px 12px;
@@ -1371,7 +1371,7 @@ section {
   }
 }
 
-/* 4) Tabel Riwayat — responsive font + safe horizontal scroll */
+
 .table-riwayat, .tx-table-wrap, .history-table-wrap {
   overflow-x: auto;
   max-width: 1200px;
@@ -1393,7 +1393,7 @@ section {
   }
 }
 
-/* 5) Topbar from v35n stays responsive (no change); ensure it centers within 1200px */
+
 .branchbar {
   max-width: 1200px;
   margin: 0 auto;
@@ -1402,14 +1402,14 @@ section {
 
 
 <style>
-/* v35p4: Table border tegas biru Amko + jarak ticker */
+
 table, th, td { border: 1.0px solid #1d4ed8 !important; border-collapse: collapse !important; }
 .card + .ticker { margin-top: 12px !important; }
 </style>
 
 
 <style>
-/* v35p5: teks tabel jelas + hover lembut */
+
 thead th { color: #b91c1c !important; font-weight: 700 !important; }
 tbody td { color: #111827 !important; font-weight: 600 !important; }
 tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s ease; }
@@ -1418,10 +1418,10 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
 
 
 <style>
-/* === PATCH v35p9: Ticker Biru Muda & Spasi Lega === */
+
 .ticker {
   background: #fff;
-  color: #222222 !important; /* light blue */
+  color: #222222 !important; 
   font-weight: 800 !important;
   font-size: 16px !important;
   border-bottom: 2px solid #60a5fa !important;
@@ -1441,9 +1441,9 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
 </style>
 
 
-<!-- v35p17-patch-start: KPI Transaksi Proporsional Full -->
+
 <style>
-/* === PATCH v35p17: KPI Transaksi Proporsional === */
+
 .kpi-grid {
   display: grid !important;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
@@ -1469,12 +1469,12 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
     grid-template-columns: 1fr !important;
   }
 }
-/* Sesuaikan padding card supaya isi benar-benar rapat kiri-kanan */
+
 .card {
   padding-left: 12px !important;
   padding-right: 12px !important;
 }
-/* Ikon & teks agar tetap proporsional */
+
 .kpi .ic {
   width: 36px !important;
   height: 36px !important;
@@ -1482,12 +1482,12 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
 .kpi .meta h4 { font-size: 16px !important; }
 .kpi .meta .val { font-size: 15px !important; }
 </style>
-<!-- v35p17-patch-end -->
 
 
-<!-- v35p18-patch-fullwidth-tight -->
+
+
 <style>
-/* === PATCH v35p18: Hapus batas kiri–kanan agar benar-benar full === */
+
 .main-container,
 .kpi-grid,
 .kpi-transaksi,
@@ -1500,7 +1500,7 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
   padding-right: 0 !important;
 }
 
-/* Pastikan branchbar juga menempel sisi kiri-kanan */
+
 .branchbar {
   width: 100% !important;
   max-width: 100% !important;
@@ -1509,7 +1509,7 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
   padding-right: 10px !important;
 }
 
-/* Untuk HP */
+
 @media (max-width: 768px) {
   .main-container, .branchbar {
     padding-left: 6px !important;
@@ -1519,11 +1519,11 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
 </style>
 
 
-<!-- v35p19-patch-edge-flush -->
-<style>
-/* === PATCH v35p19: Hilangkan padding & radius pada card KPI Transaksi === */
 
-/* Hilangkan padding & border radius khusus card KPI Transaksi */
+<style>
+
+
+
 .card:has(.kpi-grid) {
   padding-left: 0 !important;
   padding-right: 0 !important;
@@ -1534,7 +1534,7 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
   width: 100% !important;
 }
 
-/* Pastikan grid di dalamnya rapat penuh */
+
 .kpi-grid {
   width: 100% !important;
   margin: 0 !important;
@@ -1542,7 +1542,7 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
   gap: 10px !important;
 }
 
-/* Untuk menjaga tampilan tetap rapi di HP */
+
 @media (max-width: 768px) {
   .card:has(.kpi-grid) {
     border-radius: 0 !important;
@@ -1554,10 +1554,113 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
 }
 </style>
 
+
+<style>
+:root{--accent:#2196f3}
+body{background:#f2f6fb !important}
+.card h3{font-size:18px;font-weight:700;margin:0 0 10px 0}
+.kpi .meta h4{font-size:22px!important}
+.kpi .meta .val{font-size:16px!important}
+.ticker{background:#60a5fa !important;color:#ffffff !important;border-bottom:2px solid #1e40af !important;padding:12px 0 !important}
+.main-container{max-width:1200px;margin:0 auto;padding:0 16px;transition:all .3s ease}
+@media(max-width:768px){.main-container{padding:0 8px}}
+.kpi-grid{display:grid !important;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))!important;gap:12px!important;width:100%!important;margin:0!important;padding:0!important}
+.card:has(.kpi-grid){padding-left:0!important;padding-right:0!important;border-radius:0!important;box-shadow:none!important;margin-left:0!important;margin-right:0!important;width:100%!important}
+.table-wrapper,.table-riwayat,.tx-table-wrap,.history-table-wrap{overflow-x:auto;max-width:1200px;margin:0 auto}
+</style>
+
+
+<style>
+/* === Fix: Table size restored to full width === */
+.table-wrapper, .table-riwayat, .tx-table-wrap, .history-table-wrap {
+  overflow-x: auto;
+  width: 100% !important;
+  margin: 0 !important;
+  max-width: none !important;
+}
+.table-riwayat table {
+  width: 100%;
+  font-size: 14px;
+}
+
+/* === Fix: KPI font resized to more proportional scale === */
+.kpi .meta h4 {
+  font-size: 18px !important;
+}
+.kpi .meta .val {
+  font-size: 14.5px !important;
+}
+</style>
+
+
+<style>
+/* === Fix: Smaller font for KPI titles === */
+.kpi .meta h4 {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.2;
+}
+.kpi .meta .val {
+  font-size: 13.5px !important;
+  font-weight: 500;
+}
+</style>
+
+
+<style>
+/* === Fix: KPI cards fill full width on large screens === */
+.kpi-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  gap: 12px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  max-width: none !important;
+}
+.kpi-grid .kpi {
+  flex: 1 1 auto;
+  width: 100%;
+}
+</style>
+
+
+<style>
+/* === Responsive Fix: Font KPI lebih kecil di layar HP === */
+@media (max-width: 600px) {
+  .kpi .meta h4 {
+    font-size: 13px !important;
+  }
+  .kpi .meta .val {
+    font-size: 12px !important;
+  }
+  .kpi {
+    padding: 8px 6px !important;
+  }
+  .kpi-grid {
+    gap: 8px !important;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+  }
+}
+</style>
+
+
+<style>
+/* === Visual Fix: Separate ticker blue background from KPI cards === */
+.card {
+  background: #ffffff !important;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05) !important;
+}
+.kpi-grid {
+  background: transparent !important;
+}
+</style>
+
 </head>
 <body>
 <div class="layout">
-  <!-- ===== Sidebar ===== -->
+  
   <aside class="sidebar" id="sidebar">
     <div class="brand">Amko MiniLink</div>
     <nav class="nav" id="menuList"></nav>
@@ -1566,9 +1669,9 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
     </div>
   </aside>
 
-  <!-- ===== Main ===== -->
+  
   <div>
-    <!-- HEADER / BRANCH BAR -->
+    
     <div id="branchTopBar" class="branchbar">
       <button id="toggleSidebar" class="hamburger" aria-label="Toggle Sidebar" aria-controls="sidebar" aria-expanded="false">☰</button>
       <select id="branchTopSelect" class="bb-select"><option value="">-- Pilih Toko --</option></select>
@@ -1576,12 +1679,12 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
       <span id="userRole" class="user-role">-</span>
     </div>
 
-    <!-- === TEKS BERJALAN (MOTIVASI) === --></div>
+    </div>
 
-    <!-- Content -->
+    
     <div class="main-container">
   <div class="grid">
-      <!-- KPI Transaksi -->
+      
       <div class="card">
         <h3>KPI Transaksi <span id="kpiTglLabel" class="bb-now" style="margin-left:8px">Hari ini</span></h3>
         <div class="kpi-grid">
@@ -1620,7 +1723,7 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
       </div>
     
 
-      <!-- Asset bar -->
+      
       <div class="card">
         <div class="asset-main">
           <div class="asset-label">TOTAL ASET</div>
@@ -1628,13 +1731,13 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
         </div>
       </div>
 
-      <!-- KPI Saldo akun (chip scroll) -->
+      
       <div class="card">
         <h3>KPI Master Saldo Akun</h3>
         <div id="kpiSaldoWrap" class="kpi-grid"></div>
       </div>
 
-      <!-- Riwayat -->
+      
       <div class="card">
         <h3>Riwayat Transaksi</h3>
 
@@ -1693,7 +1796,7 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
 </div>
 </div>
 
-<!-- ===== Loading Overlay (global) ===== -->
+
 <div class="loading-overlay" id="loadingOverlay" aria-live="polite" aria-busy="true">
   <div class="loading-card">
     <div class="spinner" aria-hidden="true"></div>
@@ -1704,7 +1807,7 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
   </div>
 </div>
 
-<!-- ===== Modals ===== -->
+
 <div class="modal" id="modalJenis">
   <div class="dialog">
     <div class="dlg-hd">
@@ -1838,7 +1941,6 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
   let lastRiwayatRows=[]
   let editMode=false, editId=null
 
-  // Pagination
   let page=0, pageSize=25, totalRows=0
 
   // Range tanggal
@@ -1855,7 +1957,7 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
   const saldoSum = { cash:0, rek:0, asset:0, server:0 }
   let waRekeningList = [], waServerList = [], waCashList = []
 
-  /* ===== Loading Overlay Helpers ===== */
+  
   function showLoading(on=true, sub='Memuat data…'){
     const ol = $('loadingOverlay'); if(!ol) return
     $('loadingSub').textContent = sub || 'Memuat data…'
@@ -1865,7 +1967,7 @@ tbody tr:hover { background: #f1f5ff !important; transition: background 0.2s eas
 
   
 
-/* ===== Toast Notification ===== */
+
 function showToast(msg, isError=false) {
   const t = document.getElementById('toast');
   if (!t) return;
@@ -1875,7 +1977,7 @@ function showToast(msg, isError=false) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-/* ====== Ticker Motivasi ====== */
+
   const TICKER_QUOTES = [
     "Fokus pada proses, hasil akan menyusul",
     "Disiplin kecil hari ini jadi lompatan besar esok",
@@ -2033,9 +2135,8 @@ function showToast(msg, isError=false) {
       if(r.jenis==='tarik')     tarik+=n
       else if(r.jenis==='transfer') transfer+=n
       else if(r.jenis==='jasa') opr += al
-      /* Fee Brilink tidak memengaruhi omset/transfer/tarik, hanya cash-in ke laci:
-         bisa dibiarkan di luar KPI utama agar tidak bias. */
-      if(r.jenis==='fee_brilink'){ /* optional akumulasi khusus jika ingin ditampilkan */ }
+      
+      if(r.jenis==='fee_brilink'){  }
       omset+=n; fee+=fb; profit += (ad+al-fb)
     }
     $('kpi_omset').textContent=fmtRp(omset)
@@ -2153,7 +2254,6 @@ function showToast(msg, isError=false) {
     const { tmin, tmax } = getRangeISO()
     if(!viewBranch){
       $('tb').innerHTML=`<tr><td colspan="13">Pilih cabang terlebih dahulu.</td></tr>`
-      $('btnPrev').disabled=true; $('btnNext').disabled=true; $('pageInfo').textContent='Hal -'
       lastRiwayatRows=[]; updateExportState(); return
     }
 
@@ -2179,15 +2279,12 @@ function showToast(msg, isError=false) {
     const { data, error } = await dataQuery.order('created_at',{ascending:false}).range(page*pageSize,(page+1)*pageSize-1)
     if(error){
       $('tb').innerHTML = `<tr><td colspan="13" style="color:#991b1b">Gagal memuat riwayat: ${error.message}</td></tr>`
-      $('btnPrev').disabled=true; $('btnNext').disabled=true; $('pageInfo').textContent='Hal -'
       lastRiwayatRows=[]; updateExportState(); return
     }
     const rows=data||[]; lastRiwayatRows=rows
     if(rows.length===0){
       $('tb').innerHTML = `<tr><td colspan="13" style="color:#64748b">Belum ada transaksi pada tanggal ini.</td></tr>`
-      $('btnPrev').disabled = page===0
-      $('btnNext').disabled = (page+1)*pageSize >= totalRows
-      $('pageInfo').textContent = `Hal ${page+1}`
+
       updateExportState(); return
     }
 
@@ -2221,13 +2318,9 @@ function showToast(msg, isError=false) {
       </tr>`
     }).join('')
 
-    $('btnPrev').disabled = page===0
-    $('btnNext').disabled = (page+1)*pageSize >= totalRows
-    $('pageInfo').textContent = `Hal ${page+1}`
     updateExportState()
   }
 
-  // Pagination
   $('btnPrev').onclick=async()=>{ if(page>0){ page--; showLoading(true,'Memuat halaman sebelumnya'); await loadRiwayat(); showLoading(false) } }
   $('btnNext').onclick=async()=>{ if((page+1)*pageSize < totalRows){ page++; showLoading(true,'Memuat halaman berikutnya'); await loadRiwayat(); showLoading(false) } }
 
@@ -2414,7 +2507,7 @@ $('f_jenis').value = jenis;
       $('f_nom').value=fmtNum(row.nominal||0); $('f_admin_dalam').value=fmtNum(row.admin_dalam||0); $('f_admin_luar').value=fmtNum(row.admin_luar||0); $('f_fee_bank').value=fmtNum(row.fee_bank||0); $('f_ket').value=row.note||''
       if(row.jenis==='pulsa'){ $('f_modal').value=fmtNum(row.nominal||0); $('f_jual').value=fmtNum((row.nominal||0)+(row.admin_luar||0)) }
       if(row.jenis==='jasa'){ $('f_admin_luar_only').value=fmtNum(row.admin_luar||0) }
-      if(row.jenis==='fee_brilink'){ /* tak perlu field tambahan */ }
+      if(row.jenis==='fee_brilink'){  }
       $('modalForm').classList.add('show')
     }
   })
@@ -2600,7 +2693,7 @@ else if(jenis==='jasa'){
     }
   }
 
-  /* Sidebar builder */
+  
   function normPath(u){ return (u||'').toLowerCase().split('/').pop().replace(/[#?].*$/,'') || 'index.html' }
   function isActive(link){
     const current = normPath(location.pathname), target = normPath(link)
@@ -2730,7 +2823,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 
-<!-- v26 helpers: floating labels + select value tracking -->
+
 <script>
 (function(){
   // Called after setupForm renders fields
@@ -2774,7 +2867,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <script>
-/* v34-validation.js */
+
 (function(){
   function isVisible(el){
     const s = getComputedStyle(el);
@@ -2832,7 +2925,7 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 </script>
 <script>
-/* v35-success-pulse.js */
+
 function showSuccessPulse(form) {
   if (!form) return;
   form.classList.add('success-pulse');
@@ -2851,7 +2944,7 @@ function showSuccessPulse(form) {
 }
 </script>
 
-<!-- v35p23-clean-start -->
+
 <script>
 (function(){
   if (typeof window.$ === 'undefined') window.$ = (sel)=>document.querySelector(sel);
@@ -2901,18 +2994,12 @@ function showSuccessPulse(form) {
   }
 })();
 </script>
-<!-- v35p23-clean-end -->
 
 
-<!-- v35p25-stable-fix-start -->
+
+
 <script>
-/**
- * v35p25-stable-fix
- * - Non-intrusive patch: DOES NOT modify existing handlers.
- * - Normalizes payload for 'transactions.insert' ONLY when jenis = Fee Brilink.
- * - Ensures dst_account_id and nominal are set; src_account_id stays null.
- * - Keeps all dropdowns/buttons working.
- */
+
 (function(){
   const FEE_KEYS = ['fee brilink','fee_brilink','fee','brilink'];
   const isFee = (j)=> FEE_KEYS.includes(String(j||'').toLowerCase().trim());
@@ -2999,10 +3086,10 @@ function showSuccessPulse(form) {
   }
 })();
 </script>
-<!-- v35p25-stable-fix-end -->
 
 
-<!-- v35p26-fix-display-start -->
+
+
 <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true" style="display:none">OK</div>
 <script>
 // === v35p26-fix-display.js ===
@@ -3128,9 +3215,9 @@ document.addEventListener('DOMContentLoaded', () => {
   loadTransactions();
 });
 </script>
-<!-- v35p26-fix-display-end -->
 
-<!-- v35p27-fix-fee-balance-start -->
+
+
 <script>
 // === v35p27-fix-fee-balance.js ===
 function v35_isFeeJenis(j){
@@ -3182,7 +3269,7 @@ async function handleFeeBrilinkUpdate(row){
   console.log('✅ v35p27-fix-fee-balance active');
 })();
 </script>
-<!-- v35p27-fix-fee-balance-end -->
+
 
 <script>
 // === v35p36: refreshSaldoAkun ===
@@ -3204,10 +3291,12 @@ async function refreshSaldoAkun(){
 }
 </script>
 
+
+<!-- v35p37-nopagination: pagination HTML & JS removed; Supabase .range() removed -->
 </body>
 
 <style>
-/* v35p14-padding-fix-start */
+
 .container, .content, .main-wrapper {
   padding-left: 6px !important;
   padding-right: 6px !important;
@@ -3227,9 +3316,9 @@ async function refreshSaldoAkun(){
     padding: 6px 8px !important;
   }
 }
-/* v35p14-padding-fix-end */
 
-/* v35p14-horizontal-tighten-start */
+
+
 .kpi-section,
 .kpi-grid,
 .kpi-card {
@@ -3248,12 +3337,12 @@ async function refreshSaldoAkun(){
     padding-right: 12px !important;
   }
 }
-/* v35p14-horizontal-tighten-end */
+
 </style>
 
 
 <style>
-/* v35p15-fullwidth-fix */
+
 .main-container {
   width: 100% !important;
   max-width: 100% !important;
@@ -3277,7 +3366,7 @@ async function refreshSaldoAkun(){
 
 
 <style>
-/* v35p16-branchbar-fullwidth-fix */
+
 .branchbar {
   max-width: 97% !important;
   margin: 20 !important;
@@ -3289,9 +3378,9 @@ async function refreshSaldoAkun(){
 
 </html>
 
-<!-- v35p COMPACT CARD PATCH -->
+
 <style>
-/* === PATCH v35p: Card KPI kecil & proporsional === */
+
 .kpi, .kpi-card {
   width: 160px !important;
   height: 80px !important;
@@ -3330,7 +3419,7 @@ async function refreshSaldoAkun(){
 }
 </style>
 
-<!-- v35p.1 FIX SALDO AKUN STYLE (kotak kecil horizontal) -->
+
 <style>
 #kpiSaldoWrap {
   display: flex !important;
@@ -3381,7 +3470,7 @@ async function refreshSaldoAkun(){
 }
 </style>
 
-<!-- v35p.2 FIX SALDO AKUN RATA KIRI -->
+
 <style>
 #kpiSaldoWrap {
   display: flex !important;
