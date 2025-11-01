@@ -3,134 +3,116 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>Master Akun Saldo | AMKO</title>
+  <title>Master Akun Saldo | AMKO • v2.1 (Compact Elegant + Fix Tombol)</title>
   <style>
     :root{
-      --bg:#f6f8fb; --pri:#0b63f3;
+      --bg:#f6f8fb; --pri:#0b63f3; /* biru AMKO tetap */
       --card:#fff; --bd:#e5e7eb; --muted:#64748b; --txt:#0f172a;
       --blue:#1d4ed8; --amber:#d97706; --yellow:#f59e0b; --red:#be123c;
       --shadow:0 6px 18px rgba(15,23,42,.08);
+      --shadow-lg:0 12px 30px rgba(15,23,42,.14);
       --touch:48px; --radius:16px; --safe-bottom: env(safe-area-inset-bottom, 0);
-
-      /* Sidebar seperti TRANSAKSI MINI ATM */
       --sidebar-w:240px;
-      --sb:#0f172a;        /* latar sidebar */
-      --sbfg:#e5e7eb;      /* teks menu */
-      --sb-brand:#0a5eb6;  /* bar brand */
-      --sb-active:#0b3a66; /* latar item aktif */
+      --sb:#0f172a; --sbfg:#e5e7eb; --sb-brand:#0a5eb6; --sb-active:#0b3a66;
+      --anim:.4s;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--txt);-webkit-tap-highlight-color: transparent}
     button,input,select,textarea{font-family:inherit}
-
+    a, .btn, input, select, textarea, .card { transition: all var(--anim) ease; }
     .layout{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh}
 
-    /* ===== Sidebar (disamakan dengan Transaksi) ===== */
-    .sidebar{
-      background:var(--sb); color:var(--sbfg);
-      display:flex; flex-direction:column;
-      transition:left .25s ease;
-      padding:0; /* nol seperti transaksi */
-    }
-    .brand{
-      background:var(--sb-brand); color:#fff;
-      font-weight:800; font-size:15px;
-      padding:12px 14px; margin:0;
-    }
+    /* ===== Sidebar ===== */
+    .sidebar{ background:var(--sb); color:var(--sbfg); display:flex; flex-direction:column; transition:left var(--anim) ease, box-shadow var(--anim) ease; padding:0; }
+    .sidebar.open{ box-shadow: 0 10px 30px rgba(2,6,23,.35); }
+    .brand{ background:var(--sb-brand); color:#fff; font-weight:800; font-size:15px; padding:10px 14px; margin:0; letter-spacing:.2px; }
     .nav{ padding:6px; display:flex; flex-direction:column; gap:0; overflow:auto }
-    .nav a{
-      display:block; text-decoration:none; color:var(--sbfg);
-      font-size:13px; font-weight:400;
-      padding:8px 10px; border-radius:8px; line-height:1.2;
-    }
-    .nav a:hover{ background:rgba(255,255,255,.10) }
+    .nav a{ position:relative; display:block; text-decoration:none; color:var(--sbfg); font-size:13px; font-weight:500; padding:8px 10px; border-radius:8px; line-height:1.2; opacity:.95; }
+    .nav a:hover{ background:rgba(255,255,255,.06); opacity:1 }
     .nav a.active{ background:var(--sb-active); color:#fff }
+    .nav a.active::before{ content:""; position:absolute; left:0; top:6px; bottom:6px; width:4px; border-radius:4px; background:var(--pri); }
 
-    /* Grup collapsible (gaya transaksi) */
-    .group{
-      margin-top:6px;
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:8px; overflow:hidden;
-    }
-    .group-hd{
-      padding:8px 10px; background:#0e223a; color:#cfe0f3;
-      font-size:12px; font-weight:400; letter-spacing:0;
-      display:flex; justify-content:space-between; align-items:center; cursor:pointer; text-transform:none;
-    }
-    .group-hd .chev{ transition:transform .2s ease }
+    .group{ margin-top:6px; border:1px solid rgba(255,255,255,.08); border-radius:8px; overflow:hidden; }
+    .group-hd{ padding:8px 10px; background:#0e223a; color:#cfe0f3; font-size:12px; font-weight:500; display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
+    .group-hd .chev{ transition:transform var(--anim) ease }
     .group.collapsed .group-hd .chev{ transform:rotate(-90deg) }
     .group-bd{ padding:6px; background:#0f253f }
     .group.collapsed .group-bd{ display:none }
-
     .sidebar-footer{margin-top:auto;padding:8px 8px 10px;font-size:11px;color:#93a3b8}
     .logout{display:block;margin-top:8px;background:#fecdd3;color:#7f1d1d;text-align:center;border-radius:10px;padding:9px 10px;font-weight:800;text-decoration:none}
+    .logout:hover{ filter:brightness(1.05) }
 
     /* ===== Header / Topbar ===== */
-    header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-    .title{margin:0;font-size:18px}
+    header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--bd);padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+    .title{margin:0;font-size:18px; letter-spacing:.2px}
     .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px}
-
-    /* User-Role biru tebal */
     #userRole{font-weight:800;color:#2563eb;}
-
-    /* Hamburger */
     .hamburger{font-size:22px;background:none;border:none;cursor:pointer;padding:8px;display:none}
-
-    /* Overlay gelap (mobile) */
-    .overlay{position:fixed;inset:0;background:rgba(2,6,23,.45);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:19}
+    .overlay{position:fixed;inset:0;background:rgba(2,6,23,.45);opacity:0;pointer-events:none;transition:opacity var(--anim) ease;z-index:19}
     .overlay.show{opacity:1;pointer-events:auto}
     body.noscroll{overflow:hidden}
-
-    .topbar{position:sticky;top:54px;z-index:9;background:linear-gradient(#fff,#fff 75%,transparent);padding:12px 16px;border-bottom:1px solid var(--bd)}
+    .topbar{position:sticky;top:54px;z-index:9;background:linear-gradient(#fff,#fff 75%,transparent);padding:10px 12px;border-bottom:1px solid var(--bd)}
     .searchbar{display:grid;grid-template-columns:1fr auto auto;gap:8px}
-    .input{border:1px solid var(--bd);background:#fff;border-radius:10px;padding:12px 12px;font-size:16px;height:var(--touch);outline:none}
+    .input{border:1px solid var(--bd);background:#fff;border-radius:10px;padding:10px 12px;font-size:16px;height:var(--touch);outline:none}
+    .icon-input:focus-within, .input:focus{ border-color:rgba(11,99,243,.6) !important; box-shadow:0 0 0 3px rgba(11,99,243,.12); }
 
-    .btn{border:none;border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:700;height:var(--touch)}
-    .btn:active{transform:translateY(1px)}
+    .btn{border:none;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:700;height:var(--touch);transform:translateZ(0)}
+    .btn:active{transform:scale(.98)}
     .btn-primary{background:var(--pri);color:#fff}
     .btn-blue{background:#2563eb;color:#fff}
     .btn-gray{background:#eef2f6}
     .btn-ghost{background:#f1f5f9}
     .btn-danger{background:#fee2e2;color:#991b1b}
+    .btn:hover{filter:brightness(1.02)}
+    .btn[disabled]{opacity:.6;cursor:not-allowed}
 
-    .content{padding:16px;max-width:1100px;margin:0 auto}
-    .grid{display:grid;grid-template-columns:repeat(3,minmax(260px,1fr));gap:16px;margin-top:12px}
-    .card{background:var(--card);border:1px solid var(--bd);border-radius:22px;box-shadow:var(--shadow);padding:16px}
-    .row-head{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+    .content{padding:12px;max-width:1100px;margin:0 auto}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(260px,1fr));gap:12px;margin-top:10px}
+    .card{background:var(--card);border:1px solid var(--bd);border-radius:22px;box-shadow:var(--shadow);padding:14px;animation: fadeUp var(--anim) ease both;}
+    .card:hover{ transform:translateY(-2px); box-shadow:var(--shadow-lg) }
+    .row-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
     .avatar{width:44px;height:44px;border-radius:50%;background:#22c55e;color:#fff;display:grid;place-items:center;font-weight:800}
-    .card h3{margin:0 0 4px 0;font-size:18px}
+    .card h3{margin:0 0 2px 0;font-size:18px}
     .badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800;color:#fff}
     .badge-bank{background:var(--blue)}
     .badge-laci{background:var(--amber)}
     .badge-server{background:var(--yellow);color:#1f2937}
-    .kv{margin:6px 0;font-size:15px}
+    .kv{margin:4px 0;font-size:15px}
     .kv b{color:#991b1b}
     .muted{color:var(--muted);font-size:12px}
-    .actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+    .actions{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
 
-    .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:50}
+    /* Modal */
+    .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:50;backdrop-filter: blur(2px);}
     .modal.show{display:flex}
-    .dialog{width:min(760px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:92vh}
-    .dlg-hd{background:#0ea5e9;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;font-weight:800}
-    .dlg-bd{padding:14px;display:grid;gap:12px;overflow:auto}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .dialog{width:min(760px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:92vh;animation: zoomIn var(--anim) ease;}
+    .dlg-hd{background:linear-gradient(90deg,#0ea5e9,#0b63f3);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;font-weight:800}
+    .dlg-bd{padding:12px;display:grid;gap:10px;overflow:auto}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     label{font-size:12px;color:#475569;margin-bottom:6px;display:block}
-    .icon-input{display:flex;gap:8px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:12px;background:#fff;min-height:var(--touch)}
+    .icon-input{display:flex;gap:8px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:10px;background:#fff;min-height:var(--touch)}
     .icon-input input,.icon-input select,.icon-input textarea{border:none;outline:none;flex:1;font-size:16px;background:transparent}
     .icon-input textarea{min-height:96px;resize:vertical}
-    .dlg-ft{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--bd);padding:12px 16px;display:flex;gap:8px;justify-content:flex-end}
+    .dlg-ft{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--bd);padding:10px 12px;display:flex;gap:8px;justify-content:flex-end}
 
     .error{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:10px;border-radius:10px;display:none}
-    .ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:10px;display:none}
+    .ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:10px;display:none;border-radius:10px}
+
+    /* Spinner kecil */
+    .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin-right:6px;vertical-align:-2px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Animations */
+    @keyframes fadeUp{from{ opacity:0; transform:translateY(6px) } to{ opacity:1; transform:translateY(0) }}
+    @keyframes zoomIn{from{ opacity:0; transform:scale(.96) } to{ opacity:1; transform:scale(1) }}
 
     @media (max-width: 840px){
       .layout{grid-template-columns:1fr}
       .sidebar{position:fixed;left:calc(-1 * var(--sidebar-w));top:0;bottom:0;width:var(--sidebar-w);z-index:20}
       .sidebar.open{left:0}
       .hamburger{display:block}
-
-      .content{padding:12px}
+      .content{padding:10px}
       .grid{grid-template-columns:1fr}
       .topbar{top:56px;padding:10px 12px}
       header{padding:10px}
@@ -150,11 +132,9 @@
     <div class="brand">Amko MiniLink</div>
 
     <nav class="nav">
-      <!-- Menu utama -->
       <a href="dashboard.html">📊 Dashboard</a>
       <a href="transaksi-mini-atm.html">🧮 Transaksi Mini ATM</a>
 
-      <!-- Grup MASTER DATA -->
       <div class="group" data-key="grp_master">
         <div class="group-hd"><span>📂 Master Data</span><span class="chev">▾</span></div>
         <div class="group-bd">
@@ -164,7 +144,6 @@
         </div>
       </div>
 
-      <!-- Grup LAPORAN -->
       <div class="group" data-key="grp_laporan">
         <div class="group-hd"><span>📘 Laporan</span><span class="chev">▾</span></div>
         <div class="group-bd">
@@ -172,7 +151,6 @@
         </div>
       </div>
 
-      <!-- Grup PENGATURAN -->
       <div class="group" data-key="grp_pengaturan">
         <div class="group-hd"><span>⚙️ Pengaturan</span><span class="chev">▾</span></div>
         <div class="group-bd">
@@ -184,12 +162,12 @@
     </nav>
 
     <div class="sidebar-footer">
-      © Amko MiniLink • v1
+      © Amko MiniLink • v2.1
       <a href="#" id="lnk-logout" class="logout">🚪 Logout</a>
     </div>
   </aside>
 
-  <!-- Overlay untuk mobile -->
+  <!-- Overlay mobile -->
   <div id="overlay" class="overlay" aria-hidden="true"></div>
 
   <!-- ===== Konten ===== -->
@@ -198,17 +176,17 @@
     <header>
       <button id="toggleSidebar" class="hamburger" aria-label="Toggle Sidebar">☰</button>
 
-      <!-- Dropdown cabang (OWNER only), menampilkan NAMA saja -->
+      <!-- Dropdown cabang (OWNER only) -->
       <select id="branchSelect" class="input" style="min-width:220px;display:none">
         <option value="">Memuat cabang…</option>
       </select>
 
-      <!-- Status toko sekarang (pakai NAMA cabang) -->
+      <!-- Status toko sekarang -->
       <div id="currentStore" class="title" style="font-weight:800; text-align:center; flex:1;">
         TOKO SEKARANG: -
       </div>
 
-      <!-- USER-ROLE (huruf besar tebal biru) -->
+      <!-- USER-ROLE -->
       <div id="userRole"></div>
     </header>
 
@@ -229,7 +207,7 @@
   </div>
 </div>
 
-<!-- FAB (muncul untuk owner lewat JS) -->
+<!-- FAB (Owner) -->
 <button id="fabAdd" class="fab" title="Tambah" style="display:none;position:fixed;right:14px;bottom:calc(14px + var(--safe-bottom));width:56px;height:56px;border-radius:999px;background:var(--pri);color:#fff;box-shadow:0 10px 24px rgba(11,99,243,.35);z-index:15;font-size:26px;font-weight:900;align-items:center;justify-content:center;">+</button>
 
 <!-- Modal -->
@@ -268,7 +246,7 @@
       <div class="row" style="grid-template-columns:1fr">
         <div>
           <label>Saldo</label>
-          <div class="icon-input">
+          <div class="icon-input" style="border:1px solid var(--bd)">
             <span>Rp</span>
             <input id="m_saldo" inputmode="numeric" placeholder="0" />
           </div>
@@ -365,7 +343,6 @@
     gBranch = (prof.branch_code || '').toString().trim()
     viewBranch = gBranch
 
-    // USER-ROLE biru tebal (huruf besar)
     const nama = (prof.full_name || prof.email || 'USER').toUpperCase()
     const role = (gRole || '').toUpperCase()
     $('userRole').textContent = `${nama}-${role}`
@@ -374,20 +351,17 @@
 
     if(isOwner()){
       $('fabAdd').style.display='flex'
-      $('branchSelect').style.display = ''   // tampilkan dropdown di header
+      $('branchSelect').style.display = ''
       await loadBranches()
     }else{
       $('fabAdd').style.display='none'
       $('branchSelect').style.display = 'none'
     }
 
-    // === Sidebar: aktifkan highlight & collapse persist ===
     initSidebarGroups()
     applyActive()
-
     await loadAccounts()
 
-    // Realtime refresh
     const ch = supabase.channel('realtime-msa');
     ch.on('postgres_changes',{event:'*',schema:'public',table:'accounts'},()=>loadAccounts());
     ch.subscribe();
@@ -398,12 +372,10 @@
     sel.innerHTML = `<option value="">Memuat cabang…</option>`
     let list = []
 
-    // Ambil daftar cabang dari tabel branches (kalau ada)
     const { data: br, error: ebr } = await supabase.from('branches').select('code,name').order('name')
     if(!ebr && br && br.length){
       list = br.map(b=>({code:(b.code||'').trim(), name:b.name || b.code}))
     }else{
-      // fallback dari accounts
       const { data: accs } = await supabase.from('accounts').select('branch_code').order('branch_code')
       const set = new Set((accs||[]).map(a=>(a.branch_code||'').trim()).filter(Boolean))
       list = Array.from(set).map(code=>({code, name: code}))
@@ -415,12 +387,10 @@
       return
     }
 
-    // tampilkan NAMA saja sebagai label option
     sel.innerHTML = list.map(b=>`<option value="${b.code}">${b.name}</option>`).join('')
     sel.value = viewBranch || list[0].code
     if(!viewBranch) viewBranch = sel.value
 
-    // label TOKO SEKARANG pakai NAMA
     $('currentStore').textContent = `TOKO SEKARANG: ${sel.options[sel.selectedIndex]?.text || '-'}`
 
     sel.onchange = ()=>{
@@ -440,7 +410,6 @@
     if(error){ alert("Gagal ambil akun: "+error.message); return }
     cacheRows = data || []
 
-    // pin Laci Tunai ke atas
     cacheRows.sort((a,b)=>{
       const aLaci = a.account_type==='cash' && (a.name||'').toLowerCase().includes('laci')
       const bLaci = b.account_type==='cash' && (b.name||'').toLowerCase().includes('laci')
@@ -465,11 +434,11 @@
 
       const canEdit = isOwner() ? canMutateBranch(a.branch_code) : true;
       const editBtn = canEdit
-        ? `<button class="btn btn-ghost" onclick="editAccount('${a.id}')">Edit</button>`
+        ? `<button class="btn btn-ghost" onclick="window.editAccount('${a.id}')">Edit</button>`
         : `<button class="btn btn-ghost" disabled title="Pilih cabang ini untuk mengubah">Edit</button>`;
 
       const delBtn = (isOwner() && canMutateBranch(a.branch_code) && !isLaci)
-        ? `<button class="btn btn-danger" onclick="delAccount('${a.id}')">Hapus</button>`
+        ? `<button class="btn btn-danger" onclick="window.delAccount('${a.id}')">Hapus</button>`
         : ``;
 
       return `
@@ -507,6 +476,10 @@
       alert('Pilih cabang terlebih dahulu sebelum menambah akun.')
       return
     }
+    editId = null
+    $('m_type').disabled = false
+    $('m_name').disabled = false
+    $('m_type').value=''; $('m_name').value=''; $('m_saldo').value=''; $('m_is_opening').checked=false; $('m_note').value=''
     openModal('Tambah Master Saldo')
   }
   $('btnAdd').onclick = openAdd
@@ -514,6 +487,7 @@
 
   $('btnClose').onclick = $('btnCancel').onclick = closeModal
 
+  // ====== GLOBAL: Edit / Hapus / Simpan ======
   window.editAccount = async (id)=>{
     const { data, error } = await supabase.from('accounts').select('*').eq('id', id).single()
     if(error){ alert(error.message); return }
@@ -540,20 +514,78 @@
   }
 
   window.delAccount = async (id)=>{
-    const { data, error } = await supabase.from('accounts')
-      .select('id,name,account_type,branch_code').eq('id', id).single()
-    if(error){ alert(error.message); return }
+    // Spinner pada tombol Hapus (jika ada tombol aktif)
+    const btn = document.activeElement && document.activeElement.tagName==='BUTTON' ? document.activeElement : null
+    let prevHtml = null
+    if(btn){ prevHtml = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Menghapus...' }
+
+    const { data, error } = await supabase.from('accounts').select('id,name,account_type,branch_code').eq('id', id).single()
+    if(error){ if(btn){ btn.innerHTML=prevHtml; btn.disabled=false } alert(error.message); return }
 
     const isLaci = data && data.account_type==='cash' && (data.name||'').toLowerCase().includes('laci')
-    if(isLaci){ alert("Akun LACI TUNAI tidak dapat dihapus."); return }
-    if(!isOwner()){ alert('Hanya Owner yang boleh menghapus akun'); return }
-    if (!canMutateBranch(data.branch_code)){ alert('Hanya bisa menghapus akun pada cabang yang sedang dipilih.'); return }
+    if(isLaci){ if(btn){ btn.innerHTML=prevHtml; btn.disabled=false } alert("Akun LACI TUNAI tidak dapat dihapus."); return }
+    if(!isOwner()){ if(btn){ btn.innerHTML=prevHtml; btn.disabled=false } alert('Hanya Owner yang boleh menghapus akun'); return }
+    if (!canMutateBranch(data.branch_code)){ if(btn){ btn.innerHTML=prevHtml; btn.disabled=false } alert('Hanya bisa menghapus akun pada cabang yang sedang dipilih.'); return }
 
-    if(!confirm('Yakin hapus akun ini?')) return
+    if(!confirm('Yakin hapus akun ini?')){ if(btn){ btn.innerHTML=prevHtml; btn.disabled=false } return }
     const { error:errDel } = await supabase.from('accounts').delete().eq('id', id)
+    if(btn){ btn.innerHTML=prevHtml; btn.disabled=false }
     if(errDel){ alert(errDel.message); return }
-    loadAccounts()
+    await loadAccounts()
+    showOk('Akun berhasil dihapus.')
   }
+
+  window.saveAccount = async ()=>{
+    const btn = $('btnSave')
+    const prevHtml = btn.innerHTML
+    btn.disabled = true
+    btn.innerHTML = '<span class="spinner"></span>Menyimpan...'
+
+    try{
+      const type = $('m_type').value.trim()
+      const name = $('m_name').value.trim()
+      const note = $('m_note').value.trim()
+      const opening = $('m_is_opening').checked
+      const saldoRaw = $('m_saldo').value.replace(/\D/g,'')
+      const saldo = Number(saldoRaw || 0)
+
+      if(!type || !name){ throw new Error('Jenis Saldo dan Nama Platform wajib diisi.') }
+      if(!isOwner()){ throw new Error('Hanya Owner yang boleh menyimpan perubahan.') }
+
+      if(editId){
+        // update
+        const patch = { saldo, note }
+        if(opening){ patch.saldo_awal = saldo }
+        const { error } = await supabase.from('accounts').update(patch).eq('id', editId)
+        if(error) throw error
+      }else{
+        if(!viewBranch){ throw new Error('Pilih cabang terlebih dahulu.') }
+        const row = {
+          account_type: type,
+          name,
+          saldo,
+          saldo_awal: opening ? saldo : 0,
+          branch_code: viewBranch,
+          note
+        }
+        const { error } = await supabase.from('accounts').insert(row)
+        if(error) throw error
+      }
+
+      await loadAccounts()
+      showOk('Data berhasil disimpan.')
+      closeModal() // auto-close modal
+    }catch(e){
+      console.error(e)
+      showErr(e.message || 'Gagal menyimpan data.')
+    }finally{
+      btn.innerHTML = prevHtml
+      btn.disabled = false
+    }
+  }
+
+  // Bind tombol simpan (global-safe)
+  $('btnSave').onclick = ()=>window.saveAccount()
 
   /* ===== Sidebar helpers: active highlight & collapse persist ===== */
   function normPath(u){ return (u||'').toLowerCase().split('/').pop().replace(/[#?].*$/,'') || 'index.html'; }
@@ -601,9 +633,7 @@
   btnHamb?.addEventListener('click', ()=> toggleSidebar());
   overlayEl?.addEventListener('click', ()=> toggleSidebar(false));
   window.addEventListener('keyup', (e)=>{ if(e.key==='Escape') toggleSidebar(false); });
-  document.querySelectorAll('.sidebar .nav a').forEach(a=>{
-    a.addEventListener('click', ()=> toggleSidebar(false));
-  });
+  document.querySelectorAll('.sidebar .nav a').forEach(a=>{ a.addEventListener('click', ()=> toggleSidebar(false)); });
 
   // Logout
   document.getElementById('lnk-logout').addEventListener('click', async ()=>{
