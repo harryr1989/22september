@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>Manajemen Pengguna | Amko MiniLink</title>
+  <title>Manajemen Pengguna | Amko MiniLink (v1.2)</title>
   <style>
     :root{
       --bg:#f6f8fb; --pri:#0b63f3;
@@ -16,6 +16,10 @@
       --sbfg:#e5e7eb;      /* teks menu */
       --sb-brand:#0a5eb6;  /* bar brand */
       --sb-active:#0b3a66; /* item aktif */
+      --accent:#38bdf8;    /* garis aktif kiri */
+      --success:#16a34a;
+      --danger:#dc2626;
+      --toast-bg:#0b1220;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -29,34 +33,23 @@
     .sidebar{
       background:var(--sb);color:var(--sbfg);
       display:flex;flex-direction:column;
-      padding:0; /* nol seperti referensi */
-      position:relative;z-index:20;
+      padding:0; position:relative;z-index:20;
       transition:left .25s ease;
     }
-    .brand{
-      background:var(--sb-brand);color:#fff;
-      font-weight:800;font-size:15px;
-      padding:12px 14px;margin:0;
-    }
+    .brand{background:var(--sb-brand);color:#fff;font-weight:800;font-size:15px;padding:12px 14px;margin:0;}
     .nav{padding:6px;display:flex;flex-direction:column;gap:0;overflow:auto}
     .nav a{
-      display:block;text-decoration:none;color:var(--sbfg);
-      font-size:13px;font-weight:400;
-      padding:8px 10px;border-radius:8px;line-height:1.2;
+      display:flex;align-items:center;gap:8px;
+      text-decoration:none;color:var(--sbfg);
+      font-size:13px;font-weight:500;
+      padding:8px 10px;border-radius:8px;line-height:1.2;position:relative
     }
     .nav a:hover{background:rgba(255,255,255,.10)}
-    .nav a.active{background:var(--sb-active);color:#fff}
+    .nav a.active{background:var(--sb-active);color:#fff;}
+    .nav a.active::before{content:""; position:absolute; left:0; top:8px; bottom:8px; width:4px; border-radius:3px; background:var(--accent);}
 
-    .group{
-      margin-top:6px;
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:8px;overflow:hidden;
-    }
-    .group-hd{
-      padding:8px 10px;background:#0e223a;color:#cfe0f3;
-      font-size:12px;font-weight:400;
-      display:flex;justify-content:space-between;align-items:center;cursor:pointer;
-    }
+    .group{margin-top:6px;border:1px solid rgba(255,255,255,.08);border-radius:8px;overflow:hidden;}
+    .group-hd{padding:8px 10px;background:#0e223a;color:#cfe0f3;font-size:12px;font-weight:500;display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
     .group-hd .chev{transition:transform .2s ease}
     .group.collapsed .group-hd .chev{transform:rotate(-90deg)}
     .group-bd{padding:6px;background:#0f253f}
@@ -67,7 +60,7 @@
 
     /* ===== Header / Content ===== */
     header{position:sticky;top:0;z-index:9;background:#fff;border-bottom:1px solid var(--bd);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-    .content{padding:16px;max-width:1100px;margin:0 auto}
+    .content{padding:16px;max-width:1100px;margin:0 auto; padding-bottom:64px}
     .pill{padding:6px 10px;border:1px solid var(--bd);border-radius:999px;background:#f9fafb;font-size:12px;white-space:nowrap}
 
     .section{margin-top:16px}
@@ -75,17 +68,24 @@
     .card{background:var(--card);border:1px solid var(--bd);border-radius:18px;box-shadow:var(--shadow);padding:14px}
     .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
     .input{border:1px solid var(--bd);background:#fff;border-radius:10px;padding:10px 12px;font-size:15px;height:44px;outline:none;min-width:0}
-    .btn{border:none;border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:700;height:44px;white-space:nowrap}
+    .btn{border:none;border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:800;height:44px;white-space:nowrap;font-size:15px}
     .btn-primary{background:var(--pri);color:#fff}
     .btn-ghost{background:#f1f5f9}
     .btn-danger{background:#fee2e2;color:#991b1b}
+    .btn[aria-busy="true"]{position:relative;pointer-events:none;opacity:.8}
+    .btn[aria-busy="true"]::after{
+      content:""; position:absolute; right:10px; top:50%; width:16px; height:16px; transform:translateY(-50%);
+      border:2px solid rgba(255,255,255,.6); border-left-color:transparent; border-radius:50%;
+      animation:spin .9s linear infinite;
+    }
 
     .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
     .rowcard{
       display:grid;
-      grid-template-columns: minmax(160px,1.2fr) minmax(140px,1fr) minmax(110px,.7fr) minmax(160px,1fr) minmax(160px,1fr);
+      grid-template-columns: minmax(160px,1.2fr) minmax(140px,1fr) minmax(110px,.7fr) minmax(160px,1fr) minmax(220px,1fr);
       gap:8px;align-items:center;background:#fff;border:1px solid var(--bd);border-radius:12px;padding:10px;min-width:0
     }
+    .rowcard + .rowcard{margin-top:6px}
     .rowcard > *{min-width:0}
     .rowcard strong, .rowcard .muted, .rowcard span, .rowcard div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .muted{color:#64748b}
@@ -96,8 +96,11 @@
     .actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
     .actions .btn{height:36px;padding:8px 10px;border-radius:10px}
 
-    .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:50}
-    .dialog{width:min(560px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:92vh}
+    /* ===== Modal ===== */
+    .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:50;opacity:0}
+    .modal.show{display:flex;opacity:1}
+    .dialog{width:min(560px,100%);background:#fff;border-radius:16px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:92vh; transform:translateY(10px); opacity:0}
+    .modal.show .dialog{animation:fadeInUp .22s ease forwards}
     .dlg-hd{background:#0ea5e9;color:#fff;padding:12px 16px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
     .dlg-bd{padding:14px;display:grid;gap:12px;overflow:auto}
     .dlg-ft{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid var(--bd);background:#fafafa}
@@ -106,6 +109,18 @@
     .icon-input input,.icon-input select{border:none;outline:none;flex:1;font-size:15px;background:transparent;min-width:0}
     .error{display:none;background:#fee2e2;border:1px solid #fecaca;color:#991b1b;padding:10px;border-radius:10px}
     .ok{display:none;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:10px;border-radius:10px}
+
+    /* ===== Toast ===== */
+    .toast{position:fixed; right:16px; bottom:16px; z-index:60; display:flex; flex-direction:column; gap:8px;}
+    .toast-item{background:var(--toast-bg); color:#e5e7eb; border:1px solid #1f2937; padding:10px 14px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,.18); animation:toastIn .25s ease forwards; font-size:14px; max-width:min(420px, 90vw);}
+    .toast-item.success{ border-color:#14532d; color:#dcfce7 }
+    .toast-item.error{ border-color:#7f1d1d; color:#fee2e2 }
+
+    /* ===== Loader ===== */
+    .loader{display:inline-block; width:18px; height:18px; border:3px solid #cbd5e1; border-left-color:transparent; border-radius:50%; animation:spin .9s linear infinite}
+    .loading-line{height:12px; background:#eef2f7; border-radius:6px; animation:pulse 1.2s ease-in-out infinite}
+    .skeleton-card{border:1px solid var(--bd); border-radius:12px; padding:10px; background:#fff}
+    .skeleton-grid{display:grid; gap:8px}
 
     /* ===== Hamburger & Overlay ===== */
     .hamburger{font-size:22px;background:none;border:none;cursor:pointer;padding:8px;display:none}
@@ -116,9 +131,7 @@
     /* ===== Responsive (≤980px): sidebar off-canvas) ===== */
     @media (max-width: 980px){
       .layout{grid-template-columns:1fr}
-      .sidebar{
-        position:fixed; left:calc(-1 * var(--sidebar-w)); top:0; bottom:0; width:var(--sidebar-w);
-      }
+      .sidebar{ position:fixed; left:calc(-1 * var(--sidebar-w)); top:0; bottom:0; width:var(--sidebar-w); }
       .sidebar.open{ left:0; }
       .hamburger{ display:block; }
       .content{padding:12px}
@@ -126,7 +139,18 @@
       .rowcard{grid-template-columns:1fr;gap:6px}
       .toolbar{gap:6px}
     }
+
+    /* ===== Animations ===== */
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
+    @keyframes fadeInUp{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:translateY(0)}}
+    @keyframes toastIn{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:translateY(0)}}
   </style>
+
+<script>
+// v1.6 add Edge Function constant
+const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/delete_user";
+</script>
 </head>
 <body>
 <div class="layout">
@@ -178,7 +202,7 @@
     </nav>
 
     <div class="sidebar-footer">
-      © Amko MiniLink • v1
+      © Amko MiniLink • v1.2
       <a href="#" id="lnk-logout" class="logout">🚪 Logout</a>
     </div>
   </aside>
@@ -194,7 +218,7 @@
 
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <h2 style="margin:0;font-size:18px">Manajemen Pengguna</h2>
-        <span class="pill">Tambah • Edit • Reset Password • Aktif/Nonaktif • Kelola Cabang</span>
+        <span class="pill">Tambah • Edit • Reset Password • Aktif/Nonaktif • Kelola Cabang • Hapus User</span>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <div id="me" class="pill">memuat…</div>
@@ -211,6 +235,7 @@
           <div class="toolbar">
             <input id="qBranch" class="input" placeholder="Cari cabang…"/>
             <button id="btnAddBranch" class="btn btn-primary">+ Tambah Cabang</button>
+            <span id="loadingBranches" class="pill" style="display:none"><span class="loader"></span> &nbsp;Memuat cabang…</span>
           </div>
           <div id="branchesWrap">
             <div id="branchesList" style="display:grid;gap:8px"></div>
@@ -235,6 +260,7 @@
               <option value="kasir">kasir</option>
             </select>
             <button id="btnAddUser" class="btn btn-ghost">+ Tambah User</button>
+            <span id="loadingUsers" class="pill" style="display:none"><span class="loader"></span> &nbsp;Memuat pengguna…</span>
           </div>
 
           <div id="usersList" style="display:grid;gap:8px"></div>
@@ -246,11 +272,11 @@
 </div>
 
 <!-- MODAL: Tambah Cabang -->
-<div class="modal" id="modalBranch">
+<div class="modal" id="modalBranch" aria-hidden="true" role="dialog" aria-labelledby="titleBranch">
   <div class="dialog">
     <div class="dlg-hd">
       <span id="titleBranch">Tambah Cabang</span>
-      <button class="btn btn-ghost" id="btnCloseBranch">✖</button>
+      <button class="btn btn-ghost" id="btnCloseBranch" aria-label="Tutup">✖</button>
     </div>
     <div class="dlg-bd">
       <div id="msgErrBranch" class="error"></div>
@@ -280,11 +306,11 @@
 </div>
 
 <!-- MODAL: Hapus Cabang -->
-<div class="modal" id="modalDelBranch">
+<div class="modal" id="modalDelBranch" aria-hidden="true" role="dialog">
   <div class="dialog">
     <div class="dlg-hd">
       <span>Hapus Cabang</span>
-      <button class="btn btn-ghost" id="btnCloseDelBranch">✖</button>
+      <button class="btn btn-ghost" id="btnCloseDelBranch" aria-label="Tutup">✖</button>
     </div>
     <div class="dlg-bd">
       <div class="error" id="msgErrDelBranch" style="display:none"></div>
@@ -299,11 +325,11 @@
 </div>
 
 <!-- MODAL: Tambah User -->
-<div class="modal" id="modalUser">
+<div class="modal" id="modalUser" aria-hidden="true" role="dialog">
   <div class="dialog">
     <div class="dlg-hd">
       <span>Tambah User</span>
-      <button class="btn btn-ghost" id="btnCloseUser">✖</button>
+      <button class="btn btn-ghost" id="btnCloseUser" aria-label="Tutup">✖</button>
     </div>
     <div class="dlg-bd">
       <div class="error" id="msgErrUser"></div>
@@ -362,11 +388,11 @@
 </div>
 
 <!-- MODAL: Edit User -->
-<div class="modal" id="modalEdit">
+<div class="modal" id="modalEdit" aria-hidden="true" role="dialog">
   <div class="dialog">
     <div class="dlg-hd">
       <span>Edit User</span>
-      <button class="btn btn-ghost" id="btnCloseEdit">✖</button>
+      <button class="btn btn-ghost" id="btnCloseEdit" aria-label="Tutup">✖</button>
     </div>
     <div class="dlg-bd">
       <div class="error" id="msgErrEdit"></div>
@@ -417,6 +443,28 @@
   </div>
 </div>
 
+<!-- MODAL: Hapus User -->
+<div class="modal" id="modalDelUser" aria-hidden="true" role="dialog">
+  <div class="dialog">
+    <div class="dlg-hd">
+      <span>Hapus User</span>
+      <button class="btn btn-ghost" id="btnCloseDelUser" aria-label="Tutup">✖</button>
+    </div>
+    <div class="dlg-bd">
+      <div class="error" id="msgErrDelUser" style="display:none"></div>
+      <p id="delUserText" style="margin:0">Yakin ingin menghapus user ini?</p>
+      <input type="hidden" id="del_user_id"/>
+    </div>
+    <div class="dlg-ft">
+      <button class="btn" id="btnCancelDelUser">Batal</button>
+      <button class="btn btn-danger" id="btnDoDelUser">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast" id="toast"></div>
+
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -436,11 +484,54 @@
   const showOk  = (el, t)=>{ el.textContent=t; el.style.display='block'; setTimeout(()=>{el.style.display='none'},2500) }
   const pill = (r)=> r==='owner' ? 'badge-owner' : (r==='admin'?'badge-admin':'badge-kasir')
 
+  /* ===== Toast ===== */
+  function showToast(msg, type='info'){
+    const box = $('toast');
+    const item = document.createElement('div');
+    item.className = 'toast-item '+(type==='success'?'success':(type==='error'?'error':''));
+    item.textContent = msg;
+    box.appendChild(item);
+    setTimeout(()=>{ item.style.opacity='0'; item.style.transform='translateY(6px)'; }, 2200);
+    setTimeout(()=>{ item.remove(); }, 2600);
+  }
+
+  /* ===== Busy state helper ===== */
+  function setBusy(btn, busy=true){
+    if(!btn) return;
+    btn.setAttribute('aria-busy', busy?'true':'false');
+    btn.disabled = !!busy;
+  }
+
+  /* ===== Loading helper ===== */
+  function setLoadingList(targetId, isLoading){
+    const el = $(targetId);
+    if(!el) return;
+    if(isLoading){
+      el.innerHTML = '<div class="skeleton-grid">'+
+        '<div class="skeleton-card"><div class="loading-line" style="width:60%"></div></div>'+
+        '<div class="skeleton-card"><div class="loading-line" style="width:45%"></div></div>'+
+        '<div class="skeleton-card"><div class="loading-line" style="width:70%"></div></div>'+
+      '</div>';
+    }
+  }
+
   let gRole=null, gBranch=null
   let branches=[], users=[]
 
-  function openModal(id){ $(id).style.display='flex' }
-  function closeModal(id){ $(id).style.display='none' }
+  function openModal(id){
+    const el = $(id);
+    if(!el) return;
+    el.classList.add('show');
+    el.style.display='flex';
+    el.setAttribute('aria-hidden','false');
+  }
+  function closeModal(id){
+    const el = $(id);
+    if(!el) return;
+    el.classList.remove('show');
+    el.setAttribute('aria-hidden','true');
+    setTimeout(()=>{ el.style.display='none' }, 150);
+  }
 
   // ==== Sembunyikan field cabang saat role=owner ====
   function applyBranchFieldByRole(roleSelId, branchWrapId, branchSelId){
@@ -461,13 +552,18 @@
 
   // ===== Boot =====
   async function boot(){
+    $('loadingBranches').style.display = 'inline-flex';
+    $('loadingUsers').style.display = 'inline-flex';
+    setLoadingList('branchesList', true);
+    setLoadingList('usersList', true);
+
     const { data:{ session } } = await supabase.auth.getSession()
     if(!session){ location.href='login.html'; return }
 
     const { data: prof, error } = await supabase
       .from('profiles').select('id,full_name,email,role,branch_code')
       .eq('id', session.user.id).single()
-    if(error){ alert('Gagal ambil profil: '+error.message); return }
+    if(error){ showToast('Gagal ambil profil: '+error.message, 'error'); return }
 
     gRole = (prof.role||'').toLowerCase(); gBranch = prof.branch_code
     $('me').textContent = `${prof.full_name || prof.email}`
@@ -485,23 +581,28 @@
 
     initSidebarToggler();
     initSidebarGroups();
+
+    $('loadingBranches').style.display = 'none';
+    $('loadingUsers').style.display = 'none';
   }
 
   // ===== Load data =====
   async function loadBranches(){
+    setLoadingList('branchesList', true);
     const { data, error } = await supabase
       .from('branches')
       .select('id,code,name')
       .order('name');
-    if(error){ console.error(error); branches=[]; return }
+    if(error){ console.error(error); branches=[]; showToast('Gagal memuat cabang','error'); return }
     branches = data || []
   }
 
   async function loadUsers(){
+    setLoadingList('usersList', true);
     let q = supabase.from('profiles').select('id,full_name,email,role,branch_code,is_active')
     if(gRole!=='owner') q = q.eq('branch_code', gBranch)
     const { data, error } = await q.order('full_name', { nullsFirst:true })
-    if(error){ console.error(error); users=[]; return }
+    if(error){ console.error(error); users=[]; showToast('Gagal memuat pengguna','error'); return }
     users = data || []
   }
 
@@ -542,6 +643,8 @@
       const toggleBtn = (gRole==='owner')
         ? `<button class="btn btn-ghost" data-toggle="${u.id}" data-enabled="${isActive ? '0' : '1'}">${isActive ? 'Nonaktifkan' : 'Aktifkan'}</button>`
         : '';
+      const resetBtn = (gRole==='owner') ? `<button class="btn btn-ghost" data-reset="${u.id}">Reset PW</button>` : '';
+      const delBtn = (gRole==='owner') ? `<button class="btn btn-danger" data-udel="${u.id}" data-uname="${(u.full_name||'').replace(/"/g,'&quot;')}" data-uemail="${(u.email||'').replace(/"/g,'&quot;')}">🗑️ Hapus</button>` : '';
       return `
         <div class="rowcard">
           <div title="${u.full_name||''}"><strong>${u.full_name || '-'}</strong></div>
@@ -550,8 +653,9 @@
           <div><span class="pill">branch: ${u.branch_code||'-'}</span> &nbsp; ${statusPill}</div>
           <div class="actions">
             <button class="btn btn-ghost" data-edit="${u.id}">Edit</button>
-            ${gRole==='owner' ? `<button class="btn btn-ghost" data-reset="${u.id}">Reset PW</button>` : ``}
+            ${resetBtn}
             ${toggleBtn}
+            ${delBtn}
           </div>
         </div>`
     }).join('')
@@ -590,22 +694,26 @@
 
   // Cabang: Simpan (tambah / edit)
   $('btnSaveBranch').addEventListener('click', async function(){
+    const btn = this;
+    setBusy(btn, true);
     const id = $('b_id').value
     const name = $('b_name').value.trim()
     const code = $('b_code').value.trim()
-    if(!name || !code){ showErr($('msgErrBranch'),'Nama & Kode wajib'); return }
-    if(/\s/.test(code)){ showErr($('msgErrBranch'),'Kode tanpa spasi'); return }
+    if(!name || !code){ showErr($('msgErrBranch'),'Nama & Kode wajib'); setBusy(btn,false); return }
+    if(/\\s/.test(code)){ showErr($('msgErrBranch'),'Kode tanpa spasi'); setBusy(btn,false); return }
 
     const exist = await supabase.from('branches').select('id,code').eq('code', code).maybeSingle()
-    if(exist.error && exist.error.code!=='PGRST116'){ showErr($('msgErrBranch'),'Cek kode: '+exist.error.message); return }
-    if(exist.data && (!id || exist.data.id!==id)){ showErr($('msgErrBranch'),'Kode sudah dipakai'); return }
+    if(exist.error && exist.error.code!=='PGRST116'){ showErr($('msgErrBranch'),'Cek kode: '+exist.error.message); setBusy(btn,false); return }
+    if(exist.data && (!id || exist.data.id!==id)){ showErr($('msgErrBranch'),'Kode sudah dipakai'); setBusy(btn,false); return }
 
     let res
     if(id){ res = await supabase.from('branches').update({ name, code }).eq('id', id) }
     else  { res = await supabase.from('branches').insert({ name, code }) }
-    if(res.error){ showErr($('msgErrBranch'), (id?'Gagal menyimpan: ':'Gagal tambah cabang: ')+res.error.message); return }
+    if(res.error){ showErr($('msgErrBranch'), (id?'Gagal menyimpan: ':'Gagal tambah cabang: ')+res.error.message); setBusy(btn,false); return }
     showOk($('msgOkBranch'), id?'Perubahan disimpan':'Cabang ditambahkan')
+    showToast(id?'Perubahan cabang disimpan':'Cabang baru ditambahkan','success')
     await loadBranches(); renderBranches(); fillBranchFilters()
+    setBusy(btn,false);
     setTimeout(()=> closeModal('modalBranch'), 700)
   })
 
@@ -637,16 +745,21 @@
   $('btnCloseDelBranch').onclick = ()=> closeModal('modalDelBranch')
   $('btnCancelDelBranch').onclick = ()=> closeModal('modalDelBranch')
   $('btnDoDelBranch').addEventListener('click', async function(){
+    const btn = this; setBusy(btn,true);
     const id = $('del_id').value
-    if(!id) return
+    if(!id){ setBusy(btn,false); return }
     const del = await supabase.from('branches').delete().eq('id', id)
     if(del.error){
       const box = $('msgErrDelBranch')
       box.textContent = 'Gagal hapus: '+ del.error.message + ' (Pastikan tidak ada user/akun yang masih pakai kode cabang ini)'
       box.style.display='block'
+      showToast('Gagal menghapus cabang','error')
+      setBusy(btn,false);
       return
     }
     await loadBranches(); renderBranches(); fillBranchFilters()
+    showToast('Cabang dihapus','success')
+    setBusy(btn,false);
     closeModal('modalDelBranch')
   })
 
@@ -665,6 +778,7 @@
 
   // Simpan Tambah User
   $('btnSaveUser').addEventListener('click', async function(){
+    const btn = this; setBusy(btn,true);
     const full_name = $('u_name').value.trim()
     const email = $('u_email').value.trim().toLowerCase()
     const role = $('u_role').value
@@ -675,16 +789,16 @@
     function showErrUser(t){ errBox.textContent=t; errBox.style.display='block'; okBox.style.display='none' }
     function showOkUser(t){ okBox.textContent=t; okBox.style.display='block'; errBox.style.display='none' }
 
-    if(!email){ showErrUser('Email wajib'); return }
-    if(role!=='owner' && !branch_code){ showErrUser('Cabang wajib untuk role non-owner'); return }
-    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ showErrUser('Format email tidak valid'); return }
-    if(password && password.length < 6){ showErrUser('Password minimal 6 karakter'); return }
+    if(!email){ showErrUser('Email wajib'); setBusy(btn,false); return }
+    if(role!=='owner' && !branch_code){ showErrUser('Cabang wajib untuk role non-owner'); setBusy(btn,false); return }
+    if(!/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(email)){ showErrUser('Format email tidak valid'); setBusy(btn,false); return }
+    if(password && password.length < 6){ showErrUser('Password minimal 6 karakter'); setBusy(btn,false); return }
 
     if(role==='owner') branch_code = null
 
     const sess = await supabase.auth.getSession()
     const session = sess?.data?.session
-    if(!session){ showErrUser('Session habis, login ulang'); return }
+    if(!session){ showErrUser('Session habis, login ulang'); setBusy(btn,false); return }
 
     try{
       const payload = { email, full_name, role }
@@ -697,23 +811,28 @@
         body: JSON.stringify(payload)
       })
       const out = await res.json()
-      if(!res.ok){ showErrUser(out.error || 'Gagal membuat user'); return }
+      if(!res.ok){ showErrUser(out.error || 'Gagal membuat user'); showToast(out.error || 'Gagal membuat user','error'); setBusy(btn,false); return }
       let msg = 'User berhasil dibuat.'
       if(out.temp_password){ msg += ' Password sementara: '+out.temp_password }
       if(out.reset_link){ msg += ' | Reset link: '+out.reset_link }
       showOkUser(msg)
+      showToast('User berhasil dibuat','success')
       await loadUsers(); renderUsers()
+      setBusy(btn,false);
       setTimeout(()=> closeModal('modalUser'), 1200)
     }catch(e){
       showErrUser('Network error: '+ e.message)
+      showToast('Network error: '+ e.message,'error')
+      setBusy(btn,false);
     }
   })
 
-  // Edit / Reset / Toggle User
+  // Edit / Reset / Toggle / Delete User (open modal)
   $('usersList').addEventListener('click', async function(e){
     const btnEdit = e.target.closest('[data-edit]')
     const btnReset= e.target.closest('[data-reset]')
     const btnTog  = e.target.closest('[data-toggle]')
+    const btnDel  = e.target.closest('[data-udel]')
 
     if(btnEdit){
       const id = btnEdit.getAttribute('data-edit');
@@ -731,12 +850,12 @@
     }
 
     if(btnReset){
-      if(gRole!=='owner'){ alert('Hanya owner'); return }
+      if(gRole!=='owner'){ showToast('Hanya owner yang bisa reset password','error'); return }
       const id = btnReset.getAttribute('data-reset');
 
       const sess = await supabase.auth.getSession()
       const session = sess?.data?.session
-      if(!session){ alert('Session habis, login ulang'); return }
+      if(!session){ showToast('Session habis, login ulang','error'); return }
 
       try{
         const res = await fetch(FUNC_RESET_URL, {
@@ -745,23 +864,23 @@
           body: JSON.stringify({ user_id:id })
         })
         const out = await res.json()
-        if(!res.ok){ alert(out.error || 'Gagal membuat link reset'); return }
+        if(!res.ok){ showToast(out.error || 'Gagal membuat link reset','error'); return }
         try { await navigator.clipboard.writeText(out.reset_link || '') } catch(_e){}
-        alert('Link reset dibuat & disalin ke clipboard:\n\n'+ (out.reset_link || '(kosong)'))
+        showToast('Link reset dibuat & disalin ke clipboard', 'success')
       }catch(err){
-        alert('Network error: '+ err.message)
+        showToast('Network error: '+ err.message, 'error')
       }
       return;
     }
 
     if(btnTog){
-      if(gRole!=='owner'){ alert('Hanya owner'); return }
+      if(gRole!=='owner'){ showToast('Hanya owner yang bisa mengubah status','error'); return }
       const id = btnTog.getAttribute('data-toggle');
       const enable = btnTog.getAttribute('data-enabled') === '1';
 
       const sess = await supabase.auth.getSession()
       const session = sess?.data?.session
-      if(!session){ alert('Session habis, login ulang'); return }
+      if(!session){ showToast('Session habis, login ulang','error'); return }
 
       try{
         const res = await fetch(FUNC_TOGGLE_URL, {
@@ -770,17 +889,67 @@
           body: JSON.stringify({ user_id: id, enable })
         })
         const out = await res.json()
-        if(!res.ok){ alert(out.error || 'Gagal mengubah status'); return }
+        if(!res.ok){ showToast(out.error || 'Gagal mengubah status','error'); return }
         await loadUsers(); renderUsers()
+        showToast('Status pengguna diperbarui','success')
       }catch(err){
-        alert('Network error: '+err.message)
+        showToast('Network error: '+err.message,'error')
       }
+      return;
+    }
+
+    if(btnDel){
+      if(gRole!=='owner'){ showToast('Hanya owner yang bisa menghapus user','error'); return }
+      const id = btnDel.getAttribute('data-udel');
+      const nm = btnDel.getAttribute('data-uname') || '';
+      const em = btnDel.getAttribute('data-uemail') || '';
+      $('del_user_id').value = id;
+      $('msgErrDelUser').style.display='none';
+      $('delUserText').innerHTML = `Yakin ingin menghapus user <strong>${nm}</strong> &lt;${em}&gt; ?<br/>Tindakan ini tidak bisa dibatalkan.`;
+      openModal('modalDelUser');
       return;
     }
   })
 
+  // Konfirmasi Hapus User (do delete)
+  $('btnCloseDelUser').onclick = ()=> closeModal('modalDelUser')
+  $('btnCancelDelUser').onclick = ()=> closeModal('modalDelUser')
+  $('btnDoDelUser').addEventListener('click', async function(){
+    const btn = this; setBusy(btn,true);
+    const id = $('del_user_id').value;
+    if(!id){ setBusy(btn,false); return }
+
+    // Cegah menghapus diri sendiri secara tidak sengaja
+    const { data:{ session } } = await supabase.auth.getSession();
+    if(session && session.user && session.user.id === id){
+      const box = $('msgErrDelUser');
+      box.textContent = 'Tidak dapat menghapus akun yang sedang login.';
+      box.style.display = 'block';
+      showToast('Tidak dapat menghapus akun yang sedang login','error');
+      setBusy(btn,false);
+      return;
+    }
+
+    // Coba hapus profile (asumsi ada RLS/Edge Function yang mengizinkan owner)
+    const del = await supabase.from('profiles').delete().eq('id', id);
+    if(del.error){
+      const box = $('msgErrDelUser');
+      box.textContent = 'Gagal menghapus user: ' + del.error.message + '. Pastikan tidak ada constraint terkait (transaksi/relasi) atau izinkan via policy.';
+      box.style.display='block';
+      showToast('Gagal menghapus user','error');
+      setBusy(btn,false);
+      return;
+    }
+
+    await loadUsers(); renderUsers();
+    showToast('User berhasil dihapus','success');
+    setBusy(btn,false);
+    closeModal('modalDelUser');
+  })
+
   // Simpan Edit User
   $('btnSaveEdit').addEventListener('click', async function(){
+    const btn = this; setBusy(btn,true);
     const id = $('e_id').value;
     const full_name = $('e_name').value.trim();
     const role = $('e_role').value;
@@ -790,13 +959,13 @@
     function showErrEdit(t){ errBox.textContent=t; errBox.style.display='block'; okBox.style.display='none' }
     function showOkEdit(t){ okBox.textContent=t; okBox.style.display='block'; errBox.style.display='none' }
 
-    if(!id){ showErrEdit('User tidak ditemukan'); return }
-    if(role!=='owner' && !branch_code){ showErrEdit('Cabang wajib untuk role non-owner'); return }
+    if(!id){ showErrEdit('User tidak ditemukan'); setBusy(btn,false); return }
+    if(role!=='owner' && !branch_code){ showErrEdit('Cabang wajib untuk role non-owner'); setBusy(btn,false); return }
     if(role==='owner') branch_code = null
 
     const sess = await supabase.auth.getSession()
     const session = sess?.data?.session
-    if(!session){ showErrEdit('Session habis, login ulang'); return }
+    if(!session){ showErrEdit('Session habis, login ulang'); setBusy(btn,false); return }
 
     try{
       const payload = { user_id:id, full_name, role }
@@ -808,18 +977,18 @@
         body: JSON.stringify(payload)
       })
       const out = await res.json()
-      if(!res.ok){ showErrEdit(out.error || 'Gagal menyimpan perubahan'); return }
+      if(!res.ok){ showErrEdit(out.error || 'Gagal menyimpan perubahan'); showToast(out.error || 'Gagal menyimpan perubahan','error'); setBusy(btn,false); return }
       showOkEdit('Perubahan disimpan')
+      showToast('Perubahan user disimpan','success')
       await loadUsers(); renderUsers()
+      setBusy(btn,false);
       setTimeout(()=> closeModal('modalEdit'), 900)
     }catch(e){
       showErrEdit('Network error: '+ e.message)
+      showToast('Network error: '+ e.message,'error')
+      setBusy(btn,false);
     }
   })
-
-  // Tutup modal Edit
-  $('btnCloseEdit').onclick = ()=> closeModal('modalEdit')
-  $('btnCancelEdit').onclick = ()=> closeModal('modalEdit')
 
   // Logout
   $('lnk-logout').addEventListener('click', async function(e){
@@ -839,12 +1008,14 @@
     document.body.classList.toggle('noscroll', willOpen);
     if(btnHamb) btnHamb.setAttribute('aria-expanded', String(willOpen));
   }
-  btnHamb?.addEventListener('click', ()=> toggleSidebar());
-  overlayEl?.addEventListener('click', ()=> toggleSidebar(false));
-  window.addEventListener('keyup', (e)=>{ if(e.key==='Escape') toggleSidebar(false); });
-  document.querySelectorAll('.sidebar .nav a').forEach(a=>{
-    a.addEventListener('click', ()=> toggleSidebar(false));
-  });
+  function initSidebarToggler(){
+    btnHamb?.addEventListener('click', ()=> toggleSidebar());
+    overlayEl?.addEventListener('click', ()=> toggleSidebar(false));
+    window.addEventListener('keyup', (e)=>{ if(e.key==='Escape') toggleSidebar(false); });
+    document.querySelectorAll('.sidebar .nav a').forEach(a=>{
+      a.addEventListener('click', ()=> toggleSidebar(false));
+    });
+  }
 
   // Simpan/baca state group di localStorage
   function getGroupState(k){
@@ -872,5 +1043,95 @@
   // Start
   boot()
 </script>
+
+<script>
+// v1.6 runtime patch: replace delete flow to use Edge Function, and wire modal edit close buttons
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  // Replace delete action on confirm button, if present
+  var btn = byId('btnDoDelUser');
+  if(btn && !btn.__patched){
+    btn.__patched = true;
+    btn.addEventListener('click', async function(){
+      const self = this;
+      if(typeof setBusy==='function') setBusy(self,true);
+      const id = byId('del_user_id') ? byId('del_user_id').value : null;
+      try{
+        const sess = await supabase.auth.getSession();
+        const session = sess && sess.data ? sess.data.session : null;
+        if(session && session.user && session.user.id === id){
+          var box = byId('msgErrDelUser');
+          if(box){ box.textContent = 'Tidak dapat menghapus akun yang sedang login.'; box.style.display='block'; }
+          if(typeof showToast==='function') showToast('Tidak dapat menghapus akun yang sedang login','error');
+          if(typeof setBusy==='function') setBusy(self,false);
+          return;
+        }
+        if(!session){
+          var box2 = byId('msgErrDelUser');
+          if(box2){ box2.textContent = 'Session habis, login ulang'; box2.style.display='block'; }
+          if(typeof showToast==='function') showToast('Session habis, login ulang','error');
+          if(typeof setBusy==='function') setBusy(self,false);
+          return;
+        }
+        const res = await fetch(FUNC_DELETE_URL, {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json', 'Authorization': 'Bearer '+session.access_token },
+          body: JSON.stringify({ user_id:id })
+        });
+        let out = {};
+        try{ out = await res.json(); }catch(_){}
+        if(!res.ok){
+          var box3 = byId('msgErrDelUser');
+          if(box3){ box3.textContent = 'Gagal menghapus user: ' + (out.error || res.statusText); box3.style.display='block'; }
+          if(typeof showToast==='function') showToast('❌ Gagal menghapus user','error');
+          if(typeof setBusy==='function') setBusy(self,false);
+          return;
+        }
+        if(typeof loadUsers==='function') await loadUsers();
+        if(typeof renderUsers==='function') renderUsers();
+        if(typeof showToast==='function') showToast('✅ User berhasil dihapus','success');
+        if(typeof setBusy==='function') setBusy(self,false);
+        if(typeof closeModal==='function') closeModal('modalDelUser');
+      }catch(e){
+        var box4 = byId('msgErrDelUser');
+        if(box4){ box4.textContent = 'Network error: ' + e.message; box4.style.display='block'; }
+        if(typeof showToast==='function') showToast('❌ Network error','error');
+        if(typeof setBusy==='function') setBusy(self,false);
+      }
+    }, { once:false });
+  }
+  // Wire delete button in list (owner-only): rely on existing handler to open modal; if not, add minimal handler
+  var usersList = byId('usersList');
+  if(usersList && !usersList.__delWire){
+    usersList.__delWire = true;
+    usersList.addEventListener('click', function(e){
+      var btnDel = e.target.closest && e.target.closest('[data-udel]');
+      if(!btnDel) return;
+      e.preventDefault();
+      if(typeof gRole!=='undefined' && gRole!=='owner'){
+        if(typeof showToast==='function') showToast('Hanya owner yang bisa menghapus user','error');
+        return;
+      }
+      var id = btnDel.getAttribute('data-udel');
+      var nm = btnDel.getAttribute('data-uname') || '';
+      var em = btnDel.getAttribute('data-uemail') || '';
+      if(byId('del_user_id')) byId('del_user_id').value = id;
+      var msgBox = byId('msgErrDelUser'); if(msgBox) msgBox.style.display='none';
+      if(byId('delUserText')) byId('delUserText').innerHTML = 'Yakin ingin menghapus user <strong>'+nm+'</strong> &lt;'+em+'&gt; ?<br/>Tindakan ini tidak bisa dibatalkan.';
+      if(typeof openModal==='function') openModal('modalDelUser');
+    });
+  }
+  // Wire edit modal close buttons (both X and Tutup) to close either modalEditUser or modalEdit
+  function closeEditModal(){
+    ['modalEditUser','modalEdit'].forEach(function(mid){
+      var el = byId(mid);
+      if(el){ el.classList.remove('show'); el.style.display='none'; el.setAttribute('aria-hidden','true'); }
+    });
+  }
+  var xBtn = byId('btnCloseEdit'); if(xBtn) xBtn.onclick = closeEditModal;
+  var tutupBtn = byId('btnCancelEdit'); if(tutupBtn) tutupBtn.onclick = closeEditModal;
+})();
+</script>
+
 </body>
 </html>
