@@ -736,7 +736,21 @@ const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/d
       const nm = t.getAttribute('data-bname') || ''
       $('del_id').value = id
       $('msgErrDelBranch').style.display='none'
-      $('delText').innerHTML = `Yakin ingin menghapus cabang <strong>${nm}</strong>?<br/>Data terkait (user/akun) bisa menghalangi penghapusan.`
+     $('delText').innerHTML = `
+  <div style="font-size:15px; line-height:1.5">
+    Yakin ingin menghapus cabang <strong>${nm}</strong>?
+    <br><br>
+    <span style="color:#b91c1c; font-weight:700;">
+      ⚠️ PERINGATAN PENTING:
+    </span><br>
+    <span style="color:#7f1d1d;">
+      Menghapus cabang ini akan menghapus <strong>SEMUA transaksi</strong>,
+      <strong>akun saldo</strong>, dan <strong>data terkait lainnya</strong> secara permanen.
+      <br>Data yang sudah terhapus tidak dapat dipulihkan.
+    </span>
+  </div>
+`;
+
       openModal('modalDelBranch')
     }
   })
@@ -905,7 +919,21 @@ const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/d
       const em = btnDel.getAttribute('data-uemail') || '';
       $('del_user_id').value = id;
       $('msgErrDelUser').style.display='none';
-      $('delUserText').innerHTML = `Yakin ingin menghapus user <strong>${nm}</strong> &lt;${em}&gt; ?<br/>Tindakan ini tidak bisa dibatalkan.`;
+      $('delUserText').innerHTML = `
+  <div style="font-size:15px; line-height:1.5">
+    Yakin ingin menghapus user <strong>${nm}</strong> &lt;${em}&gt; ?
+    <br><br>
+    <span style="color:#b91c1c; font-weight:700;">
+      ⚠️ PERINGATAN PENTING:
+    </span><br>
+    <span style="color:#7f1d1d;">
+      Menghapus user ini akan menghapus <strong>akses login</strong>, 
+      <strong>role</strong>, dan seluruh <strong>data profil</strong> terkait.
+      <br>Tindakan ini <strong>permanen</strong> dan <u>tidak dapat dipulihkan</u>.
+    </span>
+  </div>
+`;
+
       openModal('modalDelUser');
       return;
     }
