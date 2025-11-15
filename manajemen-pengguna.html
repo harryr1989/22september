@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>Manajemen Pengguna | Amko MiniLink (v1.2)</title>
+  <title>Manajemen Pengguna | Amko MiniLink (v1.3)</title>
   <style>
     :root{
       --bg:#f6f8fb; --pri:#0b63f3;
@@ -147,10 +147,10 @@
     @keyframes toastIn{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:translateY(0)}}
   </style>
 
-<script>
-// v1.6 add Edge Function constant
-const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/delete_user";
-</script>
+  <script>
+    // v1.6 add Edge Function constant (delete user)
+    const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/delete_user";
+  </script>
 </head>
 <body>
 <div class="layout">
@@ -202,7 +202,7 @@ const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/d
     </nav>
 
     <div class="sidebar-footer">
-      © Amko MiniLink • v1.2
+      © Amko MiniLink • v1.3
       <a href="#" id="lnk-logout" class="logout">🚪 Logout</a>
     </div>
   </aside>
@@ -218,7 +218,7 @@ const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/d
 
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <h2 style="margin:0;font-size:18px">Manajemen Pengguna</h2>
-        <span class="pill">Tambah • Edit • Reset Password • Aktif/Nonaktif • Kelola Cabang • Hapus User</span>
+        <span class="pill">Tambah • Edit • New Password • Aktif/Nonaktif • Kelola Cabang • Hapus User</span>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <div id="me" class="pill">memuat…</div>
@@ -377,7 +377,9 @@ const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/d
           <span>🔑</span>
           <input id="u_password" placeholder="Minimal 6 karakter (atau kosongkan → auto-generate)"/>
         </div>
-        <div class="muted" style="font-size:12px;margin-top:6px">Kosongkan bila ingin password sementara & reset link.</div>
+        <div class="muted" style="font-size:12px;margin-top:6px">
+          Kosongkan bila ingin password sementara & reset link.
+        </div>
       </div>
     </div>
     <div class="dlg-ft">
@@ -435,6 +437,17 @@ const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/d
           </div>
         </div>
       </div>
+
+      <div>
+        <label>Password Baru (opsional)</label>
+        <div class="icon-input">
+          <span>🔑</span>
+          <input id="e_password" placeholder="Kosongkan jika tidak ingin ganti password"/>
+        </div>
+        <div class="muted" style="font-size:12px;margin-top:6px">
+          Password minimal 6 karakter. Jika kosong, password tidak akan diubah.
+        </div>
+      </div>
     </div>
     <div class="dlg-ft">
       <button class="btn" id="btnCancelEdit">Tutup</button>
@@ -475,7 +488,7 @@ const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/d
 
   /* ===== Edge Functions ===== */
   const FUNC_CREATE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/clever-processor";
-  const FUNC_UPDATE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/super-endpoint";
+  const FUNC_UPDATE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/ADMIN-UPDATE-USER";
   const FUNC_RESET_URL  = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/admin-reset-password";
   const FUNC_TOGGLE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/admin-set-user-active";
 
@@ -643,7 +656,7 @@ const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/d
       const toggleBtn = (gRole==='owner')
         ? `<button class="btn btn-ghost" data-toggle="${u.id}" data-enabled="${isActive ? '0' : '1'}">${isActive ? 'Nonaktifkan' : 'Aktifkan'}</button>`
         : '';
-      const resetBtn = (gRole==='owner') ? `<button class="btn btn-ghost" data-reset="${u.id}">Reset PW</button>` : '';
+      const resetBtn = ''; // reset pw tombol sudah dihilangkan
       const delBtn = (gRole==='owner') ? `<button class="btn btn-danger" data-udel="${u.id}" data-uname="${(u.full_name||'').replace(/"/g,'&quot;')}" data-uemail="${(u.email||'').replace(/"/g,'&quot;')}">🗑️ Hapus</button>` : '';
       return `
         <div class="rowcard">
@@ -700,7 +713,7 @@ const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/d
     const name = $('b_name').value.trim()
     const code = $('b_code').value.trim()
     if(!name || !code){ showErr($('msgErrBranch'),'Nama & Kode wajib'); setBusy(btn,false); return }
-    if(/\\s/.test(code)){ showErr($('msgErrBranch'),'Kode tanpa spasi'); setBusy(btn,false); return }
+    if(/\s/.test(code)){ showErr($('msgErrBranch'),'Kode tanpa spasi'); setBusy(btn,false); return }
 
     const exist = await supabase.from('branches').select('id,code').eq('code', code).maybeSingle()
     if(exist.error && exist.error.code!=='PGRST116'){ showErr($('msgErrBranch'),'Cek kode: '+exist.error.message); setBusy(btn,false); return }
@@ -736,7 +749,7 @@ const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/d
       const nm = t.getAttribute('data-bname') || ''
       $('del_id').value = id
       $('msgErrDelBranch').style.display='none'
-     $('delText').innerHTML = `
+      $('delText').innerHTML = `
   <div style="font-size:15px; line-height:1.5">
     Yakin ingin menghapus cabang <strong>${nm}</strong>?
     <br><br>
@@ -750,7 +763,6 @@ const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/d
     </span>
   </div>
 `;
-
       openModal('modalDelBranch')
     }
   })
@@ -805,7 +817,7 @@ const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/d
 
     if(!email){ showErrUser('Email wajib'); setBusy(btn,false); return }
     if(role!=='owner' && !branch_code){ showErrUser('Cabang wajib untuk role non-owner'); setBusy(btn,false); return }
-    if(!/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(email)){ showErrUser('Format email tidak valid'); setBusy(btn,false); return }
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ showErrUser('Format email tidak valid'); setBusy(btn,false); return }
     if(password && password.length < 6){ showErrUser('Password minimal 6 karakter'); setBusy(btn,false); return }
 
     if(role==='owner') branch_code = null
@@ -857,6 +869,7 @@ const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/d
       $('e_email').value = u.email || '';
       $('e_role').value = u.role || 'kasir';
       $('e_branch').value = u.branch_code || '';
+      $('e_password').value = '';
       $('msgErrEdit').style.display='none'; $('msgOkEdit').style.display='none';
       applyBranchFieldByRole('e_role','wrap_e_branch','e_branch')
       openModal('modalEdit');
@@ -933,47 +946,14 @@ const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/d
     </span>
   </div>
 `;
-
       openModal('modalDelUser');
       return;
     }
   })
 
-  // Konfirmasi Hapus User (do delete)
+  // Konfirmasi Hapus User (do delete) - tetap pakai delete_user via patch di bawah
   $('btnCloseDelUser').onclick = ()=> closeModal('modalDelUser')
   $('btnCancelDelUser').onclick = ()=> closeModal('modalDelUser')
-  $('btnDoDelUser').addEventListener('click', async function(){
-    const btn = this; setBusy(btn,true);
-    const id = $('del_user_id').value;
-    if(!id){ setBusy(btn,false); return }
-
-    // Cegah menghapus diri sendiri secara tidak sengaja
-    const { data:{ session } } = await supabase.auth.getSession();
-    if(session && session.user && session.user.id === id){
-      const box = $('msgErrDelUser');
-      box.textContent = 'Tidak dapat menghapus akun yang sedang login.';
-      box.style.display = 'block';
-      showToast('Tidak dapat menghapus akun yang sedang login','error');
-      setBusy(btn,false);
-      return;
-    }
-
-    // Coba hapus profile (asumsi ada RLS/Edge Function yang mengizinkan owner)
-    const del = await supabase.from('profiles').delete().eq('id', id);
-    if(del.error){
-      const box = $('msgErrDelUser');
-      box.textContent = 'Gagal menghapus user: ' + del.error.message + '. Pastikan tidak ada constraint terkait (transaksi/relasi) atau izinkan via policy.';
-      box.style.display='block';
-      showToast('Gagal menghapus user','error');
-      setBusy(btn,false);
-      return;
-    }
-
-    await loadUsers(); renderUsers();
-    showToast('User berhasil dihapus','success');
-    setBusy(btn,false);
-    closeModal('modalDelUser');
-  })
 
   // Simpan Edit User
   $('btnSaveEdit').addEventListener('click', async function(){
@@ -982,12 +962,18 @@ const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/d
     const full_name = $('e_name').value.trim();
     const role = $('e_role').value;
     let branch_code = $('e_branch').value;
+    const new_password = $('e_password') ? $('e_password').value.trim() : '';
     const errBox=$('msgErrEdit'), okBox=$('msgOkEdit')
 
     function showErrEdit(t){ errBox.textContent=t; errBox.style.display='block'; okBox.style.display='none' }
     function showOkEdit(t){ okBox.textContent=t; okBox.style.display='block'; errBox.style.display='none' }
 
     if(!id){ showErrEdit('User tidak ditemukan'); setBusy(btn,false); return }
+    if(new_password && new_password.length < 6){
+      showErrEdit('Password baru minimal 6 karakter');
+      setBusy(btn,false);
+      return;
+    }
     if(role!=='owner' && !branch_code){ showErrEdit('Cabang wajib untuk role non-owner'); setBusy(btn,false); return }
     if(role==='owner') branch_code = null
 
@@ -997,7 +983,8 @@ const FUNC_DELETE_URL = "https://kfqcdcvcnyhisbmwftzb.supabase.co/functions/v1/d
 
     try{
       const payload = { user_id:id, full_name, role }
-      if(branch_code !== null) payload.branch_code = branch_code
+      if(branch_code !== null) payload.branch_code = branch_code;
+      if(new_password) payload.password = new_password;
 
       const res = await fetch(FUNC_UPDATE_URL, {
         method:'POST',
